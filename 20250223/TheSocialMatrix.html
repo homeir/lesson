@@ -572,75 +572,98 @@ Example: When talking to family or close friends, you can share your feelings or
             });
         });
 
-        // 修改场景数据，添加id并调整数据结构
-        const scenarios =[
-    {
-      "emotional": 1.0,
-      "deep": -1.0,
-      "Case Scenario": "Getting a Stamp from a Street Officer",
-      "Suggested Response": "Show friendliness by smiling and politely saying, 'Hello, could you please stamp this for me? Thank you!' Find common ground by chatting about an objective topic, such as, 'It's quite cold today, are you busy here?' Respond appropriately to the officer's reaction; if they say, 'It's okay,' you can nod and say, 'That's good, thank you for your hard work.' Keep the interaction brief and friendly. This shallow instrumental social interaction doesn’t require depth; just achieve the goal and leave a good impression."
-    },
-    {
-      "emotional": 1.0,
-      "deep": -1.0,
-      "Case Scenario": "Company Expense Reimbursement",
-      "Suggested Response": "Show friendliness by smiling and submitting the documents, saying, 'Hello, here are my reimbursement documents, could you please review them? Thank you!' Find common ground by briefly discussing work-related topics, such as, 'Are there many people reimbursing lately? The process seems smooth.' Respond appropriately to the finance staff’s feedback; if they say, 'The documents are fine,' you can reply, 'Great, thank you for your efficiency.' Maintain politeness and positive energy. This instrumental social interaction focuses on completing the task without needing much emotional investment."
-    },
-    {
-      "emotional": -1.0,
-      "deep": 1.0,
-      "Case Scenario": "Drinking and Chatting with Friends at Night",
-      "Suggested Response": "Talk about feelings by actively sharing your emotions or experiences, such as, 'I’m exhausted from work today; having a drink with you guys is really relaxing.' This helps to close the distance. Talk about support by expressing understanding and encouragement, like, 'You’ve been under a lot of pressure lately too, right? Let’s relax together.' Show care. Advance the relationship by suggesting, 'Let’s meet up again next time or plan an outdoor activity.' Deepen the friendship through continuous interaction. This deep emotional social interaction aims to maintain and strengthen relationships, focusing on emotional resonance."
-    },
-    {
-      "emotional": -1.0,
-      "deep": 1.0,
-      "Case Scenario": "Family Member Complaining About Work",
-      "Suggested Response": "Provide emotional support by listening attentively to their complaints, nodding and saying, 'I’m listening, go on.' Express understanding and sympathy, such as, 'It’s really tough; work is indeed difficult, and you’ve worked hard.' Make them feel supported. There’s no need to offer specific solutions; you can continue by saying, 'Feel free to tell me anytime you’re upset; we’ll get through it together.' Emphasize companionship and emotional connection. This deep emotional social interaction focuses on listening and empathy, aiming to make the family member feel understood."
-    },
-    {
-      "emotional": 0.6,
-      "deep": 0.8,
-      "Case Scenario": "Social Relationship with Direct Supervisor",
-      "Suggested Response": "Talk about feelings by trying to understand the supervisor’s thoughts, such as, 'Supervisor, have you been under a lot of work pressure lately? You seem quite busy.' Talk about support by expressing willingness to share the burden, like, 'If there’s anything I can help with, please let me know; I’ll do my best.' Advance the relationship by proactively suggesting, 'If there’s a project I can join, I’d love to learn more from you,' or at appropriate times, say, 'Let’s have dinner sometime; I’d like to hear more of your experiences.' Build deeper trust and personal relationships through long-term interaction. This mixed deep social interaction balances work and emotions, requiring a balance of support and contribution."
-    },
-    {
-      "emotional": 1.0,
-      "deep": -1.0,
-      "Case Scenario": "Potential Client at a Business Dinner",
-      "Suggested Response": "Show friendliness by smiling and introducing yourself, such as, 'Hello, I’m XX; nice to meet you here.' Find common ground by discussing industry topics, like, 'What do you think of the recent market? You seem very experienced in this area.' Respond appropriately to the client’s opinions; if they say, 'The market is tough,' you can reply, 'Yes, I feel the same; do you have any good solutions?' Maintain friendliness and explore the possibility of cooperation. This shallow instrumental social interaction aims to establish initial contact without needing to deepen the relationship."
-    },
-    {
-      "emotional": 0.8,
-      "deep": -0.5,
-      "Case Scenario": "Cross-Department Colleague Collaboration (Temporary Project)",
-      "Suggested Response": "Show friendliness by smiling and saying, 'Hello, we’re collaborating on this project; I’m looking forward to it.' Find common ground by saying, 'We have the same goal to make this project successful; where do you think we should start?' Respond appropriately to the colleague’s suggestions; if they say, 'Let’s have a meeting first,' you can reply, 'Good idea, I’ll arrange it right away.' Show a cooperative attitude. This instrumental social interaction is relatively shallow, focusing on task completion, but a friendly attitude can leave room for future collaboration."
-    },
-    {
-      "emotional": 1.0,
-      "deep": -1.0,
-      "Case Scenario": "Security Guard Lifting the Barrier",
-      "Suggested Response": "Show friendliness by smiling and politely saying, 'Hello, sir, could you please lift the barrier for me? Thank you!' Find common ground by simply saying, 'It’s quite cold today; it must be tough working here.' Respond appropriately to the security guard’s reaction; if they say, 'It’s fine,' you can reply, 'That’s good, thank you for your hard work.' Keep the tone brief and friendly. This shallow instrumental social interaction only needs to achieve the goal; a smile and politeness can enhance efficiency."
-    },
-    {
-      "emotional": -0.9,
-      "deep": 1.0,
-      "Case Scenario": "Building a Personal Relationship with a Leader",
-      "Suggested Response": "Talk about feelings by probing the leader’s interests, such as, 'Leader, what sports do you usually enjoy? You seem very energetic.' Talk about support by expressing respect and loyalty, like, 'I feel very secure working under you; if you need anything, just let me know.' Advance the relationship by saying, 'Let’s have dinner sometime, or if you like any activities, I’d be happy to join you,' or give small gifts on holidays and say, 'I prepared a little something for you; hope you like it.' Build closer relationships through continuous care and interaction. This deep emotional social interaction focuses on establishing long-term trust."
-    }
-]
-
-
+        // 修改场景数据，添加id和score结构
+        const scenarios = [
+            {
+                "id": 1,
+                "score": {
+                    "emotional": 1.0,
+                    "deep": -1.0
+                },
+                "case": "Getting a Stamp from a Street Officer",
+                "suggested_response": "Show friendliness by smiling and politely saying, 'Hello, could you please stamp this for me? Thank you!' Find common ground by chatting about an objective topic, such as, 'It's quite cold today, are you busy here?' Respond appropriately to the officer's reaction; if they say, 'It's okay,' you can nod and say, 'That's good, thank you for your hard work.' Keep the interaction brief and friendly. This shallow instrumental social interaction doesn't require depth; just achieve the goal and leave a good impression."
+            },
+            {
+                "id": 2,
+                "score": {
+                    "emotional": 1.0,
+                    "deep": -1.0
+                },
+                "case": "Company Expense Reimbursement",
+                "suggested_response": "Show friendliness by smiling and submitting the documents, saying, 'Hello, here are my reimbursement documents, could you please review them? Thank you!' Find common ground by briefly discussing work-related topics, such as, 'Are there many people reimbursing lately? The process seems smooth.' Respond appropriately to the finance staff's feedback; if they say, 'The documents are fine,' you can reply, 'Great, thank you for your efficiency.' Maintain politeness and positive energy. This instrumental social interaction focuses on completing the task without needing much emotional investment."
+            },
+            {
+                "id": 3,
+                "score": {
+                    "emotional": -1.0,
+                    "deep": 1.0
+                },
+                "case": "Drinking and Chatting with Friends at Night",
+                "suggested_response": "Talk about feelings by actively sharing your emotions or experiences, such as, 'I'm exhausted from work today; having a drink with you guys is really relaxing.' This helps to close the distance. Talk about support by expressing understanding and encouragement, like, 'You've been under a lot of pressure lately too, right? Let's relax together.' Show care. Advance the relationship by suggesting, 'Let's meet up again next time or plan an outdoor activity.' Deepen the friendship through continuous interaction. This deep emotional social interaction aims to maintain and strengthen relationships, focusing on emotional resonance."
+            },
+            {
+                "id": 4,
+                "score": {
+                    "emotional": -1.0,
+                    "deep": 1.0
+                },
+                "case": "Family Member Complaining About Work",
+                "suggested_response": "Provide emotional support by listening attentively to their complaints, nodding and saying, 'I'm listening, go on.' Express understanding and sympathy, such as, 'It's really tough; work is indeed difficult, and you've worked hard.' Make them feel supported. There's no need to offer specific solutions; you can continue by saying, 'Feel free to tell me anytime you're upset; we'll get through it together.' Emphasize companionship and emotional connection. This deep emotional social interaction focuses on listening and empathy, aiming to make the family member feel understood."
+            },
+            {
+                "id": 5,
+                "score": {
+                    "emotional": 0.6,
+                    "deep": 0.8
+                },
+                "case": "Social Relationship with Direct Supervisor",
+                "suggested_response": "Talk about feelings by trying to understand the supervisor's thoughts, such as, 'Supervisor, have you been under a lot of work pressure lately? You seem quite busy.' Talk about support by expressing willingness to share the burden, like, 'If there's anything I can help with, please let me know; I'll do my best.' Advance the relationship by proactively suggesting, 'If there's a project I can join, I'd love to learn more from you,' or at appropriate times, say, 'Let's have dinner sometime; I'd like to hear more of your experiences.' Build deeper trust and personal relationships through long-term interaction. This mixed deep social interaction balances work and emotions, requiring a balance of support and contribution."
+            },
+            {
+                "id": 6,
+                "score": {
+                    "emotional": 1.0,
+                    "deep": -1.0
+                },
+                "case": "Potential Client at a Business Dinner",
+                "suggested_response": "Show friendliness by smiling and introducing yourself, such as, 'Hello, I'm XX; nice to meet you here.' Find common ground by discussing industry topics, like, 'What do you think of the recent market? You seem very experienced in this area.' Respond appropriately to the client's opinions; if they say, 'The market is tough,' you can reply, 'Yes, I feel the same; do you have any good solutions?' Maintain friendliness and explore the possibility of cooperation. This shallow instrumental social interaction aims to establish initial contact without needing to deepen the relationship."
+            },
+            {
+                "id": 7,
+                "score": {
+                    "emotional": 0.8,
+                    "deep": -0.5
+                },
+                "case": "Cross-Department Colleague Collaboration (Temporary Project)",
+                "suggested_response": "Show friendliness by smiling and saying, 'Hello, we're collaborating on this project; I'm looking forward to it.' Find common ground by saying, 'We have the same goal to make this project successful; where do you think we should start?' Respond appropriately to the colleague's suggestions; if they say, 'Let's have a meeting first,' you can reply, 'Good idea, I'll arrange it right away.' Show a cooperative attitude. This instrumental social interaction is relatively shallow, focusing on task completion, but a friendly attitude can leave room for future collaboration."
+            },
+            {
+                "id": 8,
+                "score": {
+                    "emotional": 1.0,
+                    "deep": -1.0
+                },
+                "case": "Security Guard Lifting the Barrier",
+                "suggested_response": "Show friendliness by smiling and politely saying, 'Hello, sir, could you please lift the barrier for me? Thank you!' Find common ground by simply saying, 'It's quite cold today; it must be tough working here.' Respond appropriately to the security guard's reaction; if they say, 'It's fine,' you can reply, 'That's good, thank you for your hard work.' Keep the tone brief and friendly. This shallow instrumental social interaction only needs to achieve the goal; a smile and politeness can enhance efficiency."
+            },
+            {
+                "id": 9,
+                "score": {
+                    "emotional": -0.9,
+                    "deep": 1.0
+                },
+                "case": "Building a Personal Relationship with a Leader",
+                "suggested_response": "Talk about feelings by probing the leader's interests, such as, 'Leader, what sports do you usually enjoy? You seem very energetic.' Talk about support by expressing respect and loyalty, like, 'I feel very secure working under you; if you need anything, just let me know.' Advance the relationship by saying, 'Let's have dinner sometime, or if you like any activities, I'd be happy to join you,' or give small gifts on holidays and say, 'I prepared a little something for you; hope you like it.' Build closer relationships through continuous care and interaction. This deep emotional social interaction focuses on establishing long-term trust."
+            }
+        ];
 
         // 修改场景选择的代码
         const select = document.getElementById('scenarioSelect');
         scenarios.forEach(scenario => {
             const option = document.createElement('option');
             option.value = scenario.id;
-            // 使用原始的 -1 到 1 的值
             const emotional = scenario.score.emotional.toFixed(1);
-            const deep = scenario.score.instrumental.toFixed(1);
-            // 使用新的格式 [E:-1|D:1]
+            const deep = scenario.score.deep.toFixed(1);
             option.textContent = `[E:${emotional}|D:${deep}] ${scenario.case}`;
             select.appendChild(option);
         });
@@ -660,9 +683,15 @@ Example: When talking to family or close friends, you can share your feelings or
             
             const scenario = scenarios.find(s => s.id === parseInt(e.target.value));
             
-            // 计算点的位置（将 -1 到 1 的范围映射到 0 到 100）
-            const x = ((1 + scenario.score.instrumental) * 50); // instrumental越高越右
-            const y = ((1 - scenario.score.emotional) * 50); // emotional越高越下
+            // 修正坐标计算逻辑
+            const margin = 8;
+            const usableSpace = 100 - 2 * margin; // 可用空间（去除边距）
+            
+            // deep: -1到1 映射到 左到右
+            const x = margin + ((scenario.score.deep + 1) / 2) * usableSpace;
+            
+            // emotional: 1到-1 映射到 上到下（注意这里是反向的）
+            const y = margin + ((-scenario.score.emotional + 1) / 2) * usableSpace;
             
             // 更新点的位置
             point.style.display = 'block';
@@ -695,8 +724,8 @@ Example: When talking to family or close friends, you can share your feelings or
             textContent.innerHTML = `
                 <div style="margin-bottom: 15px;">Scenario: ${scenario.case}</div>
                 <div style="color: #666;">
-                    <strong>Emotional Level: </strong>${((1 + scenario.score.emotional) * 50).toFixed(0)}%<br>
-                    <strong>Instrumental Level: </strong>${((1 + scenario.score.instrumental) * 50).toFixed(0)}%
+                    <strong>Emotional Level: </strong>${scenario.score.emotional.toFixed(1)}<br>
+                    <strong>Deep Level: </strong>${scenario.score.deep.toFixed(1)}
                 </div>
             `;
         });
