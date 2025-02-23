@@ -572,84 +572,80 @@ Example: When talking to family or close friends, you can share your feelings or
             });
         });
 
-        // 添加场景数据
-        const scenarios = [
-            {
-                id: 1,
-                case: "Meeting a new colleague on their first day",
-                score: { instrumental: 0.3, emotional: 0.2 },
-                suggested_response: "Hi there! Welcome to the team. I'm [Your Name]. Let me show you around and introduce you to everyone."
-            },
-            {
-                id: 2,
-                case: "Discussing project progress with your supervisor",
-                score: { instrumental: 0.8, emotional: 0.3 },
-                suggested_response: "I've prepared a detailed report of our progress. We've achieved most milestones, but I'd like to discuss some challenges we're facing."
-            },
-            {
-                id: 3,
-                case: "Chatting with neighbors at a community event",
-                score: { instrumental: 0.2, emotional: 0.7 },
-                suggested_response: "It's great to see everyone here! How are you enjoying the event? I love how these gatherings bring our community together."
-            },
-            {
-                id: 4,
-                case: "Having dinner with close friends",
-                score: { instrumental: 0.7, emotional: 0.9 },
-                suggested_response: "I've really missed our dinners together. How have you been? I'd love to hear about everything that's been happening in your life."
-            },
-            {
-                id: 5,
-                case: "First time meeting with potential business partner",
-                score: { instrumental: 0.9, emotional: 0.3 },
-                suggested_response: "Thank you for meeting with us today. We've prepared a comprehensive proposal that I believe will benefit both our companies."
-            },
-            {
-                id: 6,
-                case: "Coffee break with department colleagues",
-                score: { instrumental: 0.4, emotional: 0.6 },
-                suggested_response: "How's everyone's week going? I heard we might be getting some new projects soon - anyone heard anything about that?"
-            },
-            {
-                id: 7,
-                case: "Family reunion dinner",
-                score: { instrumental: 0.2, emotional: 0.9 },
-                suggested_response: "It's so wonderful to see everyone together again! Mom, that smells amazing - is it your special recipe?"
-            },
-            {
-                id: 8,
-                case: "Meeting with cross-department project team",
-                score: { instrumental: 0.7, emotional: 0.4 },
-                suggested_response: "Before we dive into the agenda, let's quickly go around and introduce ourselves. I'd love to know what department everyone's from."
-            },
-            {
-                id: 9,
-                case: "Networking event with industry professionals",
-                score: { instrumental: 0.8, emotional: 0.2 },
-                suggested_response: "I noticed you're from [Company]. I've been following your recent developments in [field]. Would love to hear your thoughts on [specific industry trend]."
-            },
-            {
-                id: 10,
-                case: "Casual lunch with mentor",
-                score: { instrumental: 0.6, emotional: 0.7 },
-                suggested_response: "I really appreciate you taking the time to meet. I've been thinking about your advice from last time, and I'd love to share how it's helped me."
-            }
-        ];
+        // 修改场景数据，添加id并调整数据结构
+        const scenarios =[
+    {
+      "emotional": 1.0,
+      "deep": -1.0,
+      "Case Scenario": "Getting a Stamp from a Street Officer",
+      "Suggested Response": "Show friendliness by smiling and politely saying, 'Hello, could you please stamp this for me? Thank you!' Find common ground by chatting about an objective topic, such as, 'It's quite cold today, are you busy here?' Respond appropriately to the officer's reaction; if they say, 'It's okay,' you can nod and say, 'That's good, thank you for your hard work.' Keep the interaction brief and friendly. This shallow instrumental social interaction doesn’t require depth; just achieve the goal and leave a good impression."
+    },
+    {
+      "emotional": 1.0,
+      "deep": -1.0,
+      "Case Scenario": "Company Expense Reimbursement",
+      "Suggested Response": "Show friendliness by smiling and submitting the documents, saying, 'Hello, here are my reimbursement documents, could you please review them? Thank you!' Find common ground by briefly discussing work-related topics, such as, 'Are there many people reimbursing lately? The process seems smooth.' Respond appropriately to the finance staff’s feedback; if they say, 'The documents are fine,' you can reply, 'Great, thank you for your efficiency.' Maintain politeness and positive energy. This instrumental social interaction focuses on completing the task without needing much emotional investment."
+    },
+    {
+      "emotional": -1.0,
+      "deep": 1.0,
+      "Case Scenario": "Drinking and Chatting with Friends at Night",
+      "Suggested Response": "Talk about feelings by actively sharing your emotions or experiences, such as, 'I’m exhausted from work today; having a drink with you guys is really relaxing.' This helps to close the distance. Talk about support by expressing understanding and encouragement, like, 'You’ve been under a lot of pressure lately too, right? Let’s relax together.' Show care. Advance the relationship by suggesting, 'Let’s meet up again next time or plan an outdoor activity.' Deepen the friendship through continuous interaction. This deep emotional social interaction aims to maintain and strengthen relationships, focusing on emotional resonance."
+    },
+    {
+      "emotional": -1.0,
+      "deep": 1.0,
+      "Case Scenario": "Family Member Complaining About Work",
+      "Suggested Response": "Provide emotional support by listening attentively to their complaints, nodding and saying, 'I’m listening, go on.' Express understanding and sympathy, such as, 'It’s really tough; work is indeed difficult, and you’ve worked hard.' Make them feel supported. There’s no need to offer specific solutions; you can continue by saying, 'Feel free to tell me anytime you’re upset; we’ll get through it together.' Emphasize companionship and emotional connection. This deep emotional social interaction focuses on listening and empathy, aiming to make the family member feel understood."
+    },
+    {
+      "emotional": 0.6,
+      "deep": 0.8,
+      "Case Scenario": "Social Relationship with Direct Supervisor",
+      "Suggested Response": "Talk about feelings by trying to understand the supervisor’s thoughts, such as, 'Supervisor, have you been under a lot of work pressure lately? You seem quite busy.' Talk about support by expressing willingness to share the burden, like, 'If there’s anything I can help with, please let me know; I’ll do my best.' Advance the relationship by proactively suggesting, 'If there’s a project I can join, I’d love to learn more from you,' or at appropriate times, say, 'Let’s have dinner sometime; I’d like to hear more of your experiences.' Build deeper trust and personal relationships through long-term interaction. This mixed deep social interaction balances work and emotions, requiring a balance of support and contribution."
+    },
+    {
+      "emotional": 1.0,
+      "deep": -1.0,
+      "Case Scenario": "Potential Client at a Business Dinner",
+      "Suggested Response": "Show friendliness by smiling and introducing yourself, such as, 'Hello, I’m XX; nice to meet you here.' Find common ground by discussing industry topics, like, 'What do you think of the recent market? You seem very experienced in this area.' Respond appropriately to the client’s opinions; if they say, 'The market is tough,' you can reply, 'Yes, I feel the same; do you have any good solutions?' Maintain friendliness and explore the possibility of cooperation. This shallow instrumental social interaction aims to establish initial contact without needing to deepen the relationship."
+    },
+    {
+      "emotional": 0.8,
+      "deep": -0.5,
+      "Case Scenario": "Cross-Department Colleague Collaboration (Temporary Project)",
+      "Suggested Response": "Show friendliness by smiling and saying, 'Hello, we’re collaborating on this project; I’m looking forward to it.' Find common ground by saying, 'We have the same goal to make this project successful; where do you think we should start?' Respond appropriately to the colleague’s suggestions; if they say, 'Let’s have a meeting first,' you can reply, 'Good idea, I’ll arrange it right away.' Show a cooperative attitude. This instrumental social interaction is relatively shallow, focusing on task completion, but a friendly attitude can leave room for future collaboration."
+    },
+    {
+      "emotional": 1.0,
+      "deep": -1.0,
+      "Case Scenario": "Security Guard Lifting the Barrier",
+      "Suggested Response": "Show friendliness by smiling and politely saying, 'Hello, sir, could you please lift the barrier for me? Thank you!' Find common ground by simply saying, 'It’s quite cold today; it must be tough working here.' Respond appropriately to the security guard’s reaction; if they say, 'It’s fine,' you can reply, 'That’s good, thank you for your hard work.' Keep the tone brief and friendly. This shallow instrumental social interaction only needs to achieve the goal; a smile and politeness can enhance efficiency."
+    },
+    {
+      "emotional": -0.9,
+      "deep": 1.0,
+      "Case Scenario": "Building a Personal Relationship with a Leader",
+      "Suggested Response": "Talk about feelings by probing the leader’s interests, such as, 'Leader, what sports do you usually enjoy? You seem very energetic.' Talk about support by expressing respect and loyalty, like, 'I feel very secure working under you; if you need anything, just let me know.' Advance the relationship by saying, 'Let’s have dinner sometime, or if you like any activities, I’d be happy to join you,' or give small gifts on holidays and say, 'I prepared a little something for you; hope you like it.' Build closer relationships through continuous care and interaction. This deep emotional social interaction focuses on establishing long-term trust."
+    }
+]
+
+
 
         // 修改场景选择的代码
         const select = document.getElementById('scenarioSelect');
         scenarios.forEach(scenario => {
             const option = document.createElement('option');
             option.value = scenario.id;
-            // 格式化分数为百分比
-            const emotional = (scenario.score.emotional * 100).toFixed(0);
-            const instrumental = (scenario.score.instrumental * 100).toFixed(0);
-            // 在选项文本前添加评分
-            option.textContent = `[E:${emotional}% I:${instrumental}%] ${scenario.case}`;
+            // 使用原始的 -1 到 1 的值
+            const emotional = scenario.score.emotional.toFixed(1);
+            const deep = scenario.score.instrumental.toFixed(1);
+            // 使用新的格式 [E:-1|D:1]
+            option.textContent = `[E:${emotional}|D:${deep}] ${scenario.case}`;
             select.appendChild(option);
         });
 
-        // 删除原有的fetch代码，直接使用场景选择事件监听
+        // 修改场景选择事件监听器
         document.getElementById('scenarioSelect').addEventListener('change', (e) => {
             if (!e.target.value) {
                 // 如果选择默认选项，清除显示
@@ -657,18 +653,21 @@ Example: When talking to family or close friends, you can share your feelings or
                 textContent.textContent = data.labels.defaultText;
                 document.querySelectorAll('.quadrant-content').forEach(el => {
                     el.style.display = 'none';
-                    el.classList.remove('quadrant-highlight'); // 移除所有高亮
+                    el.classList.remove('quadrant-highlight');
                 });
                 return;
             }
             
             const scenario = scenarios.find(s => s.id === parseInt(e.target.value));
-            const position = calculatePosition(scenario.score);
+            
+            // 计算点的位置（将 -1 到 1 的范围映射到 0 到 100）
+            const x = ((1 + scenario.score.instrumental) * 50); // instrumental越高越右
+            const y = ((1 - scenario.score.emotional) * 50); // emotional越高越下
             
             // 更新点的位置
             point.style.display = 'block';
-            point.style.left = `${position.x}%`;
-            point.style.top = `${position.y}%`;
+            point.style.left = `${x}%`;
+            point.style.top = `${y}%`;
             
             // 隐藏所有象限内容和移除高亮
             document.querySelectorAll('.quadrant-content').forEach(el => {
@@ -678,9 +677,9 @@ Example: When talking to family or close friends, you can share your feelings or
             
             // 确定显示在哪个象限
             let quadrantNum;
-            if (position.x < 50 && position.y < 50) quadrantNum = 1;
-            else if (position.x >= 50 && position.y < 50) quadrantNum = 2;
-            else if (position.x < 50 && position.y >= 50) quadrantNum = 3;
+            if (x < 50 && y < 50) quadrantNum = 1;
+            else if (x >= 50 && y < 50) quadrantNum = 2;
+            else if (x < 50 && y >= 50) quadrantNum = 3;
             else quadrantNum = 4;
             
             // 更新象限内容和添加高亮
@@ -696,19 +695,11 @@ Example: When talking to family or close friends, you can share your feelings or
             textContent.innerHTML = `
                 <div style="margin-bottom: 15px;">Scenario: ${scenario.case}</div>
                 <div style="color: #666;">
-                    <strong>Emotional Level: </strong>${(scenario.score.emotional * 100).toFixed(0)}%<br>
-                    <strong>Instrumental Level: </strong>${(scenario.score.instrumental * 100).toFixed(0)}%
+                    <strong>Emotional Level: </strong>${((1 + scenario.score.emotional) * 50).toFixed(0)}%<br>
+                    <strong>Instrumental Level: </strong>${((1 + scenario.score.instrumental) * 50).toFixed(0)}%
                 </div>
             `;
         });
-
-        // 计算场景在象限中的位置
-        function calculatePosition(score) {
-            // 将分数转换为坐标
-            const x = score.instrumental * 100; // instrumental越高越右
-            const y = (1 - score.emotional) * 100; // emotional越高越下
-            return { x, y };
-        }
 
         // 直接使用data.json的内容
         const jsonData = {
