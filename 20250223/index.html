@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Social Matrix</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #1a365d;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: #2c5282;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            color: #2b6cb0;
+            margin-bottom: 8px;
+        }
+
+        .intro-section {
+            margin-bottom: 30px;  /* 从40px减小到30px */
+        }
+
+        .dimensions-grid {
+            gap: 20px;  /* 从30px减小到20px */
+            margin-bottom: 25px;  /* 从30px减小到25px */
+        }
+
+        .dimension-box {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .quadrant-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: 30px auto;
+            border: 2px solid #4a5568;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .quadrant-point {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ed8936;  /* 暖橙色 */
+            border-radius: 50%;
+            display: none;
+        }
+
+        .quadrant-highlight {
+            background-color: rgba(237, 137, 54, 0.1);  /* 使用相同的暖橙色 */
+        }
+
+        .text-content {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 25px;
+            padding: 20px;
+            white-space: pre-line;
+        }
+
+        .scenario-select select {
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            background-color: white;
+        }
+
+        .scenario-select select:focus {
+            border-color: #4299e1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 修改底部sections的样式 */
+        .advancing-section {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            margin-top: 30px;  /* 从60px减小到30px */
+        }
+
+        .conclusion-section {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            margin-top: 25px;  /* 从40px减小到25px */
+        }
+
+        .radio-group {
+            text-align: left;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-group div {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-group label {
+            margin-left: 5px;
+            font-size: 16px;
+        }
+
+        .axis-label {
+            position: absolute;
+            font-size: 16px;
+        }
+
+        .label-top {
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .label-bottom {
+            bottom: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .label-left {
+            left: 2%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .label-right {
+            right: 2%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .vertical-line {
+            position: absolute;
+            left: 50%;
+            top: 8%;
+            bottom: 8%;
+            width: 2px;
+            background-color: #333;
+        }
+
+        .horizontal-line {
+            position: absolute;
+            top: 50%;
+            left: 8%;
+            right: 8%;
+            height: 2px;
+            background-color: #333;
+        }
+
+        .steps {
+            margin: 15px 0;
+        }
+
+        .example {
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .quadrant-content {
+            position: absolute;
+            width: 45%;
+            height: 45%;
+            padding: 10px;
+            font-size: 14px;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .quadrant-1 { /* 左上 */
+            top: 2%;
+            left: 2%;
+        }
+
+        .quadrant-2 { /* 右上 */
+            top: 2%;
+            right: 2%;
+        }
+
+        .quadrant-3 { /* 左下 */
+            bottom: 2%;
+            left: 2%;
+        }
+
+        .quadrant-4 { /* 右下 */
+            bottom: 2%;
+            right: 2%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 在radio组前添加标题和介绍 -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 32px; margin-bottom: 20px;">The Social Matrix</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                The Social Matrix is a framework that helps understand and navigate different types of social interactions. 
+                It maps social situations across two key dimensions, helping you choose appropriate communication strategies.
+            </p>
+            <h2 style="font-size: 24px; margin-bottom: 20px;">The Two Dimensions of the Social Matrix</h2>
+            <div class="dimensions-grid" style="display: flex; justify-content: space-between;">
+                <div class="dimension-box">
+                    <h3 style="font-size: 18px; margin-bottom: 10px;">Instrumental vs Emotional</h3>
+                    <p style="font-size: 14px; line-height: 1.5;">
+                        This dimension measures whether the interaction is focused on achieving specific goals (instrumental) 
+                        or building emotional connections (emotional).
+                    </p>
+                </div>
+                <div class="dimension-box">
+                    <h3 style="font-size: 18px; margin-bottom: 10px;">Shallow vs Deep</h3>
+                    <p style="font-size: 14px; line-height: 1.5;">
+                        This dimension indicates the depth of the relationship and interaction, from surface-level 
+                        exchanges to deep, meaningful connections.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 单选按钮组 -->
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Types of Social Interactions</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Select a type of social interaction to see its characteristics and recommended approaches:
+            </p>
+            <div class="radio-group" id="radioGroup">
+                <!-- Radio buttons will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- 场景选择 -->
+        <div style="margin: 40px 0;">
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Practice with Real Scenarios</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Choose a specific scenario to see how to apply the social matrix in real situations:
+            </p>
+            <div class="scenario-select" style="margin: 20px 0;">
+                <select id="scenarioSelect" style="width: 100%; padding: 8px; font-size: 14px;">
+                    <option value="">Select a Case Scenario...</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 四象限图 -->
+        <div class="quadrant-container">
+            <div class="axis-label label-top" id="topLabel"></div>
+            <div class="axis-label label-bottom" id="bottomLabel"></div>
+            <div class="axis-label label-left" id="leftLabel"></div>
+            <div class="axis-label label-right" id="rightLabel"></div>
+            <div class="vertical-line"></div>
+            <div class="horizontal-line"></div>
+            <div class="quadrant-point" id="point"></div>
+            <div class="quadrant-content quadrant-1" id="quadrant1"></div>
+            <div class="quadrant-content quadrant-2" id="quadrant2"></div>
+            <div class="quadrant-content quadrant-3" id="quadrant3"></div>
+            <div class="quadrant-content quadrant-4" id="quadrant4"></div>
+        </div>
+
+        <!-- 文字内容区域 -->
+        <div class="text-content" id="textContent"></div>
+    </div>
+
+    <script>
+        // 数据定义
+        const data = {
+            "labels": {
+                "axis": {
+                    "top": "Instrumental",
+                    "bottom": "Emotional",
+                    "left": "Shallow",
+                    "right": "Deep"
+                },
+                "defaultText": "Please select a socializing type to view details"
+            },
+            "cases": {
+                "case1": {
+                    "label": "Shallow Instrumental Socializing",
+                    "position": {
+                        "x": 25,
+                        "y": 25
+                    },
+                    "text": `For example, cross-department collaboration, temporary task partners, potential clients in business partnerships, etc. These interactions are usually brief and require us to adopt simple, friendly ice-breaking techniques.
+
+Ice-Breaking Techniques:
+1. Exhibit Friendliness: A smile is one of the simplest and most effective ways to build rapport quickly.
+2. Find Common Ground: Common topics like the weather, traffic, or health are easy to discuss and help bridge the gap between you and the other person.
+3. Respond Appropriately: Share your thoughts on the common topic and respond with something simple.
+
+Example: When dealing with finance to process a reimbursement, you can start by chatting about the weather before diving into the task: "Zhang Jie, it's so cold today. Could you please sign this form? Thanks a lot!"`
+                },
+                "case2": {
+                    "label": "Deep Instrumental Socializing",
+                    "position": {
+                        "x": 75,
+                        "y": 25
+                    },
+                    "text": `Interactions with long-term colleagues, supervisors, etc., typically require deeper communication and trust-building.
+
+Ice-Breaking Techniques:
+1. Show Professionalism: In these interactions, demonstrating your expertise in a specific area is essential to build trust.
+2. Contribute and Support: Let the other person see that you are committed to your work and willing to assist them with any problems they may face.
+
+Example: In a meeting with a supervisor or important client, offer concrete solutions to any issues and show your expertise. For example, you could say, "I noticed a potential issue with this project. I can help analyze it and see if we need to adjust the strategy."`
+                },
+                "case3": {
+                    "label": "Shallow Emotional Socializing",
+                    "position": {
+                        "x": 25,
+                        "y": 75
+                    },
+                    "text": `For example, acquaintances, members of interest groups, neighbors, etc. These people may not be part of your frequent social circle, but you wish to establish a connection through some form of interaction.
+
+Ice-Breaking Techniques:
+1. Exhibit Friendliness: Similar to shallow instrumental socializing, showing warmth and positivity is crucial here.
+2. Find Hobbies and Identities: Look for common ground related to personal interests, hobbies, or life experiences.
+3. Emotional Response: Show that you recognize and support the other person emotionally.
+
+Example: When talking to a neighbor or distant relative, you might say: "Auntie, are you still doing your square dance? You look fantastic doing it!"`
+                },
+                "case4": {
+                    "label": "Deep Emotional Socializing",
+                    "position": {
+                        "x": 75,
+                        "y": 75
+                    },
+                    "text": `For example, family members, close friends, etc. These relationships go beyond completing tasks and are based on emotional connections.
+
+Ice-Breaking Techniques:
+1. Share Feelings: The key to building emotional connections is sharing your thoughts and feelings. Whether it's happiness or stress, being open helps deepen the relationship.
+2. Support and Contribution: Emotional support is more important than specific contributions. Listening to the other person and offering emotional support is key to strengthening the bond.
+
+Example: When talking to family or close friends, you can share your feelings or recent challenges: "I've been feeling a lot of pressure at work lately. I'd love to chat and hear your thoughts."`
+                }
+            }
+        };
+
+        // 设置坐标轴标签
+        document.getElementById('topLabel').textContent = data.labels.axis.top;
+        document.getElementById('bottomLabel').textContent = data.labels.axis.bottom;
+        document.getElementById('leftLabel').textContent = data.labels.axis.left;
+        document.getElementById('rightLabel').textContent = data.labels.axis.right;
+
+        // 设置默认文本
+        document.getElementById('textContent').textContent = data.labels.defaultText;
+
+        // 生成radio按钮
+        const radioGroup = document.getElementById('radioGroup');
+        Object.entries(data.cases).forEach(([key, caseData]) => {
+            const div = document.createElement('div');
+            const description = caseData.text.split('\n\n')[0]; // 获取第一段作为描述
+            div.innerHTML = `
+                <input type="radio" name="case" value="${key}" id="${key}">
+                <label for="${key}">
+                    <strong>${caseData.label}</strong><br>
+                    <span style="font-size: 14px; color: #666;">${description}</span>
+                </label>
+            `;
+            radioGroup.appendChild(div);
+        });
+
+        // 修改文本内容的样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .radio-group div {
+                margin-bottom: 15px;
+            }
+            .radio-group label {
+                display: inline-block;
+                padding: 5px;
+                cursor: pointer;
+            }
+            .radio-group input[type="radio"]:checked + label {
+                background-color: #f0f0f0;
+                border-radius: 4px;
+            }
+            .text-content {
+                white-space: pre-line;
+            }
+            .steps {
+                margin: 15px 0;
+            }
+            .example {
+                margin-top: 15px;
+                font-style: italic;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 添加事件监听
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const point = document.getElementById('point');
+        const textContent = document.getElementById('textContent');
+
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const selectedCase = data.cases[e.target.value];
+                
+                // 更新点的位置
+                point.style.display = 'block';
+                point.style.left = `${selectedCase.position.x}%`;
+                point.style.top = `${selectedCase.position.y}%`;
+                
+                // 隐藏所有象限内容和移除高亮
+                document.querySelectorAll('.quadrant-content').forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('quadrant-highlight');
+                });
+
+                // 确定显示在哪个象限
+                let quadrantNum;
+                if (selectedCase.position.x < 50 && selectedCase.position.y < 50) quadrantNum = 1;
+                else if (selectedCase.position.x >= 50 && selectedCase.position.y < 50) quadrantNum = 2;
+                else if (selectedCase.position.x < 50 && selectedCase.position.y >= 50) quadrantNum = 3;
+                else quadrantNum = 4;
+
+                // 提取技巧和示例
+                const parts = selectedCase.text.split('\n\n');
+                const techniques = parts.find(p => p.startsWith('Ice-Breaking Techniques:'));
+                const example = parts.find(p => p.startsWith('Example:'));
+
+                // 更新象限内容
+                const quadrantContent = document.getElementById(`quadrant${quadrantNum}`);
+                quadrantContent.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; color: #333; margin-bottom: 10px;">Ice-Breaking Techniques:</div>
+                        ${techniques
+                            .replace('Ice-Breaking Techniques:', '')
+                            .split('\n')
+                            .map(technique => technique.trim())
+                            .filter(technique => technique)
+                            .map(technique => `<div style="margin-bottom: 8px; line-height: 1.4;">${technique}</div>`)
+                            .join('')}
+                    </div>
+                `;
+                quadrantContent.style.display = 'block';
+                quadrantContent.classList.add('quadrant-highlight'); // 添加高亮
+
+                // 更新底部文字内容，改进格式
+                textContent.innerHTML = `
+                    <div style="margin-bottom: 20px; line-height: 1.6;">${parts[0]}</div>
+                    <div style="font-style: italic; color: #666; padding: 10px; background-color: #f5f5f5; border-radius: 4px;">
+                        <strong>Example:</strong><br>
+                        ${example.replace('Example:', '').trim()}
+                    </div>
+                `;
+            });
+        });
+
+        // 添加场景数据
+        const scenarios = [
+            {
+                id: 1,
+                case: "Meeting a new colleague on their first day",
+                score: { instrumental: 0.3, emotional: 0.2 },
+                suggested_response: "Hi there! Welcome to the team. I'm [Your Name]. Let me show you around and introduce you to everyone."
+            },
+            {
+                id: 2,
+                case: "Discussing project progress with your supervisor",
+                score: { instrumental: 0.8, emotional: 0.3 },
+                suggested_response: "I've prepared a detailed report of our progress. We've achieved most milestones, but I'd like to discuss some challenges we're facing."
+            },
+            {
+                id: 3,
+                case: "Chatting with neighbors at a community event",
+                score: { instrumental: 0.2, emotional: 0.7 },
+                suggested_response: "It's great to see everyone here! How are you enjoying the event? I love how these gatherings bring our community together."
+            },
+            {
+                id: 4,
+                case: "Having dinner with close friends",
+                score: { instrumental: 0.7, emotional: 0.9 },
+                suggested_response: "I've really missed our dinners together. How have you been? I'd love to hear about everything that's been happening in your life."
+            },
+            {
+                id: 5,
+                case: "First time meeting with potential business partner",
+                score: { instrumental: 0.9, emotional: 0.3 },
+                suggested_response: "Thank you for meeting with us today. We've prepared a comprehensive proposal that I believe will benefit both our companies."
+            },
+            {
+                id: 6,
+                case: "Coffee break with department colleagues",
+                score: { instrumental: 0.4, emotional: 0.6 },
+                suggested_response: "How's everyone's week going? I heard we might be getting some new projects soon - anyone heard anything about that?"
+            },
+            {
+                id: 7,
+                case: "Family reunion dinner",
+                score: { instrumental: 0.2, emotional: 0.9 },
+                suggested_response: "It's so wonderful to see everyone together again! Mom, that smells amazing - is it your special recipe?"
+            },
+            {
+                id: 8,
+                case: "Meeting with cross-department project team",
+                score: { instrumental: 0.7, emotional: 0.4 },
+                suggested_response: "Before we dive into the agenda, let's quickly go around and introduce ourselves. I'd love to know what department everyone's from."
+            },
+            {
+                id: 9,
+                case: "Networking event with industry professionals",
+                score: { instrumental: 0.8, emotional: 0.2 },
+                suggested_response: "I noticed you're from [Company]. I've been following your recent developments in [field]. Would love to hear your thoughts on [specific industry trend]."
+            },
+            {
+                id: 10,
+                case: "Casual lunch with mentor",
+                score: { instrumental: 0.6, emotional: 0.7 },
+                suggested_response: "I really appreciate you taking the time to meet. I've been thinking about your advice from last time, and I'd love to share how it's helped me."
+            }
+        ];
+
+        // 修改场景选择的代码
+        const select = document.getElementById('scenarioSelect');
+        scenarios.forEach(scenario => {
+            const option = document.createElement('option');
+            option.value = scenario.id;
+            // 格式化分数为百分比
+            const emotional = (scenario.score.emotional * 100).toFixed(0);
+            const instrumental = (scenario.score.instrumental * 100).toFixed(0);
+            // 在选项文本前添加评分
+            option.textContent = `[E:${emotional}% I:${instrumental}%] ${scenario.case}`;
+            select.appendChild(option);
+        });
+
+        // 删除原有的fetch代码，直接使用场景选择事件监听
+        document.getElementById('scenarioSelect').addEventListener('change', (e) => {
+            if (!e.target.value) {
+                // 如果选择默认选项，清除显示
+                point.style.display = 'none';
+                textContent.textContent = data.labels.defaultText;
+                document.querySelectorAll('.quadrant-content').forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('quadrant-highlight'); // 移除所有高亮
+                });
+                return;
+            }
+            
+            const scenario = scenarios.find(s => s.id === parseInt(e.target.value));
+            const position = calculatePosition(scenario.score);
+            
+            // 更新点的位置
+            point.style.display = 'block';
+            point.style.left = `${position.x}%`;
+            point.style.top = `${position.y}%`;
+            
+            // 隐藏所有象限内容和移除高亮
+            document.querySelectorAll('.quadrant-content').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('quadrant-highlight');
+            });
+            
+            // 确定显示在哪个象限
+            let quadrantNum;
+            if (position.x < 50 && position.y < 50) quadrantNum = 1;
+            else if (position.x >= 50 && position.y < 50) quadrantNum = 2;
+            else if (position.x < 50 && position.y >= 50) quadrantNum = 3;
+            else quadrantNum = 4;
+            
+            // 更新象限内容和添加高亮
+            const quadrantContent = document.getElementById(`quadrant${quadrantNum}`);
+            quadrantContent.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 10px;">Suggested Response:</div>
+                <div style="font-style: italic;">${scenario.suggested_response}</div>
+            `;
+            quadrantContent.style.display = 'block';
+            quadrantContent.classList.add('quadrant-highlight');
+            
+            // 更新底部文字内容
+            textContent.innerHTML = `
+                <div style="margin-bottom: 15px;">Scenario: ${scenario.case}</div>
+                <div style="color: #666;">
+                    <strong>Emotional Level: </strong>${(scenario.score.emotional * 100).toFixed(0)}%<br>
+                    <strong>Instrumental Level: </strong>${(scenario.score.instrumental * 100).toFixed(0)}%
+                </div>
+            `;
+        });
+
+        // 计算场景在象限中的位置
+        function calculatePosition(score) {
+            // 将分数转换为坐标
+            const x = score.instrumental * 100; // instrumental越高越右
+            const y = (1 - score.emotional) * 100; // emotional越高越下
+            return { x, y };
+        }
+
+        // 直接使用data.json的内容
+        const jsonData = {
+            "sections": {
+                "Advancing Relationships": {
+                    "description": "In deep social relationships, the most important thing is how to move the relationship forward.",
+                    "steps": {
+                        "1": "Push the Relationship Forward: For example, after a business dinner, you can proactively suggest continuing the conversation elsewhere. Doing so helps deepen the connection.",
+                        "2": "Demonstrate Support: Support doesn't just come in the form of actions, but also in recognizing the other person's opinions and showing emotional validation. For example, in a business setting, you should know how to support someone's point of view to enhance the relationship."
+                    }
+                },
+                "Conclusion": {
+                    "description": "By analyzing the social matrix and applying the ice-breaking techniques, you can connect with others more efficiently. This is especially helpful for introverts or those who aren't good at socializing. Whether it's instrumental or emotional socializing, once you master the right strategies, you'll be able to establish richer interpersonal relationships and open up more opportunities in both your career and personal life."
+                }
+            }
+        };
+
+        // 更新Advancing Relationships部分
+        const advancingSection = document.createElement('div');
+        advancingSection.className = 'advancing-section';
+        advancingSection.style.cssText = 'padding: 25px; border-radius: 8px;';
+        advancingSection.innerHTML = `
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Advancing Relationships</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                ${jsonData.sections["Advancing Relationships"].description}
+            </p>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Key Steps:</h3>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    ${Object.entries(jsonData.sections["Advancing Relationships"].steps)
+                        .map(([key, value]) => `
+                            <li style="margin-bottom: 10px;">${value}</li>
+                        `).join('')}
+                </ul>
+            </div>
+        `;
+        document.querySelector('.text-content').after(advancingSection);
+
+        // 更新Conclusion部分
+        const conclusionSection = document.createElement('div');
+        conclusionSection.className = 'conclusion-section';
+        conclusionSection.style.cssText = 'padding: 25px; border-radius: 8px;';
+        conclusionSection.innerHTML = `
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Conclusion</h2>
+            <p style="font-size: 16px; line-height: 1.6;">
+                ${jsonData.sections.Conclusion.description}
+            </p>
+        `;
+        advancingSection.after(conclusionSection);
+    </script>
+</body>
+</html> 
