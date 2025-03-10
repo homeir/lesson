@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // This prevents the page from redirecting during header load
+        window.isLoadingHeader = true;
+    </script>
     <title>The Social Matrix - quickly breaking the ice</title>
     <style>
         body {
@@ -213,7 +217,25 @@
         }
     </style>
 </head>
-<body>
+<body>    <!-- Include the header -->
+    <div id="header-container">
+        <script>
+            // Dynamically load the header
+            fetch('../header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-container').innerHTML = data;
+                    // Allow redirection after header is loaded
+                    window.isLoadingHeader = false;
+                })
+                .catch(error => {
+                    console.error('Error loading header:', error);
+                    // Redirect to home page if header fails to load
+                    window.location.href = '/lesson/';
+                });
+        </script>
+    </div>
+
     <div class="container">
         <!-- 在radio组前添加标题和介绍 -->
         <div style="text-align: center; margin-bottom: 40px;">
@@ -657,6 +679,22 @@ Example: When talking to family or close friends, you can share your feelings or
             </p>
         `;
         advancingSection.after(conclusionSection);
+    </script>
+    
+    <script>
+        // Override the default redirect behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            const originalVerifyToken = window.verifyToken;
+            if (originalVerifyToken) {
+                window.verifyToken = async function() {
+                    const result = await originalVerifyToken();
+                    if (!result.valid && !window.isLoadingHeader) {
+                        window.location.href = '/lesson/';
+                    }
+                    return result;
+                };
+            }
+        });
     </script>
 </body>
 </html> 
