@@ -4,8 +4,6 @@ let activeInfoWindow = null;
 
 // Initialize Google Maps
 async function initMap() {
-
-
     // Create table element
     createTable();
     
@@ -14,6 +12,7 @@ async function initMap() {
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     
     map = new Map(document.getElementById('map'), {
+        mapId: 'f31b0e08503d2a23', // 需要替换为您的实际 Map ID
         zoom: 3,
         center: { lat: 30.0, lng: 45.0 },
         styles: [
@@ -147,7 +146,8 @@ async function addMarker(project) {
             <h2>${project.project_name}</h2>
             <div class="info-content">
                 <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
-
+                <p><strong>海拔:</strong> ${project.altitude}</p>
+                <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
             </div>
         </div>
     `;
