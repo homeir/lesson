@@ -197,6 +197,7 @@ function addLegend() {
 
 // Get color based on project status
 function getStatusColor(status) {
+    console.log('getStatusColor',status);
     switch (status.toLowerCase()) {
         case 'operational':
             return '#4CAF50';  // Green
