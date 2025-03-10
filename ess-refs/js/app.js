@@ -1,10 +1,10 @@
 /**
- * ESS项目信息管理系统
- * 使用Cheetah Grid显示和编辑项目数据
- * 通过treeql接口与API交互
+ * ESS Project Reference Database
+ * Using Cheetah Grid for display and editing
+ * Interacting with API via TreeQL interface
  */
 
-// 全局变量
+// Global variables
 let grid;
 let gridData = [];
 let originalData = [];
@@ -13,103 +13,205 @@ let changedRows = new Set();
 // API URL
 const API_URL = 'https://oska-api.yunxing.hu/records/ess_projects';
 
-// 初始化页面
+// Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     initGrid();
     fetchData();
     setupEventListeners();
 });
 
-// 初始化表格
+// Initialize grid
 function initGrid() {
     const gridElement = document.getElementById('grid');
     
-    // 定义表格列
+    // Define grid columns
     const columns = [
         {
             field: 'id',
             caption: 'ID',
-            width: 80,
+            width: 60,
             sort: true,
             readonly: true
         },
         {
+            field: 'ess_count',
+            caption: 'ESS Count',
+            width: 80,
+            sort: true,
+            editor: 'number'
+        },
+        {
             field: 'project_name',
-            caption: '项目名称',
-            width: 200,
+            caption: 'Project Name',
+            width: 300,
             sort: true,
             editor: 'text'
         },
         {
-            field: 'project_code',
-            caption: '项目代码',
-            width: 120,
-            sort: true,
-            editor: 'text'
-        },
-        {
-            field: 'client_name',
-            caption: '客户名称',
-            width: 150,
-            sort: true,
-            editor: 'text'
-        },
-        {
-            field: 'start_date',
-            caption: '开始日期',
-            width: 120,
-            sort: true,
-            editor: 'text',
-            format: value => formatDate(value)
-        },
-        {
-            field: 'end_date',
-            caption: '结束日期',
-            width: 120,
-            sort: true,
-            editor: 'text',
-            format: value => formatDate(value)
-        },
-        {
-            field: 'budget',
-            caption: '预算(元)',
-            width: 120,
-            sort: true,
-            editor: 'number',
-            format: value => formatNumber(value)
-        },
-        {
-            field: 'status',
-            caption: '状态',
+            field: 'project_application',
+            caption: 'Application',
             width: 100,
             sort: true,
             editor: {
                 type: 'select',
                 options: [
-                    {value: '进行中', label: '进行中'},
-                    {value: '已完成', label: '已完成'},
-                    {value: '已暂停', label: '已暂停'},
-                    {value: '已取消', label: '已取消'}
+                    {value: 'Utility', label: 'Utility'},
+                    {value: 'C&I', label: 'C&I'}
                 ]
             }
         },
         {
-            field: 'manager',
-            caption: '项目经理',
+            field: 'area',
+            caption: 'Area',
+            width: 100,
+            sort: true,
+            editor: {
+                type: 'select',
+                options: [
+                    {value: 'China', label: 'China'},
+                    {value: 'APAC', label: 'APAC'},
+                    {value: 'MEA', label: 'MEA'},
+                    {value: 'Europe', label: 'Europe'},
+                    {value: 'America', label: 'America'}
+                ]
+            }
+        },
+        {
+            field: 'country_city',
+            caption: 'Country/City',
             width: 120,
             sort: true,
             editor: 'text'
         },
         {
-            field: 'description',
-            caption: '描述',
+            field: 'mw',
+            caption: 'MW',
+            width: 80,
+            sort: true,
+            editor: 'number',
+            format: value => formatNumber(value)
+        },
+        {
+            field: 'mwh',
+            caption: 'MWh',
+            width: 80,
+            sort: true,
+            editor: 'number',
+            format: value => formatNumber(value)
+        },
+        {
+            field: 'battery_supplier',
+            caption: 'Battery Supplier',
             width: 200,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'battery_chemistry',
+            caption: 'Chemistry',
+            width: 80,
+            sort: true,
+            editor: {
+                type: 'select',
+                options: [
+                    {value: 'LFP', label: 'LFP'}
+                ]
+            }
+        },
+        {
+            field: 'pcs_model',
+            caption: 'PCS Model',
+            width: 100,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'pcs_numbers',
+            caption: 'PCS Qty',
+            width: 80,
+            sort: true,
+            editor: 'number'
+        },
+        {
+            field: 'ess_model1',
+            caption: 'ESS Model 1',
+            width: 120,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'ess_model2',
+            caption: 'ESS Model 2',
+            width: 120,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'ess_numbers1',
+            caption: 'ESS Qty 1',
+            width: 80,
+            sort: true,
+            editor: 'number'
+        },
+        {
+            field: 'ess_numbers2',
+            caption: 'ESS Qty 2',
+            width: 80,
+            sort: true,
+            editor: 'number'
+        },
+        {
+            field: 'altitude',
+            caption: 'Altitude',
+            width: 100,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'min_temperature',
+            caption: 'Min Temp',
+            width: 80,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'max_temperature',
+            caption: 'Max Temp',
+            width: 80,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'contract_time',
+            caption: 'Contract Date',
+            width: 120,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'crm_or_c4',
+            caption: 'CRM/C4',
+            width: 140,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'client',
+            caption: 'Client',
+            width: 200,
+            sort: true,
+            editor: 'text'
+        },
+        {
+            field: 'tech_support',
+            caption: 'Tech Support',
+            width: 100,
             sort: true,
             editor: 'text'
         }
     ];
 
-    // 创建表格实例
+    // Create grid instance
     grid = new cheetahGrid.ListGrid({
         parentElement: gridElement,
         columns: columns,
@@ -125,7 +227,7 @@ function initGrid() {
         }
     });
 
-    // 监听单元格值变化
+    // Listen for cell value changes
     grid.listen('CHANGED_VALUE', (e) => {
         const { row, field, value } = e;
         gridData[row][field] = value;
@@ -133,27 +235,13 @@ function initGrid() {
     });
 }
 
-// 格式化日期
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    
-    try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        
-        return date.toISOString().split('T')[0];
-    } catch (e) {
-        return dateStr;
-    }
-}
-
-// 格式化数字
+// Format numbers
 function formatNumber(num) {
     if (num === null || num === undefined) return '';
-    return Number(num).toLocaleString('zh-CN');
+    return Number(num).toFixed(2);
 }
 
-// 获取数据
+// Fetch data
 async function fetchData() {
     try {
         const response = await fetch(API_URL);
@@ -164,34 +252,34 @@ async function fetchData() {
         
         const data = await response.json();
         
-        // 保存原始数据用于比较
-        originalData = JSON.parse(JSON.stringify(data));
-        gridData = data;
+        // Save original data for comparison
+        originalData = JSON.parse(JSON.stringify(data.records));
+        gridData = data.records;
         
-        // 更新表格数据
+        // Update grid data
         grid.data = gridData;
         
-        // 重置变更记录
+        // Reset change tracking
         changedRows.clear();
         
-        console.log('数据加载成功', data);
+        console.log('Data loaded successfully', data);
     } catch (error) {
-        console.error('获取数据失败:', error);
-        alert('获取数据失败，请检查网络连接或API状态');
+        console.error('Failed to fetch data:', error);
+        alert('Failed to fetch data. Please check network connection or API status.');
     }
 }
 
-// 保存数据
+// Save data
 async function saveData() {
     if (changedRows.size === 0) {
-        alert('没有需要保存的更改');
+        alert('No changes to save');
         return;
     }
     
     try {
         const changedData = Array.from(changedRows).map(rowIndex => gridData[rowIndex]);
         
-        // 对每个更改的行进行保存
+        // Save each changed row
         for (const row of changedData) {
             const response = await fetch(`${API_URL}/${row.id}`, {
                 method: 'PUT',
@@ -202,32 +290,45 @@ async function saveData() {
             });
             
             if (!response.ok) {
-                throw new Error(`保存ID为${row.id}的数据失败: ${response.status}`);
+                throw new Error(`Failed to save data for ID ${row.id}: ${response.status}`);
             }
         }
         
-        alert('保存成功');
+        alert('Changes saved successfully');
         
-        // 重新获取数据
+        // Refresh data
         await fetchData();
     } catch (error) {
-        console.error('保存数据失败:', error);
-        alert(`保存数据失败: ${error.message}`);
+        console.error('Failed to save data:', error);
+        alert(`Failed to save data: ${error.message}`);
     }
 }
 
-// 添加新项目
+// Add new project
 async function addNewProject() {
     const newProject = {
-        project_name: '新项目',
-        project_code: '',
-        client_name: '',
-        start_date: formatDate(new Date()),
-        end_date: '',
-        budget: 0,
-        status: '进行中',
-        manager: '',
-        description: ''
+        ess_count: 0,
+        project_name: 'New Project',
+        project_application: 'Utility',
+        area: '',
+        country_city: '',
+        mw: 0,
+        mwh: 0,
+        battery_supplier: '',
+        battery_chemistry: 'LFP',
+        pcs_model: '',
+        pcs_numbers: 0,
+        ess_model1: '',
+        ess_model2: '',
+        ess_numbers1: 0,
+        ess_numbers2: 0,
+        altitude: '',
+        min_temperature: '',
+        max_temperature: '',
+        contract_time: '',
+        crm_or_c4: '',
+        client: '',
+        tech_support: ''
     };
     
     try {
@@ -240,31 +341,61 @@ async function addNewProject() {
         });
         
         if (!response.ok) {
-            throw new Error(`添加项目失败: ${response.status}`);
+            throw new Error(`Failed to add project: ${response.status}`);
         }
         
-        alert('添加项目成功');
+        alert('Project added successfully');
         
-        // 重新获取数据
+        // Refresh data
         await fetchData();
     } catch (error) {
-        console.error('添加项目失败:', error);
-        alert(`添加项目失败: ${error.message}`);
+        console.error('Failed to add project:', error);
+        alert(`Failed to add project: ${error.message}`);
     }
 }
 
-// 设置事件监听器
+// Export to Excel
+function exportToExcel() {
+    // Create CSV content
+    const headers = grid.header.map(col => col.caption).join(',');
+    const rows = gridData.map(row => {
+        return grid.header
+            .map(col => {
+                const value = row[col.field];
+                return `"${value !== null && value !== undefined ? value : ''}"`;
+            })
+            .join(',');
+    });
+    
+    const csv = [headers, ...rows].join('\n');
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'ess_projects.csv';
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Setup event listeners
 function setupEventListeners() {
-    // 添加按钮
+    // Add button
     document.getElementById('addButton').addEventListener('click', addNewProject);
     
-    // 保存按钮
+    // Save button
     document.getElementById('saveButton').addEventListener('click', saveData);
     
-    // 刷新按钮
+    // Refresh button
     document.getElementById('refreshButton').addEventListener('click', fetchData);
     
-    // 窗口大小变化时调整表格大小
+    // Export button
+    document.getElementById('exportButton').addEventListener('click', exportToExcel);
+    
+    // Window resize handler
     window.addEventListener('resize', () => {
         if (grid) {
             grid.updateSize();
