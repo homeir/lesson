@@ -92,7 +92,7 @@
         // 验证令牌函数
         async function verifyToken() {
             const token = Cookies.get('user_token');
-            
+            console.log('verifyToken',token);
             if (!token) {
                 return { valid: false };
             }
@@ -127,6 +127,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', async function() {
+            // 检查是否已登录
             const tokenVerification = await verifyToken();
             
             if (tokenVerification.valid) {
