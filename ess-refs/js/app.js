@@ -29,16 +29,13 @@ function initGrid() {
         {
             field: 'id',
             caption: 'ID',
-            width: 60,
-            sort: true,
-            readonly: true
+            width: 60
         },
         {
             field: 'ess_count',
             caption: 'ESS Count',
             width: 80,
-            sort: true,
-            editor: 'number'
+            columnType: 'number'
         }
     /**,
         {
