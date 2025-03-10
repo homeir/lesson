@@ -37,24 +37,23 @@
 <body>
     <div class="login-container" id="login-container">
         <div class="form-container sign-up-container">
-            <form action="#">
+            <form action="#" id="signup-form">
                 <h1>Create Account</h1>
-
                 <span>Use your email for registration</span>
-                <input type="text" placeholder="Name" />
-                <input type="email" placeholder="Email" />
-                <input type="password" placeholder="Password" />
-                <button>Sign Up</button>
+                <input type="text" placeholder="Name" id="signup-name" required />
+                <input type="email" placeholder="Email" id="signup-email" required />
+                <input type="password" placeholder="Password" id="signup-password" required />
+                <button type="submit">Sign Up</button>
             </form>
         </div>
         <div class="form-container sign-in-container">
             <form action="#" id="signin-form">
-                <h1>登录</h1>
-                <span>使用您的账号</span>
-                <input type="email" placeholder="邮箱" id="signin-email" required />
-                <input type="password" placeholder="密码" id="signin-password" required />
-                <a href="#">忘记密码?</a>
-                <button type="submit">登录</button>
+                <h1>Sign In</h1>
+                <span>Use your account</span>
+                <input type="email" placeholder="Email" id="signin-email" required />
+                <input type="password" placeholder="Password" id="signin-password" required />
+                <a href="#">Forgot your password?</a>
+                <button type="submit">Sign In</button>
             </form>
         </div>
         <div class="overlay-container">
@@ -191,6 +190,100 @@
                 // 用户未登录，显示登录界面
                 document.getElementById('login-container').style.display = 'block';
                 document.getElementById('content-container').style.display = 'none';
+            }
+        });
+
+        // 注册处理
+        const signupForm = document.getElementById('signup-form');
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const displayName = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            
+            // 对密码进行MD5加密
+            const passwordHash = md5(password);
+            
+            try {
+                const response = await fetch('http://oska-api.yunxing.hu/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: email, // 使用email作为name字段
+                        pwd: passwordHash,
+                        display_name: displayName // 可选，如果API支持
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 存储用户信息和令牌
+                    Cookies.set('user_token', data.token, { expires: 7 });
+                    Cookies.set('user_name', data.user.name, { expires: 7 });
+                    Cookies.set('user_id', data.user.id, { expires: 7 });
+                    
+                    // 显示用户名（可能需要从邮箱中提取或使用display_name）
+                    document.getElementById('user-name').textContent = 
+                        displayName || data.user.name.split('@')[0];
+                        
+                    // 显示内容区域
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('content-container').style.display = 'block';
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // 登录处理
+        const signinForm = document.getElementById('signin-form');
+        signinForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            
+            // 对密码进行MD5加密
+            const passwordHash = md5(password);
+            
+            try {
+                const response = await fetch('http://oska-api.yunxing.hu/login.php/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: email, // 使用email作为name字段
+                        pwd: passwordHash
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 存储用户信息和令牌
+                    Cookies.set('user_token', data.token, { expires: 7 });
+                    Cookies.set('user_name', data.user.name, { expires: 7 });
+                    Cookies.set('user_id', data.user.id, { expires: 7 });
+                    
+                    // 显示用户名（可能需要从邮箱中提取）
+                    document.getElementById('user-name').textContent = 
+                        data.user.name.split('@')[0];
+                        
+                    // 显示内容区域
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('content-container').style.display = 'block';
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
             }
         });
     </script>
