@@ -7,7 +7,8 @@ const projectData = [
         altitude: "15m",
         latitude: 23.8859,
         longitude: 39.1925,
-        location: { lat: 23.8859, lng: 39.1925 }
+        location: { lat: 23.8859, lng: 39.1925 },
+        status: 'operational'
     },
     {
         id: 2,
@@ -17,7 +18,8 @@ const projectData = [
         altitude: "25m",
         latitude: 28.3998,
         longitude: 36.5715,
-        location: { lat: 28.3998, lng: 36.5715 }
+        location: { lat: 28.3998, lng: 36.5715 },
+        status: 'operational'
     },
     {
         id: 3,
@@ -27,7 +29,8 @@ const projectData = [
         altitude: "12m",
         latitude: 21.5433,
         longitude: 39.1728,
-        location: { lat: 21.5433, lng: 39.1728 }
+        location: { lat: 21.5433, lng: 39.1728 },
+        status: 'operational'
     },
     {
         id: 4,
@@ -37,7 +40,8 @@ const projectData = [
         altitude: "612m",
         latitude: 24.7136,
         longitude: 46.6753,
-        location: { lat: 24.7136, lng: 46.6753 }
+        location: { lat: 24.7136, lng: 46.6753 },
+        status: 'opunder constructionerational'
     },
     {
         id: 5,
@@ -47,6 +51,7 @@ const projectData = [
         altitude: "10m",
         latitude: 26.4207,
         longitude: 50.0888,
-        location: { lat: 26.4207, lng: 50.0888 }
+        location: { lat: 26.4207, lng: 50.0888 },
+        status: 'under construction'
     }
 ]; 
