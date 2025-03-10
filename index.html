@@ -39,7 +39,7 @@
         <div class="form-container sign-up-container">
             <form action="#" id="signup-form">
                 <h1>Create Account</h1>
-                <span>Use your email for registration. v0.0.2</span>
+                <span>Use your email for registration. v0.0.3</span>
                 <input type="text" placeholder="Name" id="signup-name" required />
                 <input type="email" placeholder="Email" id="signup-email" required />
                 <input type="password" placeholder="Password" id="signup-password" required />
@@ -119,6 +119,12 @@
             Cookies.remove('user_id');
             Cookies.remove('user_email');
         }
+        // 登出事件
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            logoutUser();
+            window.location.href = 'index.html';
+        });
 
         document.addEventListener('DOMContentLoaded', async function() {
             const tokenVerification = await verifyToken();
