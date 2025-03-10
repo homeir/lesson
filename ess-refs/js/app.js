@@ -34,17 +34,14 @@ function initGrid() {
         {
             field: 'ess_count',
             caption: 'ESS Count',
-            width: 80,
-            columnType: 'number'
-        }
-    /**,
+            width: 80
+        },
+   
         {
             field: 'project_name',
             caption: 'Project Name',
             width: 300,
-            sort: true,
-            editor: 'text'
-        },
+        } /**,,
         {
             field: 'project_application',
             caption: 'Application',
@@ -213,7 +210,7 @@ function initGrid() {
     // Create grid instance with initial empty data
     grid = new cheetahGrid.ListGrid({
         parentElement: gridElement,
-        columns: columns,
+        header: columns,
         frozenColCount: 1,
         defaultRowHeight: 40,
         headerRowHeight: 45,

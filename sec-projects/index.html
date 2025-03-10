@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Projects Map</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        
+        #legend {
+            background: white;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .legend-item {
+            margin: 5px 0;
+        }
+        
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+        
+        .info-window {
+            padding: 5px;
+        }
+        
+        .info-window h2 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .info-content p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .status-operational {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .status-under-construction {
+            color: #FFA500;
+            font-weight: bold;
+        }
+        
+        .status-planning {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        #filters {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .filter-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="filters">
+        <button class="filter-btn active" data-status="all">All Projects</button>
+        <button class="filter-btn" data-status="operational">Operational</button>
+        <button class="filter-btn" data-status="under construction">Under Construction</button>
+        <button class="filter-btn" data-status="planning">Planning</button>
+    </div>
+    
+    <div id="map"></div>
+
+    <!-- Load mock data -->
+    <script src="js/mockData.js"></script>
+    
+    <!-- Load app logic -->
+    <script src="js/app.js"></script>
+    
+    <!-- Load Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</body>
+</html> 
