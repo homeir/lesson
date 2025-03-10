@@ -1,57 +1,137 @@
 const projectData = [
-    {
-        id: 1,
-        project_name: "Rabigh 储能项目",
-        mw: 100,
-        mwh: 400,
-        altitude: "15m",
-        latitude: 23.8859,
-        longitude: 39.1925,
-        location: { lat: 23.8859, lng: 39.1925 },
-        status: 'operational'
-    },
-    {
-        id: 2,
-        project_name: "Tabuk 储能项目",
-        mw: 50,
-        mwh: 200,
-        altitude: "25m",
-        latitude: 28.3998,
-        longitude: 36.5715,
-        location: { lat: 28.3998, lng: 36.5715 },
-        status: 'operational'
-    },
-    {
-        id: 3,
-        project_name: "Jeddah 储能项目",
-        mw: 150,
-        mwh: 600,
-        altitude: "12m",
-        latitude: 21.5433,
-        longitude: 39.1728,
-        location: { lat: 21.5433, lng: 39.1728 },
-        status: 'operational'
-    },
-    {
-        id: 4,
-        project_name: "Riyadh 储能项目",
-        mw: 200,
-        mwh: 800,
-        altitude: "612m",
-        latitude: 24.7136,
-        longitude: 46.6753,
-        location: { lat: 24.7136, lng: 46.6753 },
-        status: 'under construction'
-    },
-    {
-        id: 5,
-        project_name: "Dammam 储能项目",
-        mw: 80,
-        mwh: 320,
-        altitude: "10m",
-        latitude: 26.4207,
-        longitude: 50.0888,
-        location: { lat: 26.4207, lng: 50.0888 },
-        status: 'under construction'
-    }
+
+        {
+            "id": 1,
+            "project_name": "Bisha",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1457,
+            "latitude": 19.9882763,
+            "longitude": 42.3889372,
+            "status": "operational",
+            "round": "1",
+            "vendor": "BYD"
+        },
+        {
+            "id": 2,
+            "project_name": "Najran",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 650,
+            "latitude": 17.599824,
+            "longitude": 44.3192815,
+            "status": "construction",
+            "round": "2",
+            "vendor": "Sungrow"
+        },
+        {
+            "id": 3,
+            "project_name": "Madaya",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 995,
+            "latitude": 24.8160674,
+            "longitude": 46.8383757,
+            "status": "construction",
+            "round": "2",
+            "vendor": "Sungrow"
+        },
+        {
+            "id": 4,
+            "project_name": "Khamis Mushait",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1041,
+            "latitude": 18.3346185,
+            "longitude": 42.6601084,
+            "status": "construction",
+            "round": "2",
+            "vendor": "Sungrow"
+        },
+        {
+            "id": 5,
+            "project_name": "Riyadh",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 504,
+            "latitude": 24.5910597,
+            "longitude": 46.5456288,
+            "status": "construction",
+            "round": "3",
+            "vendor": "BYD"
+        },
+        {
+            "id": 6,
+            "project_name": "Qaisumah",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 770,
+            "latitude": 28.3215695,
+            "longitude": 46.0835237,
+            "status": "construction",
+            "round": "3",
+            "vendor": "BYD"
+        },
+        {
+            "id": 7,
+            "project_name": "Dawadmi",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1400,
+            "latitude": 24.5093259,
+            "longitude": 44.3281997,
+            "status": "construction",
+            "round": "3",
+            "vendor": "BYD"
+        },
+        {
+            "id": 8,
+            "project_name": "Al Jouf",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 6,
+            "latitude": 30.0551712,
+            "longitude": 38.1796244,
+            "status": "construction",
+            "round": "3",
+            "vendor": "BYD"
+        },
+        {
+            "id": 9,
+            "project_name": "Rabigh",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1293,
+            "latitude": 22.8063008,
+            "longitude": 39.0401478,
+            "status": "construction",
+            "round": "3",
+            "vendor": "BYD"
+        },
+        {
+            "id": 10,
+            "project_name": "Tabuk",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1293,
+            "latitude": 28.3988253,
+            "longitude": 36.4835016,
+            "status": "Planning",
+            "round": "4",
+            "vendor": "unknown"
+        },
+        {
+            "id": 11,
+            "project_name": "HAIL",
+            "mw": 650,
+            "mwh": 2600,
+            "altitude": 1293,
+            "latitude": 27.4558156,
+            "longitude": 41.6601429,
+            "status": "Planning",
+            "round": "4",
+            "vendor": "unknown"
+        }
+    
+    
 ]; 
