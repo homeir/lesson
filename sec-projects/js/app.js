@@ -44,12 +44,12 @@ function createTable() {
     const headerRow = document.createElement('tr');
     const headers = [
         'id', 'project_name',
-, 'MW', 'MWh', 'altitude', 'latitude', 'longitude'
+, 'MW', 'MWh', 'altitude', 'latitude', 'longitude', 'status'
     ];
 
     const dataFields = [
         'id', 'project_name',
-, 'mw', 'mwh', 'altitude', 'latitude', 'longitude'
+, 'mw', 'mwh', 'altitude', 'latitude', 'longitude', 'status'
     ];
 
     headers.forEach(headerText => {
