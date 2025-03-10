@@ -105,12 +105,7 @@ function initGrid() {
             field: 'battery_chemistry',
             caption: 'Chemistry',
             width: 80,
-            columnType: {
-                type: 'select',
-                options: [
-                    {value: 'LFP', label: 'LFP'}
-                ]
-            }
+            columnType: 'text'
         },
         {
             field: 'pcs_model',
