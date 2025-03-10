@@ -39,7 +39,8 @@ function initGrid() {
             width: 80,
             sort: true,
             editor: 'number'
-        },
+        }
+    /**,
         {
             field: 'project_name',
             caption: 'Project Name',
@@ -209,6 +210,7 @@ function initGrid() {
             sort: true,
             editor: 'text'
         }
+            */
     ];
 
     // Create grid instance with initial empty data
