@@ -43,19 +43,13 @@ function createTable() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     const headers = [
-        'ID', 'Project Name', 'Area', 
-        'Country/City', 'MW', 'MWh', 'Battery Supplier',
-        'PCS Model', 'PCS Qty', 'ESS Model',
-        'ESS Qty', 'Altitude', 'Latitude', 'Longitude', 'Min Temp', 'Max Temp',
-        'Contract Date', 'COD Date', 'Client', 'Status', 'Actions'
+        'id', 'project_name',
+, 'MW', 'MWh', 'altitude', 'latitude', 'longitude'
     ];
 
     const dataFields = [
-        'id', 'project_name', 'area',
-        'country_city', 'mw', 'mwh', 'battery_supplier',
-        'pcs_model', 'pcs_qty', 'ess_model',
-        'ess_qty', 'altitude', 'latitude', 'longitude', 'min_temp', 'max_temp',
-        'contract_date', 'cod_date', 'client', 'status'
+        'id', 'project_name',
+, 'mw', 'mwh', 'altitude', 'latitude', 'longitude'
     ];
 
     headers.forEach(headerText => {
