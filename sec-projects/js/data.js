@@ -41,7 +41,7 @@ const projectData = [
         latitude: 24.7136,
         longitude: 46.6753,
         location: { lat: 24.7136, lng: 46.6753 },
-        status: 'opunder constructionerational'
+        status: 'under construction'
     },
     {
         id: 5,

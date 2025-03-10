@@ -212,8 +212,8 @@ function getStatusColor(status) {
 // Filter projects by status
 function filterProjects(status) {
     markers.forEach(marker => {
-        const project = projectData.find(p => p.name === marker.title);
-        if (status === 'all' || project.details.status.toLowerCase() === status.toLowerCase()) {
+        const project = projectData.find(p => p.project_name === marker.title);
+        if (status === 'all' || project.status.toLowerCase() === status.toLowerCase()) {
             marker.setVisible(true);
         } else {
             marker.setVisible(false);
