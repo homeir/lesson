@@ -206,7 +206,7 @@
             const passwordHash = md5(password);
             
             try {
-                const response = await fetch('https://oska-api.yunxing.hu/users', {
+                const response = await fetch('https://oska-api.yunxing.hu/records/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -218,21 +218,16 @@
                     })
                 });
                 
-                const data = await response.json();
+                const data = await response.json(); // return quatity of successfuly created users
                 
-                if (data.success) {
-                    // 存储用户信息和令牌
-                    Cookies.set('user_token', data.token, { expires: 7 });
-                    Cookies.set('user_name', data.user.name, { expires: 7 });
-                    Cookies.set('user_id', data.user.id, { expires: 7 });
+                if (  data>0) { // 测试是否是个数字
+                    // 通知用户注册成功，同时把用户名和密码填入登录栏，并切换到登录框
+                    alert('Registration successful');
+                    document.getElementById('signin-email').value = email;
+                    document.getElementById('signin-password').value = password;
+                    document.getElementById('login-container').classList.remove('right-panel-active');
                     
-                    // 显示用户名（可能需要从邮箱中提取或使用display_name）
-                    document.getElementById('user-name').textContent = 
-                        displayName || data.user.name.split('@')[0];
-                        
-                    // 显示内容区域
-                    document.getElementById('login-container').style.display = 'none';
-                    document.getElementById('content-container').style.display = 'block';
+                    
                 } else {
                     alert('Registration failed: ' + data.message);
                 }
