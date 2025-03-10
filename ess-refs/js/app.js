@@ -29,25 +29,26 @@ function initGrid() {
         {
             field: 'id',
             caption: 'ID',
-            width: 60
+            width: 60,
+            columnType: 'number'
         },
         {
             field: 'ess_count',
             caption: 'ESS Count',
-            width: 80
+            width: 80,
+            columnType: 'number'
         },
-   
         {
             field: 'project_name',
             caption: 'Project Name',
             width: 300,
+            columnType: 'text'
         }, 
         {
             field: 'project_application',
             caption: 'Application',
             width: 100,
-            sort: true,
-            editor: {
+            columnType: {
                 type: 'select',
                 options: [
                     {value: 'Utility', label: 'Utility'},
@@ -59,8 +60,7 @@ function initGrid() {
             field: 'area',
             caption: 'Area',
             width: 100,
-            sort: true,
-            editor: {
+            columnType: {
                 type: 'select',
                 options: [
                     {value: 'China', label: 'China'},
@@ -75,38 +75,37 @@ function initGrid() {
             field: 'country_city',
             caption: 'Country/City',
             width: 120,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'mw',
             caption: 'MW',
             width: 80,
-            sort: true,
-            editor: 'number',
-            format: value => formatNumber(value)
+            columnType: {
+                type: 'number',
+                format: value => formatNumber(value)
+            }
         },
         {
             field: 'mwh',
             caption: 'MWh',
             width: 80,
-            sort: true,
-            editor: 'number',
-            format: value => formatNumber(value)
+            columnType: {
+                type: 'number',
+                format: value => formatNumber(value)
+            }
         },
         {
             field: 'battery_supplier',
             caption: 'Battery Supplier',
             width: 200,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'battery_chemistry',
             caption: 'Chemistry',
             width: 80,
-            sort: true,
-            editor: {
+            columnType: {
                 type: 'select',
                 options: [
                     {value: 'LFP', label: 'LFP'}
@@ -117,94 +116,80 @@ function initGrid() {
             field: 'pcs_model',
             caption: 'PCS Model',
             width: 100,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'pcs_numbers',
             caption: 'PCS Qty',
             width: 80,
-            sort: true,
-            editor: 'number'
+            columnType: 'number'
         },
         {
             field: 'ess_model1',
             caption: 'ESS Model 1',
             width: 120,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'ess_model2',
             caption: 'ESS Model 2',
             width: 120,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'ess_numbers1',
             caption: 'ESS Qty 1',
             width: 80,
-            sort: true,
-            editor: 'number'
+            columnType: 'number'
         },
         {
             field: 'ess_numbers2',
             caption: 'ESS Qty 2',
             width: 80,
-            sort: true,
-            editor: 'number'
+            columnType: 'number'
         },
         {
             field: 'altitude',
             caption: 'Altitude',
             width: 100,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'min_temperature',
             caption: 'Min Temp',
             width: 80,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'max_temperature',
             caption: 'Max Temp',
             width: 80,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'contract_time',
             caption: 'Contract Date',
             width: 120,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'crm_or_c4',
             caption: 'CRM/C4',
             width: 140,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'client',
             caption: 'Client',
             width: 200,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         },
         {
             field: 'tech_support',
             caption: 'Tech Support',
             width: 100,
-            sort: true,
-            editor: 'text'
+            columnType: 'text'
         }
-          
     ];
 
     // Create grid instance with initial empty data

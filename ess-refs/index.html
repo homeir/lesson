@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <!-- js-cookie 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+
     <title>ESS Project Reference</title>
     <!-- Import Cheetah Grid -->
     <script src="https://unpkg.com/cheetah-grid@1.16.4/dist/cheetahGrid.es5.min.js"></script>
@@ -58,5 +61,23 @@
 
     <!-- Custom script -->
     <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+    // 检查是否已登录
+  
+    if (Cookies.get('user_name') === undefined || Cookies.get('user_name') === null) {
+        // 用户未登录，跳转到登录页面
+        location.href = '/'; // redirect to login page
+
+    } else{
+        // 用户已登录，在页面顶部插入返回首页的链接和用户信息
+        const headerContainer = document.getElementById('header-container');
+        headerContainer.innerHTML = `
+            <a href="/">Home</a>
+            <span>Welcome, ${Cookies.get('user_name')}</span>
+        `;
+    }
+});
+</script>
 </body>
 </html> 
