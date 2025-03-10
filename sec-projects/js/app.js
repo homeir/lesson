@@ -210,7 +210,7 @@ function getStatusColor(status) {
     switch (status.toLowerCase()) {
         case 'operational':
             return '#4CAF50';  // Green
-        case 'under construction':
+        case 'construction':
             return '#FFA500';  // Orange
         case 'planning':
             return '#2196F3';  // Blue
