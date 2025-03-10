@@ -43,6 +43,44 @@
     background-color: #1976D2;
 }
 
+/* 状态样式 */
+.status-operational {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.status-under-construction {
+    color: #FFA500;
+    font-weight: 600;
+}
+
+.status-planning {
+    color: #2196F3;
+    font-weight: 600;
+}
+
+/* 信息窗口样式 */
+.info-window {
+    padding: 15px;
+    max-width: 300px;
+}
+
+.info-window h2 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.info-window .info-content p {
+    margin: 8px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.info-window .info-content strong {
+    color: #333;
+}
+
 /* 响应式设计 */
 @media screen and (max-width: 1024px) {
     .project-table {

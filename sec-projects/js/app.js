@@ -4,11 +4,7 @@ let activeInfoWindow = null;
 
 // Initialize Google Maps
 async function initMap() {
-    // Validate project data first
-    if (!validateProjectData(projectData)) {
-        console.error('项目数据格式验证失败，地图可能无法正确显示标记');
-        return;
-    }
+
 
     // Create table element
     createTable();
@@ -47,11 +43,19 @@ function createTable() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     const headers = [
-        'ID', 'ESS Count', 'Project Name', 'Application', 'Area', 
-        'Country/City', 'MW', 'MWh', 'Battery Supplier', 'Chemistry',
-        'PCS Model', 'PCS Qty', 'ESS Model 1', 'ESS Model 2',
-        'ESS Qty 1', 'ESS Qty 2', 'Altitude', 'Min Temp', 'Max Temp',
-        'Contract Date', 'CRM/C4', 'Client', 'Tech Support', 'Actions'
+        'ID', 'Project Name', 'Area', 
+        'Country/City', 'MW', 'MWh', 'Battery Supplier',
+        'PCS Model', 'PCS Qty', 'ESS Model',
+        'ESS Qty', 'Altitude', 'Latitude', 'Longitude', 'Min Temp', 'Max Temp',
+        'Contract Date', 'COD Date', 'Client', 'Status', 'Actions'
+    ];
+
+    const dataFields = [
+        'id', 'project_name', 'area',
+        'country_city', 'mw', 'mwh', 'battery_supplier',
+        'pcs_model', 'pcs_qty', 'ess_model',
+        'ess_qty', 'altitude', 'latitude', 'longitude', 'min_temp', 'max_temp',
+        'contract_date', 'cod_date', 'client', 'status'
     ];
 
     headers.forEach(headerText => {
@@ -67,23 +71,41 @@ function createTable() {
     projectData.forEach(project => {
         const row = document.createElement('tr');
         
-        // Add data cells
-        Object.keys(project).forEach(key => {
-            if (key !== 'location') {  // Skip location data
-                const td = document.createElement('td');
-                td.textContent = project[key];
-                row.appendChild(td);
+        // Add data cells based on field mapping
+        dataFields.forEach(field => {
+            const td = document.createElement('td');
+            td.textContent = project[field];
+            
+            // Add special formatting for numeric fields
+            if (['mw', 'mwh'].includes(field)) {
+                td.textContent = project[field].toFixed(2);
+                td.style.textAlign = 'right';
             }
+            // Add special formatting for temperature
+            else if (['min_temp', 'max_temp'].includes(field)) {
+                td.textContent = `${project[field]}°C`;
+                td.style.textAlign = 'right';
+            }
+            // Add special formatting for dates
+            else if (field.includes('date')) {
+                td.textContent = new Date(project[field]).toLocaleDateString('zh-CN');
+            }
+            // Add status styling
+            else if (field === 'status') {
+                td.className = `status-${project[field].toLowerCase().replace(' ', '-')}`;
+            }
+            
+            row.appendChild(td);
         });
 
         // Add view map button
         const actionCell = document.createElement('td');
         const viewButton = document.createElement('button');
-        viewButton.textContent = 'View Map';
+        viewButton.textContent = '查看地图';
         viewButton.onclick = () => {
             map.panTo(project.location);
             map.setZoom(8);
-            const marker = markers.find(m => m.title === project.name);
+            const marker = markers.find(m => m.title === project.project_name);
             if (marker) {
                 marker.dispatchEvent('click');
             }
@@ -107,29 +129,32 @@ async function addMarker(project) {
     markerElement.style.width = '20px';
     markerElement.style.height = '20px';
     markerElement.style.borderRadius = '50%';
-    markerElement.style.backgroundColor = getStatusColor(project.details.status);
+    markerElement.style.backgroundColor = getStatusColor(project.status);
     markerElement.style.border = '2px solid #FFFFFF';
     
     const marker = new AdvancedMarkerElement({
         map,
         position: project.location,
-        title: project.name,
+        title: project.project_name,
         content: markerElement
     });
 
     // Create info window content
     const content = `
         <div class="info-window">
-            <h2>${project.name}</h2>
+            <h2>${project.project_name}</h2>
             <div class="info-content">
-                <p><strong>Capacity:</strong> ${project.details.capacity}</p>
-                <p><strong>Application:</strong> ${project.details.application}</p>
-                <p><strong>Area:</strong> ${project.details.area}</p>
-                <p><strong>Battery:</strong> ${project.details.battery}</p>
-                <p><strong>Chemistry:</strong> ${project.details.chemistry}</p>
-                <p><strong>PCS Model:</strong> ${project.details.pcs_model}</p>
-                <p><strong>Client:</strong> ${project.details.client}</p>
-                <p><strong>Status:</strong> <span class="status-${project.details.status.toLowerCase().replace(' ', '-')}">${project.details.status}</span></p>
+                <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
+                <p><strong>位置:</strong> ${project.country_city}</p>
+                <p><strong>海拔:</strong> ${project.altitude}</p>
+                <p><strong>温度范围:</strong> ${project.min_temp}°C ~ ${project.max_temp}°C</p>
+                <p><strong>电池供应商:</strong> ${project.battery_supplier}</p>
+                <p><strong>PCS型号:</strong> ${project.pcs_model} x ${project.pcs_qty}</p>
+                <p><strong>ESS型号:</strong> ${project.ess_model} x ${project.ess_qty}</p>
+                <p><strong>合同日期:</strong> ${new Date(project.contract_date).toLocaleDateString('zh-CN')}</p>
+                <p><strong>投运日期:</strong> ${new Date(project.cod_date).toLocaleDateString('zh-CN')}</p>
+                <p><strong>客户:</strong> ${project.client}</p>
+                <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
             </div>
         </div>
     `;
