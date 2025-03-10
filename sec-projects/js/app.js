@@ -4,216 +4,9 @@ let activeInfoWindow = null;
 
 // Initialize Google Maps
 function initMap() {
-    const gridElement = document.getElementById('grid');
+    // Create table element
+    createTable();
     
-    // Define grid columns with proper column types
-    const columns = [
-        {
-            field: 'id',
-            caption: 'ID',
-            width: 60,
-            columnType: 'number',
-            style: { textAlign: 'center' }
-        },
-        {
-            field: 'ess_count',
-            caption: 'ESS Count',
-            width: 80,
-            columnType: 'number',
-            style: { textAlign: 'right' }
-        },
-        {
-            field: 'project_name',
-            caption: 'Project Name',
-            width: 300,
-            columnType: 'multilinetext',
-            style: { textAlign: 'left' }
-        },
-        {
-            field: 'project_application',
-            caption: 'Application',
-            width: 100,
-            columnType: new cheetahGrid.columns.type.MenuColumn({
-                options: [
-                    {value: 'Utility', label: 'Utility'},
-                    {value: 'C&I', label: 'C&I'}
-                ]
-            })
-        },
-        {
-            field: 'area',
-            caption: 'Area',
-            width: 100,
-            columnType: new cheetahGrid.columns.type.MenuColumn({
-                options: [
-                    {value: 'China', label: 'China'},
-                    {value: 'APAC', label: 'APAC'},
-                    {value: 'MEA', label: 'MEA'},
-                    {value: 'Europe', label: 'Europe'},
-                    {value: 'America', label: 'America'}
-                ]
-            })
-        },
-        {
-            field: 'country_city',
-            caption: 'Country/City',
-            width: 120
-        },
-        {
-            field: 'mw',
-            caption: 'MW',
-            width: 80,
-            columnType: new cheetahGrid.columns.type.NumberColumn({
-                format: '0.00'
-            })
-        },
-        {
-            field: 'mwh',
-            caption: 'MWh',
-            width: 80,
-            columnType: new cheetahGrid.columns.type.NumberColumn({
-                format: '0.00'
-            })
-        },
-        {
-            field: 'battery_supplier',
-            caption: 'Battery Supplier',
-            width: 200,
-            columnType: 'text'
-        },
-        {
-            field: 'battery_chemistry',
-            caption: 'Chemistry',
-            width: 80,
-            columnType: new cheetahGrid.columns.type.MenuColumn({
-                options: [
-                    {value: 'LFP', label: 'LFP'}
-                ]
-            })
-        },
-        {
-            field: 'pcs_model',
-            caption: 'PCS Model',
-            width: 100,
-            columnType: 'text'
-        },
-        {
-            field: 'pcs_numbers',
-            caption: 'PCS Qty',
-            width: 80,
-            columnType: 'number',
-            style: { textAlign: 'right' }
-        },
-        {
-            field: 'ess_model1',
-            caption: 'ESS Model 1',
-            width: 120,
-            columnType: 'text'
-        },
-        {
-            field: 'ess_model2',
-            caption: 'ESS Model 2',
-            width: 120,
-            columnType: 'text'
-        },
-        {
-            field: 'ess_numbers1',
-            caption: 'ESS Qty 1',
-            width: 80,
-            columnType: 'number',
-            style: { textAlign: 'right' }
-        },
-        {
-            field: 'ess_numbers2',
-            caption: 'ESS Qty 2',
-            width: 80,
-            columnType: 'number',
-            style: { textAlign: 'right' }
-        },
-        {
-            field: 'altitude',
-            caption: 'Altitude',
-            width: 100,
-            columnType: 'text'
-        },
-        {
-            field: 'min_temperature',
-            caption: 'Min Temp',
-            width: 80,
-            columnType: new cheetahGrid.columns.type.NumberColumn({
-                format: '0'
-            })
-        },
-        {
-            field: 'max_temperature',
-            caption: 'Max Temp',
-            width: 80,
-            columnType: new cheetahGrid.columns.type.NumberColumn({
-                format: '0'
-            })
-        },
-        {
-            field: 'contract_time',
-            caption: 'Contract Date',
-            width: 120,
-            columnType: 'text'
-        },
-        {
-            field: 'crm_or_c4',
-            caption: 'CRM/C4',
-            width: 140,
-            columnType: 'text'
-        },
-        {
-            field: 'client',
-            caption: 'Client',
-            width: 200,
-            columnType: 'multilinetext'
-        },
-        {
-            field: 'tech_support',
-            caption: 'Tech Support',
-            width: 100,
-            columnType: 'text'
-        },
-        {
-            caption: 'Actions',
-            width: 120,
-            columnType: new cheetahGrid.columns.type.ButtonColumn({
-                caption: 'View Map'
-            }),
-            action: new cheetahGrid.columns.action.ButtonAction({
-                action(rec) {
-                    const project = projectData.find(p => p.id === rec.id);
-                    if (project) {
-                        map.panTo(project.location);
-                        map.setZoom(8);
-                        const marker = markers.find(m => m.getTitle() === project.name);
-                        if (marker) {
-                            google.maps.event.trigger(marker, 'click');
-                        }
-                    }
-                }
-            })
-        }
-    ];
-
-    // Create grid instance
-    grid = new cheetahGrid.ListGrid({
-        parentElement: gridElement,
-        columns: columns,
-        frozenColCount: 1,
-        defaultRowHeight: 40,
-        headerRowHeight: 45,
-        theme: {
-            borderColor: '#ddd',
-            textAlign: 'left',
-            color: '#333',
-            frozenRowsBgColor: '#f8f8f8',
-            selectionBgColor: 'rgba(50, 150, 250, 0.1)'
-        }
-    });
-
     // Create map centered on a default location
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 3,
@@ -234,6 +27,65 @@ function initMap() {
 
     // Add legend
     addLegend();
+}
+
+function createTable() {
+    const tableContainer = document.getElementById('grid');
+    const table = document.createElement('table');
+    table.className = 'project-table';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = [
+        'ID', 'ESS Count', 'Project Name', 'Application', 'Area', 
+        'Country/City', 'MW', 'MWh', 'Battery Supplier', 'Chemistry',
+        'PCS Model', 'PCS Qty', 'ESS Model 1', 'ESS Model 2',
+        'ESS Qty 1', 'ESS Qty 2', 'Altitude', 'Min Temp', 'Max Temp',
+        'Contract Date', 'CRM/C4', 'Client', 'Tech Support', 'Actions'
+    ];
+
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create table body
+    const tbody = document.createElement('tbody');
+    projectData.forEach(project => {
+        const row = document.createElement('tr');
+        
+        // Add data cells
+        Object.keys(project).forEach(key => {
+            if (key !== 'location') {  // Skip location data
+                const td = document.createElement('td');
+                td.textContent = project[key];
+                row.appendChild(td);
+            }
+        });
+
+        // Add view map button
+        const actionCell = document.createElement('td');
+        const viewButton = document.createElement('button');
+        viewButton.textContent = 'View Map';
+        viewButton.onclick = () => {
+            map.panTo(project.location);
+            map.setZoom(8);
+            const marker = markers.find(m => m.getTitle() === project.name);
+            if (marker) {
+                google.maps.event.trigger(marker, 'click');
+            }
+        };
+        actionCell.appendChild(viewButton);
+        row.appendChild(actionCell);
+
+        tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
 }
 
 // Add a marker for a project
