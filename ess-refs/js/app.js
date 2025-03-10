@@ -249,6 +249,7 @@ function formatNumber(num) {
 function updateGridData() {
     if (grid && gridData) {
         grid.records = gridData;
+        console.log('updateGridData gridData', gridData);
     }
 }
 
