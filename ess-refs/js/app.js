@@ -9,6 +9,7 @@ let grid;
 let gridData = [];
 let originalData = [];
 let changedRows = new Set();
+let dataSource;
 
 // API URL
 const API_URL = 'https://oska-api.yunxing.hu/records/ess_projects';
@@ -227,11 +228,23 @@ function initGrid() {
         }
     });
 
+    // Initialize DataSource
+    dataSource = new cheetahGrid.data.CachedDataSource({
+        get: (index) => gridData[index],
+        length: 0
+    });
+    grid.dataSource = dataSource;
+
     // Listen for cell value changes
     grid.listen('CHANGED_VALUE', (e) => {
         const { row, field, value } = e;
         gridData[row][field] = value;
         changedRows.add(row);
+        
+        // Update DataSource length if needed
+        if (dataSource.length !== gridData.length) {
+            dataSource.length = gridData.length;
+        }
     });
 }
 
@@ -245,7 +258,8 @@ function formatNumber(num) {
 async function fetchData() {
     try {
         const response = await fetch(API_URL);
-        console.log('fetchData response',response);
+        console.log('fetchData response', response);
+        
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -256,13 +270,13 @@ async function fetchData() {
         originalData = JSON.parse(JSON.stringify(data.records));
         gridData = data.records;
         
-        // Update grid data
-        grid.data = gridData;
+        // Update DataSource length
+        dataSource.length = gridData.length;
         
         // Reset change tracking
         changedRows.clear();
         
-        console.log('Data loaded successfully', data);
+        console.log('Data loaded successfully', gridData);
     } catch (error) {
         console.error('Failed to fetch data:', error);
         alert('Failed to fetch data. Please check network connection or API status.');
