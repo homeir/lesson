@@ -48,28 +48,13 @@ function initGrid() {
             field: 'project_application',
             caption: 'Application',
             width: 100,
-            columnType: {
-                type: 'select',
-                options: [
-                    {value: 'Utility', label: 'Utility'},
-                    {value: 'C&I', label: 'C&I'}
-                ]
-            }
+            columnType: 'text'
         },
         {
             field: 'area',
             caption: 'Area',
             width: 100,
-            columnType: {
-                type: 'select',
-                options: [
-                    {value: 'China', label: 'China'},
-                    {value: 'APAC', label: 'APAC'},
-                    {value: 'MEA', label: 'MEA'},
-                    {value: 'Europe', label: 'Europe'},
-                    {value: 'America', label: 'America'}
-                ]
-            }
+            columnType: 'text'
         },
         {
             field: 'country_city',
@@ -81,19 +66,13 @@ function initGrid() {
             field: 'mw',
             caption: 'MW',
             width: 80,
-            columnType: {
-                type: 'number',
-                format: value => formatNumber(value)
-            }
+            columnType: new cheetahGrid.columns.type.NumberColumn(),
         },
         {
             field: 'mwh',
             caption: 'MWh',
             width: 80,
-            columnType: {
-                type: 'number',
-                format: value => formatNumber(value)
-            }
+            columnType: new cheetahGrid.columns.type.NumberColumn(),
         },
         {
             field: 'battery_supplier',
