@@ -9,15 +9,14 @@ let grid;
 let gridData = [];
 let originalData = [];
 let changedRows = new Set();
-let dataSource;
 
 // API URL
 const API_URL = 'https://oska-api.yunxing.hu/records/ess_projects';
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initGrid();
-    fetchData();
+    await fetchData();
     setupEventListeners();
 });
 
@@ -212,13 +211,14 @@ function initGrid() {
         }
     ];
 
-    // Create grid instance
+    // Create grid instance with initial empty data
     grid = new cheetahGrid.ListGrid({
         parentElement: gridElement,
         columns: columns,
         frozenColCount: 1,
         defaultRowHeight: 40,
         headerRowHeight: 45,
+        records: [], // Initialize with empty array
         theme: {
             borderColor: '#ddd',
             textAlign: 'left',
@@ -228,22 +228,13 @@ function initGrid() {
         }
     });
 
-    // Initialize DataSource
-    dataSource = new cheetahGrid.data.CachedDataSource({
-        get: (index) => gridData[index],
-        length: 0
-    });
-    grid.dataSource = dataSource;
-
     // Listen for cell value changes
     grid.listen('CHANGED_VALUE', (e) => {
         const { row, field, value } = e;
-        gridData[row][field] = value;
-        changedRows.add(row);
-        
-        // Update DataSource length if needed
-        if (dataSource.length !== gridData.length) {
-            dataSource.length = gridData.length;
+        if (gridData[row]) {
+            gridData[row][field] = value;
+            changedRows.add(row);
+            updateGridData();
         }
     });
 }
@@ -252,6 +243,13 @@ function initGrid() {
 function formatNumber(num) {
     if (num === null || num === undefined) return '';
     return Number(num).toFixed(2);
+}
+
+// Update grid data
+function updateGridData() {
+    if (grid && gridData) {
+        grid.records = gridData;
+    }
 }
 
 // Fetch data
@@ -265,18 +263,23 @@ async function fetchData() {
         }
         
         const data = await response.json();
+        console.log('Fetched data:', data);
         
-        // Save original data for comparison
-        originalData = JSON.parse(JSON.stringify(data.records));
-        gridData = data.records;
-        
-        // Update DataSource length
-        dataSource.length = gridData.length;
-        
-        // Reset change tracking
-        changedRows.clear();
-        
-        console.log('Data loaded successfully', gridData);
+        if (data && data.records && Array.isArray(data.records)) {
+            // Save original data for comparison
+            originalData = JSON.parse(JSON.stringify(data.records));
+            gridData = data.records;
+            
+            // Update grid with new data
+            updateGridData();
+            
+            // Reset change tracking
+            changedRows.clear();
+            
+            console.log('Data loaded successfully', gridData);
+        } else {
+            throw new Error('Invalid data format received from API');
+        }
     } catch (error) {
         console.error('Failed to fetch data:', error);
         alert('Failed to fetch data. Please check network connection or API status.');
@@ -295,6 +298,11 @@ async function saveData() {
         
         // Save each changed row
         for (const row of changedData) {
+            if (!row || !row.id) {
+                console.error('Invalid row data:', row);
+                continue;
+            }
+            
             const response = await fetch(`${API_URL}/${row.id}`, {
                 method: 'PUT',
                 headers: {
