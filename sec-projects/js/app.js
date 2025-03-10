@@ -74,25 +74,44 @@ function createTable() {
         // Add data cells based on field mapping
         dataFields.forEach(field => {
             const td = document.createElement('td');
-            td.textContent = project[field];
+            const value = project[field];
             
-            // Add special formatting for numeric fields
-            if (['mw', 'mwh'].includes(field)) {
-                td.textContent = project[field].toFixed(2);
-                td.style.textAlign = 'right';
-            }
-            // Add special formatting for temperature
-            else if (['min_temp', 'max_temp'].includes(field)) {
-                td.textContent = `${project[field]}°C`;
-                td.style.textAlign = 'right';
-            }
-            // Add special formatting for dates
-            else if (field.includes('date')) {
-                td.textContent = new Date(project[field]).toLocaleDateString('zh-CN');
-            }
-            // Add status styling
-            else if (field === 'status') {
-                td.className = `status-${project[field].toLowerCase().replace(' ', '-')}`;
+            // Handle different data types
+            if (value === undefined || value === null) {
+                td.textContent = '-';
+            } else {
+                // Add special formatting for numeric fields
+                if (['mw', 'mwh'].includes(field) && typeof value === 'number') {
+                    td.textContent = value.toFixed(2);
+                    td.style.textAlign = 'right';
+                }
+                // Add special formatting for temperature
+                else if (['min_temp', 'max_temp'].includes(field) && typeof value === 'number') {
+                    td.textContent = `${value}°C`;
+                    td.style.textAlign = 'right';
+                }
+                // Add special formatting for coordinates
+                else if (['latitude', 'longitude'].includes(field) && typeof value === 'number') {
+                    td.textContent = value.toFixed(4);
+                    td.style.textAlign = 'right';
+                }
+                // Add special formatting for dates
+                else if (field.includes('date') && value) {
+                    try {
+                        td.textContent = new Date(value).toLocaleDateString('zh-CN');
+                    } catch (e) {
+                        td.textContent = value;
+                    }
+                }
+                // Add status styling
+                else if (field === 'status' && value) {
+                    td.textContent = value;
+                    td.className = `status-${value.toLowerCase().replace(' ', '-')}`;
+                }
+                // Default handling
+                else {
+                    td.textContent = value;
+                }
             }
             
             row.appendChild(td);
@@ -103,11 +122,13 @@ function createTable() {
         const viewButton = document.createElement('button');
         viewButton.textContent = '查看地图';
         viewButton.onclick = () => {
-            map.panTo(project.location);
-            map.setZoom(8);
-            const marker = markers.find(m => m.title === project.project_name);
-            if (marker) {
-                marker.dispatchEvent('click');
+            if (project.location) {
+                map.panTo(project.location);
+                map.setZoom(8);
+                const marker = markers.find(m => m.title === project.project_name);
+                if (marker) {
+                    marker.dispatchEvent('click');
+                }
             }
         };
         actionCell.appendChild(viewButton);
