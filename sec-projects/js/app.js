@@ -3,12 +3,21 @@ let markers = [];
 let activeInfoWindow = null;
 
 // Initialize Google Maps
-function initMap() {
+async function initMap() {
+    // Validate project data first
+    if (!validateProjectData(projectData)) {
+        console.error('项目数据格式验证失败，地图可能无法正确显示标记');
+        return;
+    }
+
     // Create table element
     createTable();
     
     // Create map centered on a default location
-    map = new google.maps.Map(document.getElementById('map'), {
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    
+    map = new Map(document.getElementById('map'), {
         zoom: 3,
         center: { lat: 30.0, lng: 45.0 },
         styles: [
@@ -21,9 +30,9 @@ function initMap() {
     });
 
     // Add markers for each project
-    projectData.forEach(project => {
-        addMarker(project);
-    });
+    for (const project of projectData) {
+        await addMarker(project);
+    }
 
     // Add legend
     addLegend();
@@ -74,9 +83,9 @@ function createTable() {
         viewButton.onclick = () => {
             map.panTo(project.location);
             map.setZoom(8);
-            const marker = markers.find(m => m.getTitle() === project.name);
+            const marker = markers.find(m => m.title === project.name);
             if (marker) {
-                google.maps.event.trigger(marker, 'click');
+                marker.dispatchEvent('click');
             }
         };
         actionCell.appendChild(viewButton);
@@ -89,19 +98,23 @@ function createTable() {
 }
 
 // Add a marker for a project
-function addMarker(project) {
-    const marker = new google.maps.Marker({
+async function addMarker(project) {
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    
+    // Create marker element
+    const markerElement = document.createElement('div');
+    markerElement.className = 'custom-marker';
+    markerElement.style.width = '20px';
+    markerElement.style.height = '20px';
+    markerElement.style.borderRadius = '50%';
+    markerElement.style.backgroundColor = getStatusColor(project.details.status);
+    markerElement.style.border = '2px solid #FFFFFF';
+    
+    const marker = new AdvancedMarkerElement({
+        map,
         position: project.location,
-        map: map,
         title: project.name,
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: getStatusColor(project.details.status),
-            fillOpacity: 0.7,
-            strokeWeight: 2,
-            strokeColor: '#FFFFFF'
-        }
+        content: markerElement
     });
 
     // Create info window content
@@ -127,7 +140,7 @@ function addMarker(project) {
     });
 
     // Add click listener to marker
-    marker.addListener('click', () => {
+    marker.addEventListener('click', () => {
         if (activeInfoWindow) {
             activeInfoWindow.close();
         }
@@ -135,7 +148,7 @@ function addMarker(project) {
         activeInfoWindow = infoWindow;
         
         // Pan to marker
-        map.panTo(marker.getPosition());
+        map.panTo(marker.position);
     });
 
     markers.push(marker);
@@ -181,7 +194,7 @@ function getStatusColor(status) {
 // Filter projects by status
 function filterProjects(status) {
     markers.forEach(marker => {
-        const project = projectData.find(p => p.name === marker.getTitle());
+        const project = projectData.find(p => p.name === marker.title);
         if (status === 'all' || project.details.status.toLowerCase() === status.toLowerCase()) {
             marker.setVisible(true);
         } else {
