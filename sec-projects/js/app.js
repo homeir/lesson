@@ -156,6 +156,8 @@ async function addMarker(project) {
             <div class="info-content">
                 <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
                 <p><strong>海拔:</strong> ${project.altitude}m</p>
+                <p><strong>供应商:</strong> ${project.vendor}</p>
+                <p><strong>轮次:</strong> ${project.round}</p>
                 <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
             </div>
         </div>
@@ -181,32 +183,84 @@ async function addMarker(project) {
     markers.push(marker);
 }
 
-// Add legend to map
+// Add legend to the map
 function addLegend() {
-    const legend = document.createElement('div');
-    legend.id = 'legend';
-    legend.innerHTML = `
-        <h3>Project Status</h3>
-        <div class="legend-item">
-            <span class="legend-color" style="background-color: #4CAF50"></span>
-            <span>Operational</span>
-        </div>
-        <div class="legend-item">
-            <span class="legend-color" style="background-color: #FFA500"></span>
-            <span>Under Construction</span>
-        </div>
-        <div class="legend-item">
-            <span class="legend-color" style="background-color: #2196F3"></span>
-            <span>Planning</span>
-        </div>
-    `;
-
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+    const legendContainer = document.getElementById('legend');
+    
+    // 清空图例容器
+    legendContainer.innerHTML = '';
+    
+    // 添加状态图例标题
+    const statusTitle = document.createElement('h3');
+    statusTitle.textContent = '项目状态:';
+    statusTitle.style.margin = '0 20px 0 0';
+    legendContainer.appendChild(statusTitle);
+    
+    // 添加状态图例项
+    const statuses = [
+        { name: '运行中', value: 'operational', color: '#4CAF50' },
+        { name: '建设中', value: 'construction', color: '#FFA500' },
+        { name: '规划中', value: 'planning', color: '#2196F3' }
+    ];
+    
+    statuses.forEach(status => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = status.color;
+        
+        const label = document.createElement('span');
+        label.textContent = status.name;
+        
+        item.appendChild(colorBox);
+        item.appendChild(label);
+        legendContainer.appendChild(item);
+    });
+    
+    // 添加供应商图例标题
+    const vendorTitle = document.createElement('h3');
+    vendorTitle.textContent = '供应商:';
+    vendorTitle.style.margin = '0 20px 0 20px';
+    legendContainer.appendChild(vendorTitle);
+    
+    // 添加供应商图例项
+    const vendors = [
+        { name: '比亚迪', value: 'BYD' },
+        { name: '阳光电源', value: 'Sungrow' },
+        { name: '未知', value: 'unknown' }
+    ];
+    
+    vendors.forEach(vendor => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const label = document.createElement('span');
+        label.textContent = vendor.name;
+        
+        // 添加点击事件
+        item.style.cursor = 'pointer';
+        item.onclick = () => {
+            // 移除所有供应商过滤按钮的活动状态
+            document.querySelectorAll('.filter-btn[data-type="vendor"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加对应按钮的活动状态
+            document.querySelector(`.filter-btn[data-type="vendor"][data-value="${vendor.value}"]`).classList.add('active');
+            
+            // 应用过滤
+            filterProjects('vendor', vendor.value);
+        };
+        
+        item.appendChild(label);
+        legendContainer.appendChild(item);
+    });
 }
 
-// Get color based on project status
+// Get color for status
 function getStatusColor(status) {
-    console.log('getStatusColor',status);
     switch (status.toLowerCase()) {
         case 'operational':
             return '#4CAF50';  // Green
@@ -219,17 +273,29 @@ function getStatusColor(status) {
     }
 }
 
-// Filter projects by status
-function filterProjects(status) {
+// Filter projects by criteria
+function filterProjects(criteria, value) {
     markers.forEach(marker => {
         const project = projectData.find(p => p.project_name === marker.title);
-        if (status === 'all' || project.status.toLowerCase() === status.toLowerCase()) {
-            marker.element.style.display = 'block';
-        } else {
-            marker.element.style.display = 'none';
-            if (activeInfoWindow) {
-                activeInfoWindow.close();
-            }
+        
+        // 如果找不到项目，跳过
+        if (!project) return;
+        
+        let isVisible = false;
+        
+        // 根据不同的过滤条件进行过滤
+        if (criteria === 'status') {
+            isVisible = (value === 'all' || project.status.toLowerCase() === value.toLowerCase());
+        } else if (criteria === 'vendor') {
+            isVisible = (value === 'all' || project.vendor === value);
+        }
+        
+        // 设置标记的可见性
+        marker.element.style.display = isVisible ? 'block' : 'none';
+        
+        // 如果标记被隐藏且信息窗口打开，则关闭信息窗口
+        if (!isVisible && activeInfoWindow) {
+            activeInfoWindow.close();
         }
     });
 }
@@ -239,11 +305,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add filter event listeners
     document.querySelectorAll('.filter-btn').forEach(button => {
         button.addEventListener('click', (e) => {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            // 获取过滤类型和值
+            const filterType = e.target.dataset.type || 'status'; // 默认为状态过滤
+            const filterValue = e.target.dataset.value || 'all';
+            
+            // 移除同组按钮的活动状态
+            document.querySelectorAll(`.filter-btn[data-type="${filterType}"]`).forEach(btn => {
                 btn.classList.remove('active');
             });
+            
+            // 添加当前按钮的活动状态
             e.target.classList.add('active');
-            filterProjects(e.target.dataset.status);
+            
+            // 应用过滤
+            filterProjects(filterType, filterValue);
         });
     });
 }); 
