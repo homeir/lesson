@@ -133,12 +133,21 @@ async function addMarker(project) {
     markerElement.style.backgroundColor = getStatusColor(project.status);
     markerElement.style.border = '2px solid #FFFFFF';
     
+    // Create location object from latitude and longitude
+    const location = {
+        lat: project.latitude,
+        lng: project.longitude
+    };
+    
     const marker = new AdvancedMarkerElement({
         map,
-        position: project.location,
+        position: location,
         title: project.project_name,
         content: markerElement
     });
+
+    // Store marker element for visibility control
+    marker.element = markerElement;
 
     // Create info window content
     const content = `
@@ -146,7 +155,7 @@ async function addMarker(project) {
             <h2>${project.project_name}</h2>
             <div class="info-content">
                 <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
-                <p><strong>海拔:</strong> ${project.altitude}</p>
+                <p><strong>海拔:</strong> ${project.altitude}m</p>
                 <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
             </div>
         </div>
@@ -166,7 +175,7 @@ async function addMarker(project) {
         activeInfoWindow = infoWindow;
         
         // Pan to marker
-        map.panTo(marker.position);
+        map.panTo(location);
     });
 
     markers.push(marker);
@@ -215,9 +224,9 @@ function filterProjects(status) {
     markers.forEach(marker => {
         const project = projectData.find(p => p.project_name === marker.title);
         if (status === 'all' || project.status.toLowerCase() === status.toLowerCase()) {
-            marker.setVisible(true);
+            marker.element.style.display = 'block';
         } else {
-            marker.setVisible(false);
+            marker.element.style.display = 'none';
             if (activeInfoWindow) {
                 activeInfoWindow.close();
             }
