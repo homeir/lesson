@@ -86,21 +86,8 @@ function createTable() {
                 }
                 // Add special formatting for coordinates
                 else if (['latitude', 'longitude'].includes(field) && typeof value === 'number') {
-                    td.textContent = value.toFixed(4);
+                    td.textContent = value.toFixed(6);
                     td.style.textAlign = 'right';
-                }
-                // Add special formatting for dates
-                else if (field.includes('date') && value) {
-                    try {
-                        td.textContent = new Date(value).toLocaleDateString('zh-CN');
-                    } catch (e) {
-                        td.textContent = value;
-                    }
-                }
-                // Add status styling
-                else if (field === 'status' && value) {
-                    td.textContent = value;
-                    td.className = `status-${value.toLowerCase().replace(' ', '-')}`;
                 }
                 // Default handling
                 else {
@@ -160,16 +147,7 @@ async function addMarker(project) {
             <h2>${project.project_name}</h2>
             <div class="info-content">
                 <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
-                <p><strong>位置:</strong> ${project.country_city}</p>
-                <p><strong>海拔:</strong> ${project.altitude}</p>
-                <p><strong>温度范围:</strong> ${project.min_temp}°C ~ ${project.max_temp}°C</p>
-                <p><strong>电池供应商:</strong> ${project.battery_supplier}</p>
-                <p><strong>PCS型号:</strong> ${project.pcs_model} x ${project.pcs_qty}</p>
-                <p><strong>ESS型号:</strong> ${project.ess_model} x ${project.ess_qty}</p>
-                <p><strong>合同日期:</strong> ${new Date(project.contract_date).toLocaleDateString('zh-CN')}</p>
-                <p><strong>投运日期:</strong> ${new Date(project.cod_date).toLocaleDateString('zh-CN')}</p>
-                <p><strong>客户:</strong> ${project.client}</p>
-                <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
+
             </div>
         </div>
     `;
