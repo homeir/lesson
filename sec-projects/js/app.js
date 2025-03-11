@@ -100,7 +100,7 @@ function createTable() {
         // Add view map button
         const actionCell = document.createElement('td');
         const viewButton = document.createElement('button');
-        viewButton.textContent = '查看地图';
+        viewButton.textContent = 'View Map';
         viewButton.onclick = () => {
             if (project.location) {
                 map.panTo(project.location);
@@ -154,11 +154,11 @@ async function addMarker(project) {
         <div class="info-window">
             <h2>${project.project_name}</h2>
             <div class="info-content">
-                <p><strong>容量:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
-                <p><strong>海拔:</strong> ${project.altitude}m</p>
-                <p><strong>供应商:</strong> ${project.vendor}</p>
-                <p><strong>轮次:</strong> ${project.round}</p>
-                <p><strong>状态:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
+                <p><strong>Capacity:</strong> ${project.mw}MW / ${project.mwh}MWh</p>
+                <p><strong>Altitude:</strong> ${project.altitude}m</p>
+                <p><strong>Vendor:</strong> ${project.vendor}</p>
+                <p><strong>Round:</strong> ${project.round}</p>
+                <p><strong>Status:</strong> <span class="status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
             </div>
         </div>
     `;
@@ -192,15 +192,15 @@ function addLegend() {
     
     // 添加状态图例标题
     const statusTitle = document.createElement('h3');
-    statusTitle.textContent = '项目状态:';
+    statusTitle.textContent = 'Project Status:';
     statusTitle.style.margin = '0 20px 0 0';
     legendContainer.appendChild(statusTitle);
     
     // 添加状态图例项
     const statuses = [
-        { name: '运行中', value: 'operational', color: '#4CAF50' },
-        { name: '建设中', value: 'construction', color: '#FFA500' },
-        { name: '规划中', value: 'planning', color: '#2196F3' }
+        { name: 'Operational', value: 'operational', color: '#4CAF50' },
+        { name: 'Under Construction', value: 'construction', color: '#FFA500' },
+        { name: 'Planning', value: 'planning', color: '#2196F3' }
     ];
     
     statuses.forEach(status => {
@@ -221,15 +221,15 @@ function addLegend() {
     
     // 添加供应商图例标题
     const vendorTitle = document.createElement('h3');
-    vendorTitle.textContent = '供应商:';
+    vendorTitle.textContent = 'Vendors:';
     vendorTitle.style.margin = '0 20px 0 20px';
     legendContainer.appendChild(vendorTitle);
     
     // 添加供应商图例项
     const vendors = [
-        { name: '比亚迪', value: 'BYD' },
-        { name: '阳光电源', value: 'Sungrow' },
-        { name: '未知', value: 'unknown' }
+        { name: 'BYD', value: 'BYD' },
+        { name: 'Sungrow', value: 'Sungrow' },
+        { name: 'Unknown', value: 'unknown' }
     ];
     
     vendors.forEach(vendor => {
