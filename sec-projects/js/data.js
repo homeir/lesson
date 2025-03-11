@@ -30,8 +30,8 @@ const projectData = [
             "mw": 650,
             "mwh": 2600,
             "altitude": 995,
-            "latitude": 24.8160674,
-            "longitude": 46.8383757,
+            "latitude": 16.7656141,
+            "longitude": 42.7356856,
             "status": "construction",
             "round": "2",
             "vendor": "Sungrow"
