@@ -1,54 +1,56 @@
-# 塞内加尔电网分析应用
+# Senegal Electricity Grid Analysis Application
 
-这个应用程序用于显示塞内加尔的电力传输网络，并提供了按电压等级过滤和查看变电站位置的功能。
+This application displays the electricity transmission network of Senegal and provides functionality to filter by voltage level and view substation locations.
 
-## 功能特点
+## Features
 
-1. 在Google地图上显示塞内加尔的电力传输网络
-2. 根据电压等级（225kV、90kV、30kV）使用不同颜色显示线路
-3. 显示变电站位置，包括225kV和90kV变电站
-4. 当线路有起始和终止站点名称时，在地图上显示这些名称
-5. 提供按电压等级过滤线路的功能
+1. Display Senegal's electricity transmission network on Google Maps
+2. Show different voltage levels (225kV, 90kV, 30kV) with different colors
+3. Display substation locations, including 225kV and 90kV substations
+4. Show station names on the map when lines have origin and destination information
+5. Filter lines by voltage level
+6. Toggle display of origin and destination station labels
 
-## 使用说明
+## Usage Instructions
 
-1. 在浏览器中打开`index.html`文件
-2. 您需要替换`index.html`文件中的`YOUR_API_KEY`为有效的Google Maps API密钥
-3. 使用左上角的复选框可以过滤不同电压等级的线路
-4. 点击变电站图标可以查看变电站的详细信息
+1. Open the `index.html` file in a browser
+2. Use the checkboxes in the top-left corner to filter lines by voltage level
+3. Use the "Station Labels" section to toggle the display of origin and destination station names
+4. Click on substations to view detailed information
+5. Click on lines to view detailed information about the transmission line
 
-## 数据来源
+## Data Sources
 
-- 电网数据来自`Senegal Electricity Transmission Network.kml`文件
-- 变电站数据来自`substations.json`文件
+- Grid data from `Senegal Electricity Transmission Network.kml` file
+- Substation data from `substations.json` file
 
-## 变电站信息
+## Substation Information
 
-### 225kV变电站（6座）
-- 昆努
-- 多拜诺
-- 图巴
-- 考拉克
-- 马里昆达
-- 迪亚斯
+### 225kV Substations (6)
+- Kounoune
+- Tobene
+- Touba
+- Kaolack
+- Malikunda
+- Diass
 
-### 90kV变电站（13座）
-- 鹿角
-- 贝莱尔
-- 安恩
-- 大学
-- 帕特多瓦
-- 机场
-- 姆堡
-- 昆努
-- 多拜诺
-- 迪瓦那
-- 索科西姆
-- 欧拉姆
-- 索美塔
+### 90kV Substations (13)
+- Cap des Biches
+- Bel Air
+- Hann
+- University
+- Patte d'Oie
+- Airport
+- Mbao
+- Kounoune
+- Tobene
+- Diawana
+- Sococim
+- Ouaram
+- Someta
 
-## 技术实现
+## Technical Implementation
 
-- 使用Google Maps JavaScript API显示地图
-- 使用JavaScript解析KML文件数据
-- 使用HTML/CSS/JavaScript构建用户界面和交互功能 
+- Uses Google Maps JavaScript API to display the map
+- Uses JavaScript to parse KML file data
+- Built with HTML/CSS/JavaScript for user interface and interaction 

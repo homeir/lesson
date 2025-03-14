@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>塞内加尔电网分析</title>
+    <title>Senegal Electricity Grid Analysis</title>
     <style>
         body {
             margin: 0;
@@ -82,75 +82,97 @@
             border-top: 1px solid #ccc;
             padding-top: 10px;
         }
+        .control-section {
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div class="legend">
-        <h3 style="margin-top: 0;">图例</h3>
+        <h3 style="margin-top: 0;">Legend</h3>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #FF0000; height: 4px;"></div>
-            <div class="legend-text">225kV线路</div>
+            <div class="legend-text">225kV Lines</div>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #0000FF; height: 3px;"></div>
-            <div class="legend-text">90kV线路</div>
+            <div class="legend-text">90kV Lines</div>
         </div>
         <div class="legend-item">
             <div class="legend-color" style="background-color: #00FF00; height: 2px;"></div>
-            <div class="legend-text">30kV线路</div>
+            <div class="legend-text">30kV Lines</div>
         </div>
         <div class="legend-item">
             <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; border-radius: 50%;"></div>
-            <div class="legend-text">225kV变电站</div>
+            <div class="legend-text">225kV Substations</div>
         </div>
         <div class="legend-item">
             <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #0000FF; border-radius: 50%;"></div>
-            <div class="legend-text">90kV变电站</div>
+            <div class="legend-text">90kV Substations</div>
         </div>
     </div>
 
     <div class="controls">
-        <h3 style="margin-top: 0;">电压等级过滤</h3>
+        <h3 style="margin-top: 0;">Voltage Filter</h3>
         <div class="control-item">
             <input type="checkbox" id="voltage225" checked>
-            <label for="voltage225">225kV线路</label>
+            <label for="voltage225">225kV Lines</label>
         </div>
         <div class="control-item">
             <input type="checkbox" id="voltage90" checked>
-            <label for="voltage90">90kV线路</label>
+            <label for="voltage90">90kV Lines</label>
         </div>
         <div class="control-item">
             <input type="checkbox" id="voltage30" checked>
-            <label for="voltage30">30kV线路</label>
+            <label for="voltage30">30kV Lines</label>
         </div>
+        
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Station Labels</h3>
+            <div class="control-item">
+                <input type="checkbox" id="showFromNames" checked>
+                <label for="showFromNames">Show Origin Stations</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showToNames" checked>
+                <label for="showToNames">Show Destination Stations</label>
+            </div>
+            <button id="applyLabels" style="margin-top: 5px;">Apply</button>
+        </div>
+        
         <div class="stats">
+            <h3 style="margin-top: 0;">Statistics</h3>
             <div id="stats-content">
-                <div>总线路数: <span id="total-lines">0</span></div>
-                <div>225kV线路: <span id="lines-225">0</span></div>
-                <div>90kV线路: <span id="lines-90">0</span></div>
-                <div>30kV线路: <span id="lines-30">0</span></div>
-                <div>变电站数量: <span id="total-substations">0</span></div>
+                <div>Total Lines: <span id="total-lines">0</span></div>
+                <div>225kV Lines: <span id="lines-225">0</span></div>
+                <div>90kV Lines: <span id="lines-90">0</span></div>
+                <div>30kV Lines: <span id="lines-30">0</span></div>
+                <div>Substations: <span id="total-substations">0</span></div>
             </div>
         </div>
     </div>
 
     <div class="info-panel" id="info-panel">
         <div class="close-btn" onclick="closeInfoPanel()">×</div>
-        <div class="info-title" id="info-title">线路信息</div>
+        <div class="info-title" id="info-title">Line Information</div>
         <div class="info-content" id="info-content"></div>
     </div>
 
     <script>
-        // 存储地图对象
+        // Store map object
         let map;
-        // 存储变电站标记
+        // Store substation markers
         let substationMarkers = [];
-        // 存储电网线路
+        // Store grid lines
         let gridLines = [];
-        // 存储KML数据
+        // Store KML data
         let kmlData;
-        // 存储统计信息
+        // Store station labels
+        let stationLabels = [];
+        // Store statistics
         let stats = {
             total: 0,
             voltage225: 0,
@@ -159,26 +181,38 @@
             substations: 0
         };
 
-        // 初始化地图
+        // Initialize map
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 14.5, lng: -14.5 },
-                zoom: 7
+                zoom: 7,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+                },
+                streetViewControl: true,
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_TOP
+                }
             });
 
-            // 加载变电站数据
+            // Load substation data
             loadSubstations();
             
-            // 加载KML文件
+            // Load KML file
             loadKmlData();
 
-            // 添加过滤器事件监听
+            // Add filter event listeners
             document.getElementById('voltage225').addEventListener('change', filterLines);
             document.getElementById('voltage90').addEventListener('change', filterLines);
             document.getElementById('voltage30').addEventListener('change', filterLines);
+            
+            // Add label control event listener
+            document.getElementById('applyLabels').addEventListener('click', updateLabels);
         }
 
-        // 加载变电站数据
+        // Load substation data
         function loadSubstations() {
             fetch('substations.json')
                 .then(response => response.json())
@@ -199,7 +233,7 @@
                             }
                         });
 
-                        // 添加信息窗口
+                        // Add info window
                         const infoWindow = new google.maps.InfoWindow({
                             content: `<div><strong>${station.name}</strong><br>${station.type}</div>`
                         });
@@ -214,7 +248,7 @@
                 });
         }
 
-        // 加载KML数据
+        // Load KML data
         function loadKmlData() {
             fetch('Senegal Electricity Transmission Network.kml')
                 .then(response => response.text())
@@ -225,37 +259,37 @@
                 });
         }
 
-        // 处理KML数据
+        // Process KML data
         function processKmlData() {
             const placemarks = kmlData.getElementsByTagName('Placemark');
             
             for (let i = 0; i < placemarks.length; i++) {
                 const placemark = placemarks[i];
                 
-                // 获取电压等级
+                // Get voltage level
                 const voltageElement = placemark.querySelector('SimpleData[name="VOLTAGE_KV"]');
                 if (!voltageElement) continue;
                 const voltage = parseInt(voltageElement.textContent);
                 
-                // 获取起始和终止站点名称
+                // Get origin and destination station names
                 const fromElement = placemark.querySelector('SimpleData[name="FROM_NM"]');
                 const toElement = placemark.querySelector('SimpleData[name="TO_NM"]');
                 const fromName = fromElement ? fromElement.textContent : '';
                 const toName = toElement ? toElement.textContent : '';
                 
-                // 获取状态
+                // Get status
                 const statusElement = placemark.querySelector('SimpleData[name="STATUS"]');
                 const status = statusElement ? statusElement.textContent : '';
                 
-                // 获取来源
+                // Get sources
                 const sourcesElement = placemark.querySelector('SimpleData[name="SOURCES"]');
                 const sources = sourcesElement ? sourcesElement.textContent : '';
                 
-                // 获取项目名称
+                // Get project name
                 const projectElement = placemark.querySelector('SimpleData[name="PROJECT_NM"]');
                 const project = projectElement ? projectElement.textContent : '';
                 
-                // 获取坐标
+                // Get coordinates
                 const coordinatesElement = placemark.querySelector('coordinates');
                 if (!coordinatesElement) continue;
                 
@@ -267,25 +301,25 @@
                     return { lat: parseFloat(lat), lng: parseFloat(lng) };
                 });
                 
-                // 根据电压等级设置颜色和宽度
+                // Set color and weight based on voltage
                 let color, weight;
                 if (voltage === 225) {
-                    color = '#FF0000'; // 红色
+                    color = '#FF0000'; // Red
                     weight = 4;
                     stats.voltage225++;
                 } else if (voltage === 90) {
-                    color = '#0000FF'; // 蓝色
+                    color = '#0000FF'; // Blue
                     weight = 3;
                     stats.voltage90++;
                 } else {
-                    color = '#00FF00'; // 绿色
+                    color = '#00FF00'; // Green
                     weight = 2;
                     stats.voltage30++;
                 }
                 
                 stats.total++;
                 
-                // 创建线路
+                // Create line
                 const line = new google.maps.Polyline({
                     path: path,
                     geodesic: true,
@@ -295,7 +329,7 @@
                     map: map
                 });
                 
-                // 存储线路信息
+                // Store line info
                 const lineInfo = {
                     line: line,
                     voltage: voltage,
@@ -303,34 +337,37 @@
                     toName: toName,
                     status: status,
                     sources: sources,
-                    project: project
+                    project: project,
+                    path: path
                 };
                 
                 gridLines.push(lineInfo);
                 
-                // 添加点击事件
+                // Add click event
                 line.addListener('click', () => {
                     showLineInfo(lineInfo);
                 });
                 
-                // 如果有起始和终止站点名称，添加标签
+                // Add labels if names exist
                 if (fromName) {
-                    addLabel(path[0], fromName);
+                    const label = addLabel(path[0], fromName, 'from');
+                    if (label) stationLabels.push(label);
                 }
                 
                 if (toName && toName !== fromName) {
-                    addLabel(path[path.length - 1], toName);
+                    const label = addLabel(path[path.length - 1], toName, 'to');
+                    if (label) stationLabels.push(label);
                 }
             }
             
             updateStats();
         }
         
-        // 添加标签
-        function addLabel(position, text) {
-            if (!text) return;
+        // Add label
+        function addLabel(position, text, type) {
+            if (!text) return null;
             
-            new google.maps.Marker({
+            const marker = new google.maps.Marker({
                 position: position,
                 map: map,
                 label: {
@@ -344,9 +381,40 @@
                     scale: 0
                 }
             });
+            
+            return {
+                marker: marker,
+                type: type,
+                text: text
+            };
         }
         
-        // 过滤线路
+        // Update labels based on checkbox selection
+        function updateLabels() {
+            const showFrom = document.getElementById('showFromNames').checked;
+            const showTo = document.getElementById('showToNames').checked;
+            
+            // Remove all existing labels
+            stationLabels.forEach(label => {
+                label.marker.setMap(null);
+            });
+            stationLabels = [];
+            
+            // Add labels based on selection
+            gridLines.forEach(lineInfo => {
+                if (showFrom && lineInfo.fromName) {
+                    const label = addLabel(lineInfo.path[0], lineInfo.fromName, 'from');
+                    if (label) stationLabels.push(label);
+                }
+                
+                if (showTo && lineInfo.toName && lineInfo.toName !== lineInfo.fromName) {
+                    const label = addLabel(lineInfo.path[lineInfo.path.length - 1], lineInfo.toName, 'to');
+                    if (label) stationLabels.push(label);
+                }
+            });
+        }
+        
+        // Filter lines
         function filterLines() {
             const show225 = document.getElementById('voltage225').checked;
             const show90 = document.getElementById('voltage90').checked;
@@ -363,47 +431,47 @@
             });
         }
         
-        // 显示线路信息
+        // Show line info
         function showLineInfo(lineInfo) {
             const infoPanel = document.getElementById('info-panel');
             const infoTitle = document.getElementById('info-title');
             const infoContent = document.getElementById('info-content');
             
-            infoTitle.textContent = '线路信息';
+            infoTitle.textContent = 'Line Information';
             
             let content = '';
-            content += `<div><strong>电压等级:</strong> ${lineInfo.voltage}kV</div>`;
+            content += `<div><strong>Voltage:</strong> ${lineInfo.voltage}kV</div>`;
             
             if (lineInfo.fromName) {
-                content += `<div><strong>起始站点:</strong> ${lineInfo.fromName}</div>`;
+                content += `<div><strong>Origin Station:</strong> ${lineInfo.fromName}</div>`;
             }
             
             if (lineInfo.toName) {
-                content += `<div><strong>终止站点:</strong> ${lineInfo.toName}</div>`;
+                content += `<div><strong>Destination Station:</strong> ${lineInfo.toName}</div>`;
             }
             
             if (lineInfo.status) {
-                content += `<div><strong>状态:</strong> ${lineInfo.status}</div>`;
+                content += `<div><strong>Status:</strong> ${lineInfo.status}</div>`;
             }
             
             if (lineInfo.sources) {
-                content += `<div><strong>数据来源:</strong> ${lineInfo.sources}</div>`;
+                content += `<div><strong>Data Source:</strong> ${lineInfo.sources}</div>`;
             }
             
             if (lineInfo.project) {
-                content += `<div><strong>项目名称:</strong> ${lineInfo.project}</div>`;
+                content += `<div><strong>Project Name:</strong> ${lineInfo.project}</div>`;
             }
             
             infoContent.innerHTML = content;
             infoPanel.style.display = 'block';
         }
         
-        // 关闭信息面板
+        // Close info panel
         function closeInfoPanel() {
             document.getElementById('info-panel').style.display = 'none';
         }
         
-        // 更新统计信息
+        // Update statistics
         function updateStats() {
             document.getElementById('total-lines').textContent = stats.total;
             document.getElementById('lines-225').textContent = stats.voltage225;
@@ -412,6 +480,6 @@
             document.getElementById('total-substations').textContent = stats.substations;
         }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&libraries&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
 </body>
 </html>

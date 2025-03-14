@@ -1,121 +1,121 @@
 [
   {
-    "name": "昆努",
+    "name": "Kounoune",
     "voltage": 225,
     "lat": 14.7667,
     "lng": -17.3667,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "多拜诺",
+    "name": "Tobene",
     "voltage": 225,
     "lat": 14.6500,
     "lng": -16.2333,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "图巴",
+    "name": "Touba",
     "voltage": 225,
     "lat": 14.8833,
     "lng": -16.6500,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "考拉克",
+    "name": "Kaolack",
     "voltage": 225,
     "lat": 14.1500,
     "lng": -16.0667,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "马里昆达",
+    "name": "Malikunda",
     "voltage": 225,
     "lat": 13.6000,
     "lng": -16.4500,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "迪亚斯",
+    "name": "Diass",
     "voltage": 225,
     "lat": 14.7333,
     "lng": -17.1000,
-    "type": "225kV变电站"
+    "type": "225kV Substation"
   },
   {
-    "name": "鹿角",
+    "name": "Cap des Biches",
     "voltage": 90,
     "lat": 14.6833,
     "lng": -17.4500,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "贝莱尔",
+    "name": "Bel Air",
     "voltage": 90,
     "lat": 14.7000,
     "lng": -17.4667,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "安恩",
+    "name": "Hann",
     "voltage": 90,
     "lat": 14.7333,
     "lng": -17.4333,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "大学",
+    "name": "University",
     "voltage": 90,
     "lat": 14.7000,
     "lng": -17.4833,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "帕特多瓦",
+    "name": "Patte d'Oie",
     "voltage": 90,
     "lat": 14.6667,
     "lng": -17.4333,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "机场",
+    "name": "Airport",
     "voltage": 90,
     "lat": 14.7500,
     "lng": -17.4000,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "姆堡",
+    "name": "Mbao",
     "voltage": 90,
     "lat": 14.7833,
     "lng": -17.3833,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "迪瓦那",
+    "name": "Diawana",
     "voltage": 90,
     "lat": 14.7667,
     "lng": -16.9500,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "索科西姆",
+    "name": "Sococim",
     "voltage": 90,
     "lat": 14.5000,
     "lng": -16.7500,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "欧拉姆",
+    "name": "Ouaram",
     "voltage": 90,
     "lat": 14.1333,
     "lng": -16.2333,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   },
   {
-    "name": "索美塔",
+    "name": "Someta",
     "voltage": 90,
     "lat": 13.7833,
     "lng": -16.4833,
-    "type": "90kV变电站"
+    "type": "90kV Substation"
   }
 ] 
