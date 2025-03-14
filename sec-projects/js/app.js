@@ -190,14 +190,17 @@ async function addMarker(project) {
 
 // 加载 GeoJSON 数据
 function loadGeoJsonData() {
+    console.log('开始加载 GeoJSON 数据...');
     fetch('electric-network-mena.geojson')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            console.log('GeoJSON 数据加载成功，正在解析...');
             return response.json();
         })
         .then(data => {
+            console.log('GeoJSON 数据解析成功，开始处理...');
             // 存储 GeoJSON 数据
             geoJsonData = data;
             
@@ -209,19 +212,71 @@ function loadGeoJsonData() {
                 }
             });
             
-            // 添加 transmissionPower 筛选按钮
-            addTransmissionPowerFilters(Array.from(transmissionPowers).sort((a, b) => a - b));
+            const powerValues = Array.from(transmissionPowers).sort((a, b) => a - b);
+            console.log('找到的传输功率值:', powerValues);
             
-            // 显示 GeoJSON 数据
-            displayGeoJsonData(data);
+            try {
+                // 添加 transmissionPower 筛选按钮
+                addTransmissionPowerFilters(powerValues);
+                
+                // 显示 GeoJSON 数据
+                displayGeoJsonData(data);
+                
+                console.log('GeoJSON 数据处理完成');
+            } catch (error) {
+                console.error('处理 GeoJSON 数据时出错:', error);
+            }
         })
-        .catch(error => console.error('Error loading GeoJSON data:', error));
+        .catch(error => {
+            console.error('加载 GeoJSON 数据时出错:', error);
+            // 显示错误信息给用户
+            const mapElement = document.getElementById('map');
+            if (mapElement) {
+                const errorDiv = document.createElement('div');
+                errorDiv.style.position = 'absolute';
+                errorDiv.style.top = '50%';
+                errorDiv.style.left = '50%';
+                errorDiv.style.transform = 'translate(-50%, -50%)';
+                errorDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';
+                errorDiv.style.color = 'white';
+                errorDiv.style.padding = '20px';
+                errorDiv.style.borderRadius = '5px';
+                errorDiv.style.zIndex = '1000';
+                errorDiv.textContent = `加载电力网络数据失败: ${error.message}`;
+                mapElement.style.position = 'relative';
+                mapElement.appendChild(errorDiv);
+            }
+        });
 }
 
 // 添加 transmissionPower 筛选按钮
 function addTransmissionPowerFilters(powers) {
+    // 查找筛选容器
+    let filtersContainer = document.querySelector('.filter-container');
+    
+    // 如果筛选容器不存在，则创建一个
+    if (!filtersContainer) {
+        console.log('未找到 .filter-container 元素，正在创建...');
+        filtersContainer = document.createElement('div');
+        filtersContainer.className = 'filter-container';
+        
+        // 将筛选容器添加到内容区域
+        const contentElement = document.querySelector('.content');
+        if (contentElement) {
+            // 在地图元素之前插入筛选容器
+            const mapElement = document.getElementById('map');
+            if (mapElement) {
+                contentElement.insertBefore(filtersContainer, mapElement);
+            } else {
+                contentElement.appendChild(filtersContainer);
+            }
+        } else {
+            console.error('未找到 .content 元素，无法添加筛选容器');
+            return; // 如果找不到内容区域，则退出函数
+        }
+    }
+    
     // 创建筛选组
-    const filtersContainer = document.querySelector('.filters-container');
     const filterGroup = document.createElement('div');
     filterGroup.className = 'filter-group';
     
@@ -468,12 +523,19 @@ function addTransmissionLine(feature) {
 
 // 根据传输功率筛选 GeoJSON 数据
 function filterGeoJsonByTransmissionPower(value) {
+    console.log(`筛选传输功率: ${value}`);
+    
     // 显示/隐藏传输线路
     transmissionLines.forEach(line => {
         const properties = line.properties || {};
-        const isVisible = value === 'all' || properties.transmissionPower === parseInt(value);
+        const linePower = properties.transmissionPower;
+        const filterValue = value === 'all' ? 'all' : parseInt(value, 10);
+        const isVisible = filterValue === 'all' || linePower === filterValue;
+        
         line.setVisible(isVisible);
     });
+    
+    console.log(`筛选完成，共 ${transmissionLines.length} 条线路`);
 }
 
 // 添加传输功率图例
@@ -501,6 +563,10 @@ function addTransmissionPowerLegend() {
         const colorBox = document.createElement('div');
         colorBox.className = 'legend-color';
         colorBox.style.backgroundColor = power.color;
+        // 确保线路图例的样式是线条形状
+        colorBox.style.width = '20px';
+        colorBox.style.height = '5px';
+        colorBox.style.borderRadius = '2px';
         
         const label = document.createElement('span');
         label.textContent = power.name;
@@ -518,10 +584,14 @@ function addTransmissionPowerLegend() {
             });
             
             // 添加对应按钮的活动状态
-            document.querySelector(`.filter-btn[data-type="transmission"][data-value="${power.value}"]`).classList.add('active');
-            
-            // 应用过滤
-            filterGeoJsonByTransmissionPower(power.value);
+            const targetBtn = document.querySelector(`.filter-btn[data-type="transmission"][data-value="${power.value}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+                // 应用筛选
+                filterGeoJsonByTransmissionPower(power.value);
+            } else {
+                console.warn(`未找到传输功率为 ${power.value} 的按钮`);
+            }
         };
     });
 }
