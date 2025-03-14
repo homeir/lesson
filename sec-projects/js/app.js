@@ -1,6 +1,8 @@
 let map;
 let markers = [];
 let activeInfoWindow = null;
+let geoJsonLayer = null; // 添加 GeoJSON 图层变量
+let transmissionLines = []; // 存储电力传输线路
 
 // Initialize Google Maps
 async function initMap() {
@@ -13,7 +15,7 @@ async function initMap() {
     
     map = new Map(document.getElementById('map'), {
         mapId: 'f31b0e08503d2a23', // 需要替换为您的实际 Map ID
-        zoom: 3,
+        zoom: 4, // 降低缩放级别以显示更大区域
         center: { lat: 30.0, lng: 45.0 },
         styles: [
             {
@@ -23,6 +25,9 @@ async function initMap() {
             }
         ]
     });
+
+    // 加载 GeoJSON 数据
+    loadGeoJsonData();
 
     // Add markers for each project
     for (const project of projectData) {
@@ -183,6 +188,383 @@ async function addMarker(project) {
     markers.push(marker);
 }
 
+// 加载 GeoJSON 数据
+function loadGeoJsonData() {
+    fetch('electric-network-mena.geojson')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 存储 GeoJSON 数据
+            geoJsonData = data;
+            
+            // 提取所有可能的 transmissionPower 值
+            const transmissionPowers = new Set();
+            data.features.forEach(feature => {
+                if (feature.properties && feature.properties.transmissionPower) {
+                    transmissionPowers.add(feature.properties.transmissionPower);
+                }
+            });
+            
+            // 添加 transmissionPower 筛选按钮
+            addTransmissionPowerFilters(Array.from(transmissionPowers).sort((a, b) => a - b));
+            
+            // 显示 GeoJSON 数据
+            displayGeoJsonData(data);
+        })
+        .catch(error => console.error('Error loading GeoJSON data:', error));
+}
+
+// 添加 transmissionPower 筛选按钮
+function addTransmissionPowerFilters(powers) {
+    // 创建筛选组
+    const filtersContainer = document.querySelector('.filters-container');
+    const filterGroup = document.createElement('div');
+    filterGroup.className = 'filter-group';
+    
+    // 添加标题
+    const title = document.createElement('h3');
+    title.textContent = 'Filter by Transmission Power:';
+    filterGroup.appendChild(title);
+    
+    // 添加按钮容器
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'filter-buttons';
+    
+    // 添加"全部"按钮
+    const allButton = document.createElement('button');
+    allButton.className = 'filter-btn active';
+    allButton.dataset.type = 'transmission';
+    allButton.dataset.value = 'all';
+    allButton.textContent = 'All';
+    buttonsContainer.appendChild(allButton);
+    
+    // 添加每个 transmissionPower 的按钮
+    powers.forEach(power => {
+        const button = document.createElement('button');
+        button.className = 'filter-btn';
+        button.dataset.type = 'transmission';
+        button.dataset.value = power;
+        button.textContent = `${power}kV`;
+        buttonsContainer.appendChild(button);
+    });
+    
+    // 将按钮容器添加到筛选组
+    filterGroup.appendChild(buttonsContainer);
+    
+    // 将筛选组添加到筛选容器
+    filtersContainer.appendChild(filterGroup);
+    
+    // 添加事件监听器
+    buttonsContainer.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            // 移除同组按钮的活动状态
+            buttonsContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加当前按钮的活动状态
+            e.target.classList.add('active');
+            
+            // 应用筛选
+            filterGeoJsonByTransmissionPower(e.target.dataset.value);
+        });
+    });
+}
+
+// 显示 GeoJSON 数据
+function displayGeoJsonData(data) {
+    // 清除现有的 GeoJSON 图层
+    if (geoJsonLayer) {
+        geoJsonLayer.setMap(null);
+    }
+    
+    // 清除现有的传输线路
+    transmissionLines.forEach(line => line.setMap(null));
+    transmissionLines = [];
+    
+    // 处理每个 feature
+    data.features.forEach(feature => {
+        if (feature.geometry && feature.geometry.type === 'LineString') {
+            // 创建传输线路
+            addTransmissionLine(feature);
+        } else if (feature.geometry && feature.geometry.type === 'Point') {
+            // 点可能已经通过其他方式显示，这里可以添加额外的处理
+            // 例如，如果需要显示电网节点，可以在这里添加代码
+            addNetworkNode(feature);
+        }
+    });
+    
+    console.log(`已加载 ${transmissionLines.length} 条传输线路`);
+}
+
+// 添加电网节点
+function addNetworkNode(feature) {
+    // 如果不需要显示节点，可以注释掉此函数的内容
+    const properties = feature.properties || {};
+    const coordinates = feature.geometry.coordinates;
+    const position = { lat: coordinates[1], lng: coordinates[0] };
+    
+    // 根据节点类型设置图标
+    let icon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 5,
+        fillColor: '#000000',
+        fillOpacity: 0.8,
+        strokeWeight: 1,
+        strokeColor: '#FFFFFF'
+    };
+    
+    // 根据节点类型设置颜色
+    if (properties.nodeType) {
+        switch (properties.nodeType.toLowerCase()) {
+            case 'city':
+                icon.fillColor = '#FF0000'; // 红色
+                icon.scale = 6;
+                break;
+            case 'plant':
+                icon.fillColor = '#00FF00'; // 绿色
+                break;
+            case 'dam':
+                icon.fillColor = '#0000FF'; // 蓝色
+                break;
+            case 'town':
+                icon.fillColor = '#FFA500'; // 橙色
+                break;
+            default:
+                icon.fillColor = '#000000'; // 黑色
+                break;
+        }
+    }
+    
+    // 创建标记
+    const marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        icon: icon,
+        title: properties.name || 'Unknown'
+    });
+    
+    // 添加点击事件
+    marker.addListener('click', () => {
+        // 创建信息窗口内容
+        let content = `
+            <div class="info-window">
+                <h2>${properties.name || 'Unknown'}</h2>
+                <div class="info-content">
+                    <p><strong>Type:</strong> ${properties.nodeType || 'Unknown'}</p>
+                </div>
+            </div>
+        `;
+        
+        // 显示信息窗口
+        if (activeInfoWindow) {
+            activeInfoWindow.close();
+        }
+        
+        const infoWindow = new google.maps.InfoWindow({
+            content: content,
+            position: position
+        });
+        
+        infoWindow.open(map);
+        activeInfoWindow = infoWindow;
+    });
+}
+
+// 添加传输线路
+function addTransmissionLine(feature) {
+    const properties = feature.properties || {};
+    const coordinates = feature.geometry.coordinates;
+    const path = coordinates.map(coord => ({ lat: coord[1], lng: coord[0] }));
+    
+    // 根据传输功率设置线条颜色
+    let color = '#000000'; // 默认黑色
+    let strokeWeight = 2; // 默认线宽
+    
+    switch (properties.transmissionPower) {
+        case 150:
+            color = '#00FF00'; // 绿色
+            break;
+        case 225:
+            color = '#0000FF'; // 蓝色
+            break;
+        case 400:
+            color = '#FF0000'; // 红色
+            break;
+        case 500:
+            color = '#800080'; // 紫色
+            break;
+        default:
+            color = '#000000'; // 黑色
+            break;
+    }
+    
+    // 根据线路类型设置线条样式
+    if (properties.lineType === 'double') {
+        strokeWeight = 3;
+    } else if (properties.lineType === 'triple') {
+        strokeWeight = 4;
+    }
+    
+    // 创建线路
+    const line = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: color,
+        strokeOpacity: 0.8,
+        strokeWeight: strokeWeight,
+        map: map,
+        // 存储属性以便筛选
+        properties: properties
+    });
+    
+    // 添加点击事件
+    line.addListener('click', () => {
+        // 创建信息窗口内容
+        let content = `
+            <div class="info-window">
+                <h2>Transmission Line</h2>
+                <div class="info-content">
+                    <p><strong>Power:</strong> ${properties.transmissionPower}kV</p>
+                    <p><strong>Type:</strong> ${properties.lineType}</p>
+        `;
+        
+        // 如果有节点信息，添加到内容中
+        if (properties.nodes && properties.nodes.length > 0) {
+            content += `<p><strong>Nodes:</strong> ${properties.nodes.join(' → ')}</p>`;
+        }
+        
+        // 如果是互联线路，添加到内容中
+        if (properties.interconnection && properties.interconnection.length > 0) {
+            content += `<p><strong>Interconnection:</strong> ${properties.interconnection.join(' - ')}</p>`;
+        }
+        
+        content += `
+                </div>
+            </div>
+        `;
+        
+        // 显示信息窗口
+        if (activeInfoWindow) {
+            activeInfoWindow.close();
+        }
+        
+        const infoWindow = new google.maps.InfoWindow({
+            content: content,
+            position: path[Math.floor(path.length / 2)] // 在线路中间显示信息窗口
+        });
+        
+        infoWindow.open(map);
+        activeInfoWindow = infoWindow;
+    });
+    
+    // 将线路添加到数组中
+    transmissionLines.push(line);
+}
+
+// 根据传输功率筛选 GeoJSON 数据
+function filterGeoJsonByTransmissionPower(value) {
+    // 显示/隐藏传输线路
+    transmissionLines.forEach(line => {
+        const properties = line.properties || {};
+        const isVisible = value === 'all' || properties.transmissionPower === parseInt(value);
+        line.setVisible(isVisible);
+    });
+}
+
+// 添加传输功率图例
+function addTransmissionPowerLegend() {
+    const legendContainer = document.getElementById('legend');
+    
+    // 添加传输功率图例标题
+    const powerTitle = document.createElement('h3');
+    powerTitle.textContent = 'Transmission Power:';
+    powerTitle.style.margin = '0 20px 0 20px';
+    legendContainer.appendChild(powerTitle);
+    
+    // 添加传输功率图例项
+    const powers = [
+        { name: '150kV', value: 150, color: '#00FF00' },
+        { name: '225kV', value: 225, color: '#0000FF' },
+        { name: '400kV', value: 400, color: '#FF0000' },
+        { name: '500kV', value: 500, color: '#800080' }
+    ];
+    
+    powers.forEach(power => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = power.color;
+        
+        const label = document.createElement('span');
+        label.textContent = power.name;
+        
+        item.appendChild(colorBox);
+        item.appendChild(label);
+        legendContainer.appendChild(item);
+        
+        // 添加点击事件
+        item.style.cursor = 'pointer';
+        item.onclick = () => {
+            // 移除所有传输功率过滤按钮的活动状态
+            document.querySelectorAll('.filter-btn[data-type="transmission"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加对应按钮的活动状态
+            document.querySelector(`.filter-btn[data-type="transmission"][data-value="${power.value}"]`).classList.add('active');
+            
+            // 应用过滤
+            filterGeoJsonByTransmissionPower(power.value);
+        };
+    });
+}
+
+// 添加节点类型图例
+function addNodeTypeLegend() {
+    const legendContainer = document.getElementById('legend');
+    
+    // 添加节点类型图例标题
+    const nodeTypeTitle = document.createElement('h3');
+    nodeTypeTitle.textContent = 'Node Types:';
+    nodeTypeTitle.style.margin = '0 20px 0 20px';
+    legendContainer.appendChild(nodeTypeTitle);
+    
+    // 添加节点类型图例项
+    const nodeTypes = [
+        { name: 'City', color: '#FF0000' },
+        { name: 'Plant', color: '#00FF00' },
+        { name: 'Dam', color: '#0000FF' },
+        { name: 'Town', color: '#FFA500' },
+        { name: 'Other', color: '#000000' }
+    ];
+    
+    nodeTypes.forEach(nodeType => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = nodeType.color;
+        colorBox.style.width = '10px';
+        colorBox.style.height = '10px';
+        colorBox.style.borderRadius = '50%';
+        
+        const label = document.createElement('span');
+        label.textContent = nodeType.name;
+        
+        item.appendChild(colorBox);
+        item.appendChild(label);
+        legendContainer.appendChild(item);
+    });
+}
+
 // Add legend to the map
 function addLegend() {
     const legendContainer = document.getElementById('legend');
@@ -210,6 +592,9 @@ function addLegend() {
         const colorBox = document.createElement('div');
         colorBox.className = 'legend-color';
         colorBox.style.backgroundColor = status.color;
+        colorBox.style.width = '15px';
+        colorBox.style.height = '15px';
+        colorBox.style.borderRadius = '50%';
         
         const label = document.createElement('span');
         label.textContent = status.name;
@@ -257,6 +642,12 @@ function addLegend() {
         item.appendChild(label);
         legendContainer.appendChild(item);
     });
+    
+    // 添加传输功率图例
+    addTransmissionPowerLegend();
+    
+    // 添加节点类型图例
+    addNodeTypeLegend();
 }
 
 // Get color for status
