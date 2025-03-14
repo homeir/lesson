@@ -2,22 +2,22 @@
   {
     "name": "Kounoune",
     "voltage": 225,
-    "lat": 14.7667,
-    "lng": -17.3667,
+    "lat": 14.7434588,
+    "lng": -17.2694651,
     "type": "225kV Substation"
   },
   {
     "name": "Tobene",
     "voltage": 225,
-    "lat": 14.6500,
-    "lng": -16.2333,
+    "lat": 15.0053863,
+    "lng": -16.8658336,
     "type": "225kV Substation"
   },
   {
     "name": "Touba",
     "voltage": 225,
-    "lat": 14.8833,
-    "lng": -16.6500,
+    "lat": 14.8552897,
+    "lng": -15.8855325,
     "type": "225kV Substation"
   },
   {
@@ -28,10 +28,10 @@
     "type": "225kV Substation"
   },
   {
-    "name": "Malikunda",
+    "name": "Malicounda",
     "voltage": 225,
-    "lat": 13.6000,
-    "lng": -16.4500,
+    "lat": 14.4707049,
+    "lng": -16.9508097,
     "type": "225kV Substation"
   },
   {
@@ -44,8 +44,8 @@
   {
     "name": "Cap des Biches",
     "voltage": 90,
-    "lat": 14.6833,
-    "lng": -17.4500,
+    "lat": 14.7200087,
+    "lng": -17.2998741,
     "type": "90kV Substation"
   },
   {
@@ -117,5 +117,12 @@
     "lat": 13.7833,
     "lng": -16.4833,
     "type": "90kV Substation"
+  },
+  {
+    "name": "Ndindy",
+    "voltage": 225,
+    "lat": 14.8943759,
+    "lng": -16.2062527,
+    "type": "225kV Substation"
   }
 ] 
