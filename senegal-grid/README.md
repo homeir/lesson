@@ -12,6 +12,7 @@ This application displays the electricity transmission network of Senegal and pr
 6. Toggle display of origin and destination station labels
 7. Display power plants by type (Solar, Wind, Hydro, Energy Storage, Heavy Fuel Oil)
 8. Filter power plants by type
+9. Switch between different map types (Road Map, Satellite, Hybrid, Terrain)
 
 ## Usage Instructions
 
@@ -19,8 +20,9 @@ This application displays the electricity transmission network of Senegal and pr
 2. Use the checkboxes in the top-left corner to filter lines by voltage level
 3. Use the "Station Labels" section to toggle the display of origin and destination station names
 4. Use the "Power Plants" section to filter power plants by type
-5. Click on substations or power plants to view detailed information
-6. Click on lines to view detailed information about the transmission line
+5. Use the "Map Type" section to switch between different map views (Road Map, Satellite, Hybrid, Terrain)
+6. Click on substations or power plants to view detailed information
+7. Click on lines to view detailed information about the transmission line
 
 ## Data Sources
 

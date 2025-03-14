@@ -212,6 +212,26 @@
             <button id="applyPlantFilters" style="margin-top: 5px;">Apply</button>
         </div>
         
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Map Type</h3>
+            <div class="control-item">
+                <input type="radio" id="mapTypeRoadmap" name="mapType" value="roadmap" checked>
+                <label for="mapTypeRoadmap">Road Map</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeSatellite" name="mapType" value="satellite">
+                <label for="mapTypeSatellite">Satellite</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeHybrid" name="mapType" value="hybrid">
+                <label for="mapTypeHybrid">Hybrid</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeTerrain" name="mapType" value="terrain">
+                <label for="mapTypeTerrain">Terrain</label>
+            </div>
+        </div>
+        
         <div class="stats">
             <h3 style="margin-top: 0;">Statistics</h3>
             <div id="stats-content">
@@ -289,6 +309,12 @@
             
             // Add power plant filter event listener
             document.getElementById('applyPlantFilters').addEventListener('click', filterPowerPlants);
+            
+            // Add map type change event listeners
+            document.getElementById('mapTypeRoadmap').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeSatellite').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeHybrid').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeTerrain').addEventListener('change', changeMapType);
         }
 
         // Load substation data
@@ -658,6 +684,19 @@
             document.getElementById('lines-30').textContent = stats.voltage30;
             document.getElementById('total-substations').textContent = stats.substations;
             document.getElementById('total-plants').textContent = stats.plants;
+        }
+
+        // Change map type
+        function changeMapType() {
+            if (document.getElementById('mapTypeRoadmap').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+            } else if (document.getElementById('mapTypeSatellite').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+            } else if (document.getElementById('mapTypeHybrid').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+            } else if (document.getElementById('mapTypeTerrain').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+            }
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
