@@ -1,0 +1,155 @@
+[
+  {
+    "name": "Taiba N'diaye Wind Farm",
+    "type": "Wind Power Plant",
+    "capacity": 158.7,
+    "lat": 15.0095568,
+    "lng": -16.8631927,
+    "status": "Operational",
+    "year": 2020
+  },
+  {
+    "name": "IPH Energy Storage",
+    "type": "Energy Storage",
+    "capacity": "40MW/160MWh",
+    "lat": 14.8553,
+    "lng": -15.8855,
+    "status": "Planned",
+    "year": 2024
+  },
+  {
+    "name": "Bokhol Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 20,
+    "lat": 16.5114,
+    "lng": -15.8019,
+    "status": "Operational",
+    "year": 2016
+  },
+  {
+    "name": "Malicounda Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 22,
+    "lat": 14.4724,
+    "lng": -16.9508,
+    "status": "Operational",
+    "year": 2017
+  },
+  {
+    "name": "Kahone Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 35,
+    "lat": 14.1522,
+    "lng": -16.0731,
+    "status": "Operational",
+    "year": 2021
+  },
+  {
+    "name": "Santhiou Mékhé Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 30,
+    "lat": 15.1033,
+    "lng": -16.6206,
+    "status": "Operational",
+    "year": 2017
+  },
+  {
+    "name": "Ten Merina Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 30,
+    "lat": 15.0054,
+    "lng": -16.8658,
+    "status": "Operational",
+    "year": 2018
+  },
+  {
+    "name": "Diass Solar Plant",
+    "type": "Solar Power Plant",
+    "capacity": 25,
+    "lat": 14.7333,
+    "lng": -17.1000,
+    "status": "Operational",
+    "year": 2019
+  },
+  {
+    "name": "Manantali Dam",
+    "type": "Hydro Power Plant",
+    "capacity": 200,
+    "lat": 13.1833,
+    "lng": -10.4167,
+    "status": "Operational",
+    "year": 2002
+  },
+  {
+    "name": "Félou Hydroelectric Plant",
+    "type": "Hydro Power Plant",
+    "capacity": 60,
+    "lat": 14.3500,
+    "lng": -11.3500,
+    "status": "Operational",
+    "year": 2014
+  },
+  {
+    "name": "Cap des Biches Power Plant",
+    "type": "Heavy Fuel Oil Plant",
+    "capacity": 86,
+    "lat": 14.7200,
+    "lng": -17.2999,
+    "status": "Operational",
+    "year": 1990
+  },
+  {
+    "name": "Kounoune Power Plant",
+    "type": "Heavy Fuel Oil Plant",
+    "capacity": 67.5,
+    "lat": 14.7435,
+    "lng": -17.2695,
+    "status": "Operational",
+    "year": 2008
+  },
+  {
+    "name": "Sendou Power Plant",
+    "type": "Heavy Fuel Oil Plant",
+    "capacity": 125,
+    "lat": 14.6833,
+    "lng": -17.2667,
+    "status": "Operational",
+    "year": 2018
+  },
+  {
+    "name": "Tobene Power Plant",
+    "type": "Heavy Fuel Oil Plant",
+    "capacity": 115,
+    "lat": 15.0054,
+    "lng": -16.8658,
+    "status": "Operational",
+    "year": 2016
+  },
+  {
+    "name": "Malicounda Power Plant",
+    "type": "Heavy Fuel Oil Plant",
+    "capacity": 120,
+    "lat": 14.4724,
+    "lng": -16.9508,
+    "status": "Operational",
+    "year": 2022
+  },
+  {
+    "name": "Dakar Energy Storage",
+    "type": "Energy Storage",
+    "capacity": 15,
+    "lat": 14.7167,
+    "lng": -17.4333,
+    "status": "Operational",
+    "year": 2021
+  },
+  {
+    "name": "Diass Energy Storage",
+    "type": "Energy Storage",
+    "capacity": 60,
+    "lat": 14.7333,
+    "lng": -17.1000,
+    "status": "Under Construction",
+    "year": 2023
+  }
+] 

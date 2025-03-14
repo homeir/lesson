@@ -23,6 +23,8 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
             z-index: 1000;
+            max-height: 70vh;
+            overflow-y: auto;
         }
         .legend-item {
             display: flex;
@@ -47,6 +49,8 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
             z-index: 1000;
             max-width: 250px;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .control-item {
             margin-bottom: 5px;
@@ -87,31 +91,71 @@
             border-top: 1px solid #ccc;
             padding-top: 10px;
         }
+        .legend-section {
+            margin-top: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div class="legend">
         <h3 style="margin-top: 0;">Legend</h3>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #FF0000; height: 4px;"></div>
-            <div class="legend-text">225kV Lines</div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Transmission Lines</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF0000; height: 4px;"></div>
+                <div class="legend-text">225kV Lines</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #0000FF; height: 3px;"></div>
+                <div class="legend-text">90kV Lines</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #00FF00; height: 2px;"></div>
+                <div class="legend-text">30kV Lines</div>
+            </div>
         </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #0000FF; height: 3px;"></div>
-            <div class="legend-text">90kV Lines</div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Substations</h4>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; border-radius: 50%;"></div>
+                <div class="legend-text">225kV Substations</div>
+            </div>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #0000FF; border-radius: 50%;"></div>
+                <div class="legend-text">90kV Substations</div>
+            </div>
         </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #00FF00; height: 2px;"></div>
-            <div class="legend-text">30kV Lines</div>
-        </div>
-        <div class="legend-item">
-            <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; border-radius: 50%;"></div>
-            <div class="legend-text">225kV Substations</div>
-        </div>
-        <div class="legend-item">
-            <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #0000FF; border-radius: 50%;"></div>
-            <div class="legend-text">90kV Substations</div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Power Plants</h4>
+            <div class="legend-item">
+                <img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png" class="legend-icon">
+                <div class="legend-text">Solar Power Plant</div>
+            </div>
+            <div class="legend-item">
+                <img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" class="legend-icon">
+                <div class="legend-text">Wind Power Plant</div>
+            </div>
+            <div class="legend-item">
+                <img src="https://maps.google.com/mapfiles/ms/icons/purple-dot.png" class="legend-icon">
+                <div class="legend-text">Hydro Power Plant</div>
+            </div>
+            <div class="legend-item">
+                <img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" class="legend-icon">
+                <div class="legend-text">Energy Storage</div>
+            </div>
+            <div class="legend-item">
+                <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" class="legend-icon">
+                <div class="legend-text">Heavy Fuel Oil Plant</div>
+            </div>
         </div>
     </div>
 
@@ -143,6 +187,31 @@
             <button id="applyLabels" style="margin-top: 5px;">Apply</button>
         </div>
         
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Power Plants</h3>
+            <div class="control-item">
+                <input type="checkbox" id="showSolar" checked>
+                <label for="showSolar">Solar Power Plants</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showWind" checked>
+                <label for="showWind">Wind Power Plants</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showHydro" checked>
+                <label for="showHydro">Hydro Power Plants</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showStorage" checked>
+                <label for="showStorage">Energy Storage</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showFuelOil" checked>
+                <label for="showFuelOil">Heavy Fuel Oil Plants</label>
+            </div>
+            <button id="applyPlantFilters" style="margin-top: 5px;">Apply</button>
+        </div>
+        
         <div class="stats">
             <h3 style="margin-top: 0;">Statistics</h3>
             <div id="stats-content">
@@ -151,13 +220,14 @@
                 <div>90kV Lines: <span id="lines-90">0</span></div>
                 <div>30kV Lines: <span id="lines-30">0</span></div>
                 <div>Substations: <span id="total-substations">0</span></div>
+                <div>Power Plants: <span id="total-plants">0</span></div>
             </div>
         </div>
     </div>
 
     <div class="info-panel" id="info-panel">
         <div class="close-btn" onclick="closeInfoPanel()">×</div>
-        <div class="info-title" id="info-title">Line Information</div>
+        <div class="info-title" id="info-title">Information</div>
         <div class="info-content" id="info-content"></div>
     </div>
 
@@ -168,6 +238,8 @@
         let substationMarkers = [];
         // Store grid lines
         let gridLines = [];
+        // Store power plant markers
+        let plantMarkers = [];
         // Store KML data
         let kmlData;
         // Store station labels
@@ -178,7 +250,8 @@
             voltage225: 0,
             voltage90: 0,
             voltage30: 0,
-            substations: 0
+            substations: 0,
+            plants: 0
         };
 
         // Initialize map
@@ -200,6 +273,9 @@
             // Load substation data
             loadSubstations();
             
+            // Load power plant data
+            loadPowerPlants();
+            
             // Load KML file
             loadKmlData();
 
@@ -210,6 +286,9 @@
             
             // Add label control event listener
             document.getElementById('applyLabels').addEventListener('click', updateLabels);
+            
+            // Add power plant filter event listener
+            document.getElementById('applyPlantFilters').addEventListener('click', filterPowerPlants);
         }
 
         // Load substation data
@@ -243,6 +322,54 @@
                         });
 
                         substationMarkers.push(marker);
+                    });
+                    updateStats();
+                });
+        }
+        
+        // Load power plant data
+        function loadPowerPlants() {
+            fetch('plants.json')
+                .then(response => response.json())
+                .then(data => {
+                    stats.plants = data.length;
+                    data.forEach(plant => {
+                        // Set icon based on plant type
+                        let iconUrl;
+                        switch(plant.type) {
+                            case 'Solar Power Plant':
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                                break;
+                            case 'Wind Power Plant':
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+                                break;
+                            case 'Hydro Power Plant':
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png';
+                                break;
+                            case 'Energy Storage':
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                                break;
+                            case 'Heavy Fuel Oil Plant':
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                                break;
+                            default:
+                                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+                        }
+                        
+                        const marker = new google.maps.Marker({
+                            position: { lat: plant.lat, lng: plant.lng },
+                            map: map,
+                            title: plant.name,
+                            icon: iconUrl,
+                            plantType: plant.type
+                        });
+                        
+                        // Add click event
+                        marker.addListener('click', () => {
+                            showPlantInfo(plant);
+                        });
+                        
+                        plantMarkers.push(marker);
                     });
                     updateStats();
                 });
@@ -414,6 +541,39 @@
             });
         }
         
+        // Filter power plants
+        function filterPowerPlants() {
+            const showSolar = document.getElementById('showSolar').checked;
+            const showWind = document.getElementById('showWind').checked;
+            const showHydro = document.getElementById('showHydro').checked;
+            const showStorage = document.getElementById('showStorage').checked;
+            const showFuelOil = document.getElementById('showFuelOil').checked;
+            
+            plantMarkers.forEach(marker => {
+                let visible = false;
+                
+                switch(marker.plantType) {
+                    case 'Solar Power Plant':
+                        visible = showSolar;
+                        break;
+                    case 'Wind Power Plant':
+                        visible = showWind;
+                        break;
+                    case 'Hydro Power Plant':
+                        visible = showHydro;
+                        break;
+                    case 'Energy Storage':
+                        visible = showStorage;
+                        break;
+                    case 'Heavy Fuel Oil Plant':
+                        visible = showFuelOil;
+                        break;
+                }
+                
+                marker.setVisible(visible);
+            });
+        }
+        
         // Filter lines
         function filterLines() {
             const show225 = document.getElementById('voltage225').checked;
@@ -466,6 +626,25 @@
             infoPanel.style.display = 'block';
         }
         
+        // Show power plant info
+        function showPlantInfo(plant) {
+            const infoPanel = document.getElementById('info-panel');
+            const infoTitle = document.getElementById('info-title');
+            const infoContent = document.getElementById('info-content');
+            
+            infoTitle.textContent = 'Power Plant Information';
+            
+            let content = '';
+            content += `<div><strong>Name:</strong> ${plant.name}</div>`;
+            content += `<div><strong>Type:</strong> ${plant.type}</div>`;
+            content += `<div><strong>Capacity:</strong> ${plant.capacity} MW</div>`;
+            content += `<div><strong>Status:</strong> ${plant.status}</div>`;
+            content += `<div><strong>Year:</strong> ${plant.year}</div>`;
+            
+            infoContent.innerHTML = content;
+            infoPanel.style.display = 'block';
+        }
+        
         // Close info panel
         function closeInfoPanel() {
             document.getElementById('info-panel').style.display = 'none';
@@ -478,6 +657,7 @@
             document.getElementById('lines-90').textContent = stats.voltage90;
             document.getElementById('lines-30').textContent = stats.voltage30;
             document.getElementById('total-substations').textContent = stats.substations;
+            document.getElementById('total-plants').textContent = stats.plants;
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
