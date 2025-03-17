@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非洲电力传输网络分析</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 10px;
+        }
+        .legend-text {
+            font-size: 12px;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .control-item {
+            margin-bottom: 5px;
+        }
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .info-content {
+            font-size: 14px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .stats {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .control-section {
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .legend-section {
+            margin-top: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="legend">
+        <h3 style="margin-top: 0;">图例</h3>
+        <!-- 传输线路图例将由 JavaScript 动态添加 -->
+    </div>
+
+    <div class="controls">
+        <h3 style="margin-top: 0;">地图类型</h3>
+        <div class="control-item">
+            <input type="radio" id="mapTypeRoadmap" name="mapType" value="roadmap" checked>
+            <label for="mapTypeRoadmap">道路地图</label>
+        </div>
+        <div class="control-item">
+            <input type="radio" id="mapTypeSatellite" name="mapType" value="satellite">
+            <label for="mapTypeSatellite">卫星图像</label>
+        </div>
+        <div class="control-item">
+            <input type="radio" id="mapTypeHybrid" name="mapType" value="hybrid">
+            <label for="mapTypeHybrid">混合模式</label>
+        </div>
+        <div class="control-item">
+            <input type="radio" id="mapTypeTerrain" name="mapType" value="terrain">
+            <label for="mapTypeTerrain">地形图</label>
+        </div>
+        
+        <!-- 电压过滤器将由 JavaScript 动态添加 -->
+        
+        <div class="stats">
+            <h3 style="margin-top: 0;">统计信息</h3>
+            <div id="stats-content">
+                <div>总线路数: <span id="total-lines">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="info-panel">
+        <div class="close-btn" onclick="closeInfoPanel()">×</div>
+        <div class="info-title" id="info-title">信息</div>
+        <div class="info-content" id="info-content"></div>
+    </div>
+
+    <!-- 引入我们的应用脚本 -->
+    <script src="app.js"></script>
+    
+    <!-- 引入 Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
+    
+    <script>
+        // 地图类型切换
+        document.getElementById('mapTypeRoadmap').addEventListener('change', changeMapType);
+        document.getElementById('mapTypeSatellite').addEventListener('change', changeMapType);
+        document.getElementById('mapTypeHybrid').addEventListener('change', changeMapType);
+        document.getElementById('mapTypeTerrain').addEventListener('change', changeMapType);
+        
+        // 切换地图类型
+        function changeMapType() {
+            if (document.getElementById('mapTypeRoadmap').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+            } else if (document.getElementById('mapTypeSatellite').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+            } else if (document.getElementById('mapTypeHybrid').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+            } else if (document.getElementById('mapTypeTerrain').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+            }
+        }
+    </script>
+</body>
+</html>
