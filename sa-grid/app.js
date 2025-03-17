@@ -1,21 +1,21 @@
-// 存储地图对象
+// Store map object
 let map;
-// 存储传输线路
+// Store transmission lines
 let transmissionLines = [];
-// 存储电压等级过滤器
+// Store voltage filters
 let voltageFilters = {};
-// 存储传输线路图例
+// Store transmission line legend
 let voltageLegend = {};
-// 存储统计信息
+// Store statistics
 let stats = {
     total: 0,
     voltageCategories: {}
 };
 
-// 初始化地图
+// Initialize map
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -8.783195, lng: 34.508523 }, // 非洲中部位置
+        center: { lat: -8.783195, lng: 34.508523 }, // Center of Africa
         zoom: 4,
         mapTypeControl: true,
         mapTypeControlOptions: {
@@ -28,90 +28,107 @@ function initMap() {
         }
     });
 
-    // 加载 GeoJSON 数据
+    // Load GeoJSON data
     loadGeoJsonData();
 
-    // 添加电压等级过滤器事件监听器
+    // Add voltage filter event listeners
     setupVoltageFilters();
 }
 
-// 加载 GeoJSON 数据
+// Load GeoJSON data
 function loadGeoJsonData() {
     fetch('africagrid20170906final.geojson')
         .then(response => {
             if (!response.ok) {
-                throw new Error('无法加载 GeoJSON 数据: ' + response.statusText);
+                throw new Error('Failed to load GeoJSON data: ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            displayGeoJsonData(data);
-            createVoltageLegend();
-            updateStats();
+            try {
+                if (!data || !data.features || !Array.isArray(data.features)) {
+                    throw new Error('Invalid GeoJSON data format');
+                }
+                
+                displayGeoJsonData(data);
+                createVoltageLegend();
+                
+                // Delay updating statistics to ensure DOM is fully loaded
+                setTimeout(() => {
+                    try {
+                        updateStats();
+                    } catch (statsError) {
+                        console.error('Error updating statistics:', statsError);
+                    }
+                }, 100);
+            } catch (processError) {
+                console.error('Error processing GeoJSON data:', processError);
+                alert('Error processing transmission line data: ' + processError.message);
+            }
         })
         .catch(error => {
-            console.error('加载 GeoJSON 数据时出错:', error);
-            alert('加载传输线路数据时出错: ' + error.message);
+            console.error('Error loading GeoJSON data:', error);
+            alert('Error loading transmission line data: ' + error.message);
         });
 }
 
-// 显示 GeoJSON 数据
+// Display GeoJSON data
 function displayGeoJsonData(data) {
-    // 清除现有的传输线路
+    // Clear existing transmission lines
     transmissionLines.forEach(line => line.setMap(null));
     transmissionLines = [];
 
-    // 重置统计信息
+    // Reset statistics
     stats.total = 0;
     stats.voltageCategories = {};
     
-    // 处理每个特征
+    // Process each feature
     data.features.forEach(feature => {
-        // 确保是线段类型
+        // Ensure it's a line string type
         if (feature.geometry && feature.geometry.type === 'LineString') {
             const properties = feature.properties;
             const voltage = properties.voltage_kV;
             const status = properties.status;
             const country = properties.country;
             
-            // 统计电压等级
+            // Count voltage levels
             if (!stats.voltageCategories[voltage]) {
                 stats.voltageCategories[voltage] = 0;
             }
             stats.voltageCategories[voltage]++;
             stats.total++;
             
-            // 设置线条颜色和粗细
+            // Set line color and weight
             let color, weight;
             
-            // 根据电压等级设置颜色和粗细
+            // Set color and weight based on voltage level
             if (voltage >= 330) {
-                color = '#FF0000'; // 红色
+                color = '#FF0000'; // Red
                 weight = 5;
             } else if (voltage >= 161) {
-                color = '#FFA500'; // 橙色
+                color = '#FFA500'; // Orange
                 weight = 4;
             } else if (voltage >= 90) {
-                color = '#0000FF'; // 蓝色
+                color = '#0000FF'; // Blue
                 weight = 3;
             } else if (voltage >= 60) {
-                color = '#800080'; // 紫色
+                color = '#800080'; // Purple
                 weight = 2;
             } else {
-                color = '#00FF00'; // 绿色
+                color = '#00FF00'; // Green
                 weight = 1.5;
             }
             
-            // 如果是计划中的线路，使用虚线
+            // If it's a planned line, use dashed line
             const strokeOpacity = status === 'Planned' ? 0.7 : 1.0;
             const strokeDashArray = status === 'Planned' ? [4, 4] : null;
             
-            // 创建路径坐标
+            // Create path coordinates
             const path = feature.geometry.coordinates.map(coord => {
                 return { lat: coord[1], lng: coord[0] };
             });
             
-            // 创建线段
+            // Create line
             const line = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
@@ -121,12 +138,12 @@ function displayGeoJsonData(data) {
                 map: map
             });
             
-            // 设置虚线样式（如果是计划中的线路）
+            // Set dashed line style (if it's a planned line)
             if (strokeDashArray) {
                 line.setOptions({ strokeDasharray: strokeDashArray });
             }
             
-            // 存储线段信息
+            // Store line info
             const lineInfo = {
                 line: line,
                 voltage: voltage,
@@ -141,69 +158,76 @@ function displayGeoJsonData(data) {
             
             transmissionLines.push(lineInfo);
             
-            // 添加点击事件
+            // Add click event
             line.addListener('click', () => {
                 showLineInfo(lineInfo);
             });
         }
     });
     
-    // 创建电压过滤器
+    // Create voltage filters
     createVoltageFilters(stats.voltageCategories);
 }
 
-// 创建电压过滤器
+// Create voltage filters
 function createVoltageFilters(voltageStats) {
-    const controlsDiv = document.querySelector('.controls');
-    
-    // 检查是否已存在电压过滤器部分
-    let voltageSection = document.getElementById('voltage-filters');
-    if (!voltageSection) {
-        voltageSection = document.createElement('div');
-        voltageSection.id = 'voltage-filters';
-        voltageSection.className = 'control-section';
-        voltageSection.innerHTML = '<h3 style="margin-top: 0;">传输电压过滤器</h3>';
+    try {
+        const controlsDiv = document.querySelector('.controls');
+        if (!controlsDiv) {
+            console.error('Controls panel element does not exist');
+            return;
+        }
         
-        // 添加到控制面板
-        controlsDiv.appendChild(voltageSection);
-    } else {
-        // 清空现有内容
-        voltageSection.innerHTML = '<h3 style="margin-top: 0;">传输电压过滤器</h3>';
+        // Check if voltage filter section already exists
+        let voltageSection = document.getElementById('voltage-filters');
+        if (!voltageSection) {
+            voltageSection = document.createElement('div');
+            voltageSection.id = 'voltage-filters';
+            voltageSection.className = 'control-section';
+            voltageSection.innerHTML = '<h3 style="margin-top: 0;">Transmission Voltage Filters</h3>';
+            
+            // Add to controls panel
+            controlsDiv.appendChild(voltageSection);
+        } else {
+            // Clear existing content
+            voltageSection.innerHTML = '<h3 style="margin-top: 0;">Transmission Voltage Filters</h3>';
+        }
+        
+        // Sort by voltage level
+        const voltages = Object.keys(voltageStats).sort((a, b) => parseFloat(b) - parseFloat(a));
+        
+        voltages.forEach(voltage => {
+            const count = voltageStats[voltage];
+            const controlItem = document.createElement('div');
+            controlItem.className = 'control-item';
+            
+            const id = `voltage-${voltage}`;
+            voltageFilters[voltage] = true;
+            
+            controlItem.innerHTML = `
+                <input type="checkbox" id="${id}" checked>
+                <label for="${id}">${voltage}kV Lines (${count})</label>
+            `;
+            
+            voltageSection.appendChild(controlItem);
+        });
+        
+        // Add apply button
+        const applyButton = document.createElement('button');
+        applyButton.id = 'applyVoltageFilters';
+        applyButton.style.marginTop = '5px';
+        applyButton.textContent = 'Apply Filters';
+        applyButton.addEventListener('click', filterTransmissionLines);
+        
+        voltageSection.appendChild(applyButton);
+        
+        // Don't call updateStats directly here, let loadGeoJsonData handle it
+    } catch (error) {
+        console.error('Error creating voltage filters:', error);
     }
-    
-    // 按电压等级排序
-    const voltages = Object.keys(voltageStats).sort((a, b) => parseFloat(b) - parseFloat(a));
-    
-    voltages.forEach(voltage => {
-        const count = voltageStats[voltage];
-        const controlItem = document.createElement('div');
-        controlItem.className = 'control-item';
-        
-        const id = `voltage-${voltage}`;
-        voltageFilters[voltage] = true;
-        
-        controlItem.innerHTML = `
-            <input type="checkbox" id="${id}" checked>
-            <label for="${id}">${voltage}kV 线路 (${count})</label>
-        `;
-        
-        voltageSection.appendChild(controlItem);
-    });
-    
-    // 添加应用按钮
-    const applyButton = document.createElement('button');
-    applyButton.id = 'applyVoltageFilters';
-    applyButton.style.marginTop = '5px';
-    applyButton.textContent = '应用过滤器';
-    applyButton.addEventListener('click', filterTransmissionLines);
-    
-    voltageSection.appendChild(applyButton);
-    
-    // 更新统计信息
-    updateStats();
 }
 
-// 设置电压过滤器事件监听器
+// Set up voltage filter event listeners
 function setupVoltageFilters() {
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'applyVoltageFilters') {
@@ -212,137 +236,176 @@ function setupVoltageFilters() {
     });
 }
 
-// 过滤传输线路
+// Filter transmission lines
 function filterTransmissionLines() {
-    // 获取所有电压过滤器的状态
-    for (const voltage in voltageFilters) {
-        const checkbox = document.getElementById(`voltage-${voltage}`);
-        if (checkbox) {
-            voltageFilters[voltage] = checkbox.checked;
+    try {
+        // Get all voltage filter states
+        for (const voltage in voltageFilters) {
+            const checkbox = document.getElementById(`voltage-${voltage}`);
+            if (checkbox) {
+                voltageFilters[voltage] = checkbox.checked;
+            }
         }
+        
+        // Apply filters
+        transmissionLines.forEach(item => {
+            const visible = voltageFilters[item.voltage] !== undefined ? voltageFilters[item.voltage] : true;
+            item.line.setVisible(visible);
+        });
+    } catch (error) {
+        console.error('Error filtering transmission lines:', error);
     }
-    
-    // 应用过滤器
-    transmissionLines.forEach(item => {
-        const visible = voltageFilters[item.voltage] !== undefined ? voltageFilters[item.voltage] : true;
-        item.line.setVisible(visible);
-    });
 }
 
-// 创建电压等级图例
+// Create voltage level legend
 function createVoltageLegend() {
-    const legendDiv = document.querySelector('.legend');
-    
-    // 检查是否已存在传输线路图例部分
-    let legendSection = document.getElementById('transmission-legend');
-    if (!legendSection) {
-        legendSection = document.createElement('div');
-        legendSection.id = 'transmission-legend';
-        legendSection.className = 'legend-section';
-        legendSection.innerHTML = '<h4 style="margin-top: 0;">传输线路</h4>';
+    try {
+        const legendDiv = document.querySelector('.legend');
+        if (!legendDiv) {
+            console.error('Legend element does not exist');
+            return;
+        }
         
-        // 添加到图例
-        legendDiv.appendChild(legendSection);
-    } else {
-        // 清空现有内容
-        legendSection.innerHTML = '<h4 style="margin-top: 0;">传输线路</h4>';
-    }
-    
-    // 定义电压等级和对应的颜色、粗细
-    const voltageCategories = [
-        { voltage: '330kV+', color: '#FF0000', weight: 5 },
-        { voltage: '161-330kV', color: '#FFA500', weight: 4 },
-        { voltage: '90-160kV', color: '#0000FF', weight: 3 },
-        { voltage: '60-89kV', color: '#800080', weight: 2 },
-        { voltage: '<60kV', color: '#00FF00', weight: 1.5 }
-    ];
-    
-    voltageCategories.forEach(category => {
-        const legendItem = document.createElement('div');
-        legendItem.className = 'legend-item';
+        // Check if transmission line legend section already exists
+        let legendSection = document.getElementById('transmission-legend');
+        if (!legendSection) {
+            legendSection = document.createElement('div');
+            legendSection.id = 'transmission-legend';
+            legendSection.className = 'legend-section';
+            legendSection.innerHTML = '<h4 style="margin-top: 0;">Transmission Lines</h4>';
+            
+            // Add to legend
+            legendDiv.appendChild(legendSection);
+        } else {
+            // Clear existing content
+            legendSection.innerHTML = '<h4 style="margin-top: 0;">Transmission Lines</h4>';
+        }
         
-        legendItem.innerHTML = `
-            <div class="legend-color" style="background-color: ${category.color}; height: ${category.weight}px;"></div>
-            <div class="legend-text">${category.voltage} 线路</div>
+        // Define voltage levels and corresponding colors and weights
+        const voltageCategories = [
+            { voltage: '330kV+', color: '#FF0000', weight: 5 },
+            { voltage: '161-330kV', color: '#FFA500', weight: 4 },
+            { voltage: '90-160kV', color: '#0000FF', weight: 3 },
+            { voltage: '60-89kV', color: '#800080', weight: 2 },
+            { voltage: '<60kV', color: '#00FF00', weight: 1.5 }
+        ];
+        
+        voltageCategories.forEach(category => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            legendItem.innerHTML = `
+                <div class="legend-color" style="background-color: ${category.color}; height: ${category.weight}px;"></div>
+                <div class="legend-text">${category.voltage} Lines</div>
+            `;
+            
+            legendSection.appendChild(legendItem);
+        });
+        
+        // Add planned line legend
+        const plannedItem = document.createElement('div');
+        plannedItem.className = 'legend-item';
+        plannedItem.innerHTML = `
+            <div class="legend-color" style="background-color: #888888; height: 2px; border-top: 1px dashed #888888;"></div>
+            <div class="legend-text">Planned Lines</div>
         `;
         
-        legendSection.appendChild(legendItem);
-    });
-    
-    // 添加计划线路图例
-    const plannedItem = document.createElement('div');
-    plannedItem.className = 'legend-item';
-    plannedItem.innerHTML = `
-        <div class="legend-color" style="background-color: #888888; height: 2px; border-top: 1px dashed #888888;"></div>
-        <div class="legend-text">计划中的线路</div>
-    `;
-    
-    legendSection.appendChild(plannedItem);
+        legendSection.appendChild(plannedItem);
+    } catch (error) {
+        console.error('Error creating voltage legend:', error);
+    }
 }
 
-// 显示线路信息
+// Show line info
 function showLineInfo(lineInfo) {
-    const infoPanel = document.getElementById('info-panel');
-    const infoTitle = document.getElementById('info-title');
-    const infoContent = document.getElementById('info-content');
-    
-    infoTitle.textContent = '传输线路信息';
-    
-    let content = '';
-    content += `<div><strong>电压:</strong> ${lineInfo.voltage}kV</div>`;
-    content += `<div><strong>状态:</strong> ${lineInfo.status}</div>`;
-    content += `<div><strong>国家:</strong> ${lineInfo.country}</div>`;
-    
-    if (lineInfo.length_km) {
-        content += `<div><strong>长度:</strong> ${lineInfo.length_km} km</div>`;
+    try {
+        const infoPanel = document.getElementById('info-panel');
+        const infoTitle = document.getElementById('info-title');
+        const infoContent = document.getElementById('info-content');
+        
+        if (!infoPanel || !infoTitle || !infoContent) {
+            console.error('Info panel elements do not exist');
+            return;
+        }
+        
+        infoTitle.textContent = 'Transmission Line Information';
+        
+        let content = '';
+        content += `<div><strong>Voltage:</strong> ${lineInfo.voltage}kV</div>`;
+        content += `<div><strong>Status:</strong> ${lineInfo.status}</div>`;
+        content += `<div><strong>Country:</strong> ${lineInfo.country}</div>`;
+        
+        if (lineInfo.length_km) {
+            content += `<div><strong>Length:</strong> ${lineInfo.length_km} km</div>`;
+        }
+        
+        if (lineInfo.from) {
+            content += `<div><strong>Origin Station:</strong> ${lineInfo.from}</div>`;
+        }
+        
+        if (lineInfo.to) {
+            content += `<div><strong>Destination Station:</strong> ${lineInfo.to}</div>`;
+        }
+        
+        if (lineInfo.operator) {
+            content += `<div><strong>Operator:</strong> ${lineInfo.operator}</div>`;
+        }
+        
+        if (lineInfo.source) {
+            content += `<div><strong>Data Source:</strong> ${lineInfo.source}</div>`;
+        }
+        
+        infoContent.innerHTML = content;
+        infoPanel.style.display = 'block';
+    } catch (error) {
+        console.error('Error showing line info:', error);
     }
-    
-    if (lineInfo.from) {
-        content += `<div><strong>起点站:</strong> ${lineInfo.from}</div>`;
-    }
-    
-    if (lineInfo.to) {
-        content += `<div><strong>终点站:</strong> ${lineInfo.to}</div>`;
-    }
-    
-    if (lineInfo.operator) {
-        content += `<div><strong>运营商:</strong> ${lineInfo.operator}</div>`;
-    }
-    
-    if (lineInfo.source) {
-        content += `<div><strong>数据来源:</strong> ${lineInfo.source}</div>`;
-    }
-    
-    infoContent.innerHTML = content;
-    infoPanel.style.display = 'block';
 }
 
-// 关闭信息面板
+// Close info panel
 function closeInfoPanel() {
-    document.getElementById('info-panel').style.display = 'none';
+    try {
+        const infoPanel = document.getElementById('info-panel');
+        if (infoPanel) {
+            infoPanel.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error closing info panel:', error);
+    }
 }
 
-// 更新统计信息
+// Update statistics
 function updateStats() {
-    // 更新总线路数
-    document.getElementById('total-lines').textContent = stats.total;
-    
-    // 创建详细的电压统计信息
-    const statsContent = document.getElementById('stats-content');
-    
-    // 清除现有的电压统计信息
-    while (statsContent.childNodes.length > 1) {
-        statsContent.removeChild(statsContent.lastChild);
+    try {
+        // Update total lines
+        const totalLinesElement = document.getElementById('total-lines');
+        if (totalLinesElement) {
+            totalLinesElement.textContent = stats.total;
+        }
+        
+        // Create detailed voltage statistics
+        const statsContent = document.getElementById('stats-content');
+        if (!statsContent) {
+            console.warn('Stats content element does not exist');
+            return;
+        }
+        
+        // Clear existing voltage statistics
+        while (statsContent.childNodes.length > 1) {
+            statsContent.removeChild(statsContent.lastChild);
+        }
+        
+        // Sort by voltage level
+        const voltages = Object.keys(stats.voltageCategories).sort((a, b) => parseFloat(b) - parseFloat(a));
+        
+        // Add statistics for each voltage level
+        voltages.forEach(voltage => {
+            const count = stats.voltageCategories[voltage];
+            const statItem = document.createElement('div');
+            statItem.innerHTML = `${voltage}kV Lines: <span>${count}</span>`;
+            statsContent.appendChild(statItem);
+        });
+    } catch (error) {
+        console.error('Error updating statistics:', error);
     }
-    
-    // 按电压等级排序
-    const voltages = Object.keys(stats.voltageCategories).sort((a, b) => parseFloat(b) - parseFloat(a));
-    
-    // 添加每个电压等级的统计信息
-    voltages.forEach(voltage => {
-        const count = stats.voltageCategories[voltage];
-        const statItem = document.createElement('div');
-        statItem.innerHTML = `${voltage}kV 线路: <span>${count}</span>`;
-        statsContent.appendChild(statItem);
-    });
 } 
