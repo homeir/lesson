@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光伏阵列布局模拟</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>光伏阵列布局模拟</h1>
+            <div class="system-info">
+                <h2>系统信息</h2>
+                <ul>
+                    <li>总功率: 11.01MWp</li>
+                    <li>型号: 1P84 624stringsx28x630WpBi 48units 13in1 SCB</li>
+                    <li>光伏板功率: 630Wp</li>
+                    <li>总串数: 624串</li>
+                    <li>汇流箱数量: 48个</li>
+                </ul>
+            </div>
+        </header>
+        
+        <main>
+            <div class="controls">
+                <button id="zoom-in">放大</button>
+                <button id="zoom-out">缩小</button>
+                <button id="reset-view">重置视图</button>
+                <div class="view-options">
+                    <label>
+                        <input type="checkbox" id="show-strings" checked>
+                        显示串
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-combiner-boxes" checked>
+                        显示汇流箱
+                    </label>
+                </div>
+            </div>
+            
+            <div class="pv-array-container">
+                <div id="pv-array" class="pv-array"></div>
+            </div>
+            
+            <div class="details-panel">
+                <h3>详细信息</h3>
+                <div id="selection-details">
+                    点击阵列中的元素查看详情
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>光伏阵列模拟器 - 集中式布局模拟</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
