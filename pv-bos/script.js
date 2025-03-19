@@ -133,6 +133,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 分组计算的状态
     let groupCalculationActive = false;
+    
+    // 将分组状态暴露给窗口对象，以便string-grouping.js可以访问
+    window.groupCalculationActive = groupCalculationActive;
 
     // 计算总串数
     function calculateTotalStrings() {
@@ -261,10 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stringsMatchStatusSpan) {
             if (configuredStrings === totalArrayStrings) {
                 stringsMatchStatusSpan.textContent = '已匹配';
-                stringsMatchStatusSpan.className = 'status-matched';
+                stringsMatchStatusSpan.className = 'match-status matched';
             } else {
                 stringsMatchStatusSpan.textContent = '未匹配';
-                stringsMatchStatusSpan.className = 'status-unmatched';
+                stringsMatchStatusSpan.className = 'match-status unmatched';
             }
         }
     }
@@ -317,18 +320,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h4>汇流箱组 #${group.id}</h4>
                 <button class="remove-group" data-group-id="${group.id}">删除</button>
             </div>
-            <div class="control-group">
-                <label for="combiner-count-${group.id}">汇流箱数量:</label>
-                <input type="number" id="combiner-count-${group.id}" class="combiner-count" 
-                    min="1" max="50" value="${group.count}" data-group-id="${group.id}">
-            </div>
-            <div class="control-group">
-                <label for="strings-per-combiner-${group.id}">每汇流箱串数:</label>
-                <input type="number" id="strings-per-combiner-${group.id}" class="strings-per-combiner" 
-                    min="1" max="30" value="${group.stringsPerBox}" data-group-id="${group.id}">
-            </div>
-            <div class="group-summary">
-                总串数: <span class="group-total-strings" id="group-total-strings-${group.id}">${group.count * group.stringsPerBox}</span>
+            <div class="horizontal-controls">
+                <div class="control-group inline">
+                    <label for="combiner-count-${group.id}">汇流箱数量:</label>
+                    <input type="number" id="combiner-count-${group.id}" class="combiner-count" 
+                        min="1" max="50" value="${group.count}" data-group-id="${group.id}">
+                </div>
+                <div class="control-group inline">
+                    <label for="strings-per-combiner-${group.id}">每汇流箱串数:</label>
+                    <input type="number" id="strings-per-combiner-${group.id}" class="strings-per-combiner" 
+                        min="1" max="30" value="${group.stringsPerBox}" data-group-id="${group.id}">
+                </div>
+                <div class="group-summary inline">
+                    总串数: <span class="group-total-strings" id="group-total-strings-${group.id}">${group.count * group.stringsPerBox}</span>
+                </div>
             </div>
         `;
         
@@ -793,11 +798,13 @@ document.addEventListener('DOMContentLoaded', function() {
             logDebug('无法执行分组运算：汇流箱配置不匹配');
             return;
         }
-        console.log('开始执行分组运算',combinerBoxGroups,totalStrings);
+        
         logDebug('开始执行分组运算');
         
         // 切换按钮状态
         groupCalculationActive = !groupCalculationActive;
+        // 同步更新窗口对象上的状态
+        window.groupCalculationActive = groupCalculationActive;
         
         if (groupCalculationBtn) {
             if (groupCalculationActive) {

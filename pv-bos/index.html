@@ -27,19 +27,12 @@
         
         <main>
             <div class="controls">
-                <div class="layout-controls">
-                    <label for="layout-select">布局选择:</label>
-                    <select id="layout-select">
-                        <option value="layout1">布局1 (紫黄色 - 384.6×383.5)</option>
-                        <option value="layout2">布局2 (红黄色 - 369.9×408.5)</option>
-                        <option value="layout3">布局3 (多色 - 352.8×385.5)</option>
-                    </select>
-                </div>
+
                 
                 <div class="array-controls">
                     <div class="control-group">
                         <label for="row-input">行数:</label>
-                        <input type="number" id="row-input" min="1" max="100" value="52">
+                        <input type="number" id="row-input" min="1" max="100" value="5">
                     </div>
                     <div class="control-group">
                         <label for="column-input">列数:</label>
@@ -70,27 +63,31 @@
                                 <h4>汇流箱组 #1</h4>
                                 <button class="remove-group" data-group-id="1">删除</button>
                             </div>
-                            <div class="control-group">
-                                <label for="combiner-count-1">汇流箱数量:</label>
-                                <input type="number" id="combiner-count-1" class="combiner-count" min="1" max="50" value="4" data-group-id="1">
-                            </div>
-                            <div class="control-group">
-                                <label for="strings-per-combiner-1">每汇流箱串数:</label>
-                                <input type="number" id="strings-per-combiner-1" class="strings-per-combiner" min="1" max="30" value="13" data-group-id="1">
-                            </div>
-                            <div class="group-summary">
-                                总串数: <span class="group-total-strings" id="group-total-strings-1">52</span>
+                            <div class="horizontal-controls">
+                                <div class="control-group inline">
+                                    <label for="combiner-count-1">汇流箱数量:</label>
+                                    <input type="number" id="combiner-count-1" class="combiner-count" min="1" max="50" value="48" data-group-id="1">
+                                </div>
+                                <div class="control-group inline">
+                                    <label for="strings-per-combiner-1">每汇流箱串数:</label>
+                                    <input type="number" id="strings-per-combiner-1" class="strings-per-combiner" min="1" max="30" value="13" data-group-id="1">
+                                </div>
+                                <div class="group-summary inline">
+                                    总串数: <span class="group-total-strings" id="group-total-strings-1">624</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <button id="add-combiner-group">添加汇流箱组</button>
                     <div class="combiner-summary">
-                        <div class="summary-item">总汇流箱数: <span id="total-combiner-boxes">4</span></div>
-                        <div class="summary-item">配置总串数: <span id="total-configured-strings">52</span></div>
-                        <div class="summary-item">阵列总串数: <span id="total-array-strings">60</span></div>
-                        <div class="status">匹配状态: <span id="strings-match-status">未匹配</span></div>
+                        <div class="horizontal-summary">
+                            <div class="summary-item">总汇流箱数: <span id="total-combiner-boxes">48</span></div>
+                            <div class="summary-item">配置总串数: <span id="total-configured-strings">624</span></div>
+                            <div class="summary-item">阵列总串数: <span id="total-array-strings">624</span></div>
+                            <div class="status">匹配状态: <span id="strings-match-status">已匹配</span></div>
+                        </div>
                         <div class="group-action" style="margin-top: 10px; text-align: center;">
-                            <button id="group-calculation-btn" style="display: none;">分组运算</button>
+                            <button id="group-calculation-btn">分组运算</button>
                         </div>
                     </div>
                 </div>

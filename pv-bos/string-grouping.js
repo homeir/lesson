@@ -36,7 +36,7 @@ function isConfigurationMatched(combinerBoxGroups, totalStrings) {
  */
 function getDefaultColorMapping(totalStrings) {
     const colorMapping = {};
-    const defaultColor = STRING_COLORS[0]; // 使用紫色作为默认颜色
+    const defaultColor = STRING_COLORS[1]; // 使用黄色作为默认颜色
     
     for (let i = 0; i < totalStrings; i++) {
         colorMapping[i] = defaultColor;
@@ -54,52 +54,9 @@ function getDefaultColorMapping(totalStrings) {
  * @returns {Object} - 串索引到颜色的映射
  */
 function getStringColorMapping(combinerBoxGroups, totalStrings, rows, columns) {
-    // 检查汇流箱配置是否匹配
-    if (!isConfigurationMatched(combinerBoxGroups, totalStrings)) {
-        console.log('汇流箱配置与总串数不匹配，使用默认颜色');
-        return getDefaultColorMapping(totalStrings);
-    }
-    
-    console.log('汇流箱配置匹配，应用颜色分组');
-    const colorMapping = {};
-    
-    // 每列内部的串数
-    const stringsPerModule = 3; // 每个模块有3个串
-    
-    // 计算每个汇流箱组应该分配的串数量
-    const stringsPerGroup = combinerBoxGroups.reduce((acc, group) => {
-        return Math.max(acc, group.stringsPerBox);
-    }, 13); // 默认每13串为一组
-    
-    console.log(`每汇流箱连接串数: ${stringsPerGroup}`);
-    
-    // 每个颜色组包含的列数
-    const columnsPerColorGroup = 3;
-    
-    // 为每一列分配颜色
-    for (let col = 0; col < columns; col++) {
-        // 计算当前列属于哪个颜色组
-        const colorGroupIndex = Math.floor(col / columnsPerColorGroup);
-        // 颜色组之间交替使用紫色和黄色
-        const colorIndex = colorGroupIndex % 2 === 0 ? 0 : 1; // 紫色和黄色交替
-        const color = STRING_COLORS[colorIndex];
-        
-        // 该列的所有串
-        for (let row = 0; row < rows; row++) {
-            // 每个模块有3个串
-            for (let s = 0; s < stringsPerModule; s++) {
-                // 计算串的索引
-                const moduleIndex = row * columns + col;
-                const stringIndex = moduleIndex * stringsPerModule + s;
-                
-                if (stringIndex < totalStrings) {
-                    colorMapping[stringIndex] = color;
-                }
-            }
-        }
-    }
-    
-    return colorMapping;
+    // 无论配置是否匹配，都使用黄色作为默认颜色
+    console.log('初始状态，使用黄色作为默认颜色');
+    return getDefaultColorMapping(totalStrings);
 }
 
 /**
@@ -141,15 +98,13 @@ function applyStringColors(pvArray, colorMapping) {
  * @returns {Object} - 颜色对象
  */
 function getCombinerBoxColor(column, isConfigMatched) {
-    if (!isConfigMatched) {
-        return STRING_COLORS[0]; // 默认紫色
+    // 在初始状态下，所有汇流箱都使用黄色
+    if (!isConfigMatched || !window.groupCalculationActive) {
+        return STRING_COLORS[1]; // 默认黄色
     }
     
-    // 每3列为一组
-    const columnsPerColorGroup = 3;
-    const colorGroupIndex = Math.floor(column / columnsPerColorGroup);
-    // 颜色组之间交替使用紫色和黄色
-    const colorIndex = colorGroupIndex % 2 === 0 ? 0 : 1; // 紫色和黄色交替
+    // 只有在分组运算模式下才根据列索引分配颜色
+    const colorIndex = column % STRING_COLORS.length;
     return STRING_COLORS[colorIndex];
 }
 
@@ -179,14 +134,11 @@ function calculateOptimalGrouping(combinerBoxGroups, rows, columns) {
     for (let groupIndex = 0, boxIndex = 0; groupIndex < combinerBoxGroups.length; groupIndex++) {
         const group = combinerBoxGroups[groupIndex];
         let groupId = groupIndex + 1; // 组ID从1开始
-        const totalGroupStrings = group.count * group.stringsPerBox;
-        
-
         // 为该组中的每个汇流箱单独分配
-        for (;boxIndex < group.count; ) {
+        for (let currentBoxIdex=0;currentBoxIdex < group.count;currentBoxIdex++ ) {
             // 为当前汇流箱分配串
             for (let stringInBox = 0; stringInBox < group.stringsPerBox; stringInBox++) {
-                if (stringIndex < totalStrings) {
+                if (stringIndex < totalStrings) { // 如果串索引小于总串数
                     stringsFlat[stringIndex] = boxIndex;
                     stringIndex++;
                 }
