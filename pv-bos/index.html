@@ -14,10 +14,13 @@
                 <h2>系统信息</h2>
                 <ul>
                     <li>总功率: <span id="total-power">11.01</span> MWp</li>
-                    <li>型号: 1P84 <span id="total-strings">624</span>stringsx28x630WpBi <span id="combiner-count">48</span>units 13in1 SCB</li>
-                    <li>光伏板功率: 630Wp</li>
+                    <li>DC容量: <span id="dc-capacity">11.01</span> MWp</li>
+                    <li>型号: 1P84 <span id="total-strings">624</span>stringsx<span id="modules-per-string-display">28</span>x<span id="module-power-display">630</span>WpBi <span id="combiner-count">48</span>units 13in1 SCB</li>
+                    <li>光伏板功率: <span id="module-power-display2">630</span>Wp</li>
                     <li>总串数: <span id="string-count">624</span>串</li>
                     <li>汇流箱数量: <span id="box-count">48</span>个</li>
+                    <li>逆变器型号: <span id="inverter-model-display">SG9375UD-MV-20</span> (<span id="inverter-power-display">9375</span> kW)</li>
+                    <li>DC/AC比率: <span id="dc-ac-ratio">1.17</span></li>
                 </ul>
             </div>
         </header>
@@ -35,12 +38,60 @@
                 
                 <div class="array-controls">
                     <div class="control-group">
-                        <label for="row-slider">行数: <span id="row-value">5</span></label>
-                        <input type="range" id="row-slider" min="1" max="20" value="5" class="slider">
+                        <label for="row-input">行数:</label>
+                        <input type="number" id="row-input" min="1" max="100" value="52">
                     </div>
                     <div class="control-group">
-                        <label for="column-slider">列数: <span id="column-value">4</span></label>
-                        <input type="range" id="column-slider" min="1" max="20" value="4" class="slider">
+                        <label for="column-input">列数:</label>
+                        <input type="number" id="column-input" min="1" max="20" value="4">
+                    </div>
+                    <div class="control-group">
+                        <label for="module-power">组件功率 (Wp):</label>
+                        <input type="number" id="module-power" min="100" max="1000" value="630" step="10">
+                    </div>
+                    <div class="control-group">
+                        <label for="modules-per-string">每串组件数量:</label>
+                        <input type="number" id="modules-per-string" min="1" max="50" value="28">
+                    </div>
+                    <div class="control-group">
+                        <label for="inverter-model">逆变器型号:</label>
+                        <select id="inverter-model">
+                            <option value="SG9375UD-MV-20">SG9375UD-MV-20 (9375 kW)</option>
+                            <option value="8800">8800 (8800 kW)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="combiner-box-controls">
+                    <h3>汇流箱配置</h3>
+                    <div class="combiner-box-groups" id="combiner-box-groups">
+                        <div class="combiner-group" data-group-id="1">
+                            <div class="group-header">
+                                <h4>汇流箱组 #1</h4>
+                                <button class="remove-group" data-group-id="1">删除</button>
+                            </div>
+                            <div class="control-group">
+                                <label for="combiner-count-1">汇流箱数量:</label>
+                                <input type="number" id="combiner-count-1" class="combiner-count" min="1" max="50" value="4" data-group-id="1">
+                            </div>
+                            <div class="control-group">
+                                <label for="strings-per-combiner-1">每汇流箱串数:</label>
+                                <input type="number" id="strings-per-combiner-1" class="strings-per-combiner" min="1" max="30" value="13" data-group-id="1">
+                            </div>
+                            <div class="group-summary">
+                                总串数: <span class="group-total-strings" id="group-total-strings-1">52</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="add-combiner-group">添加汇流箱组</button>
+                    <div class="combiner-summary">
+                        <div class="summary-item">总汇流箱数: <span id="total-combiner-boxes">4</span></div>
+                        <div class="summary-item">配置总串数: <span id="total-configured-strings">52</span></div>
+                        <div class="summary-item">阵列总串数: <span id="total-array-strings">60</span></div>
+                        <div class="status">匹配状态: <span id="strings-match-status">未匹配</span></div>
+                        <div class="group-action" style="margin-top: 10px; text-align: center;">
+                            <button id="group-calculation-btn" style="display: none;">分组运算</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -50,15 +101,9 @@
                     <button id="reset-view">重置视图</button>
                 </div>
                 
-                <div class="view-options">
-                    <label>
-                        <input type="checkbox" id="show-strings" checked>
-                        显示串
-                    </label>
-                    <label>
-                        <input type="checkbox" id="show-combiner-boxes" checked>
-                        显示汇流箱
-                    </label>
+                <div class="display-options">
+                    <label><input type="checkbox" id="show-strings" checked> 显示串</label>
+                    <label><input type="checkbox" id="show-combiner-boxes"> 显示汇流箱</label>
                 </div>
             </div>
             
@@ -79,9 +124,21 @@
         
         <footer>
             <p>光伏阵列模拟器 - 实时调整行列数量</p>
+            <div id="debug-info" style="margin-top: 10px; color: #e74c3c;"></div>
         </footer>
     </div>
     
+    <script>
+        // 添加调试功能
+        window.addEventListener('error', function(event) {
+            const debugInfo = document.getElementById('debug-info');
+            if (debugInfo) {
+                debugInfo.innerHTML += `<p>错误: ${event.message} (${event.filename}:${event.lineno})</p>`;
+            }
+            console.error('捕获到错误:', event);
+        });
+    </script>
     <script src="script.js"></script>
+    <script src="string-grouping.js"></script>
 </body>
 </html>
