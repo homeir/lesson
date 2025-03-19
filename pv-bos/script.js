@@ -793,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
             logDebug('无法执行分组运算：汇流箱配置不匹配');
             return;
         }
-        
+        console.log('开始执行分组运算',combinerBoxGroups,totalStrings);
         logDebug('开始执行分组运算');
         
         // 切换按钮状态

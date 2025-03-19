@@ -165,7 +165,7 @@ function calculateOptimalGrouping(combinerBoxGroups, rows, columns) {
     
     // 计算总串数
     const totalStrings = rows * columns * 3; // 每个模块有3个串
-    console.log(`总串数: ${totalStrings}`);
+    console.log(`总串数: ${totalStrings}`,combinerBoxGroups);
     
     // 创建一维数组形式的串映射，稍后会转换为二维数组
     // 使用蛇形排列，将整个阵列看作一个大的一维数组，初始值为0
@@ -176,55 +176,40 @@ function calculateOptimalGrouping(combinerBoxGroups, rows, columns) {
     let stringIndex = 0;
     
     // 为每个汇流箱组分配ID和串数
-    for (let groupIndex = 0; groupIndex < combinerBoxGroups.length; groupIndex++) {
+    for (let groupIndex = 0, boxIndex = 0; groupIndex < combinerBoxGroups.length; groupIndex++) {
         const group = combinerBoxGroups[groupIndex];
-        const groupId = groupIndex + 1; // 组ID从1开始
+        let groupId = groupIndex + 1; // 组ID从1开始
         const totalGroupStrings = group.count * group.stringsPerBox;
         
-        console.log(`组#${groupId}: ${group.count}个汇流箱, 每个汇流箱接${group.stringsPerBox}串, 总共${totalGroupStrings}串`);
-        
+
         // 为该组中的每个汇流箱单独分配
-        for (let boxIndex = 0; boxIndex < group.count; boxIndex++) {
+        for (;boxIndex < group.count; ) {
             // 为当前汇流箱分配串
             for (let stringInBox = 0; stringInBox < group.stringsPerBox; stringInBox++) {
                 if (stringIndex < totalStrings) {
-                    stringsFlat[stringIndex] = groupId;
+                    stringsFlat[stringIndex] = boxIndex;
                     stringIndex++;
                 }
+                
             }
+            boxIndex++
+            console.log(`组#${groupId}: 汇流箱#${boxIndex}, ${stringIndex} `);
+        
         }
+        
     }
     
-    // 检查是否所有串都已分配
-    const unassignedCount = stringsFlat.filter(value => value === 0).length;
-    if (unassignedCount > 0) {
-        console.warn(`警告: 还有${unassignedCount}个串未分配组ID`);
-    }
-    
-    // 检查分组结果
-    const groupCounts = {};
-    stringsFlat.forEach(groupId => {
-        if (groupId > 0) {
-            if (!groupCounts[groupId]) {
-                groupCounts[groupId] = 0;
-            }
-            groupCounts[groupId]++;
-        }
-    });
-    
-    console.log('一维数组分组统计:');
-    for (const [groupId, count] of Object.entries(groupCounts)) {
-        console.log(`组 #${groupId}: ${count}串`);
-    }
+    console.log('stringsFlat',stringsFlat);
+
     
     // 将一维数组转换为二维数组，表示实际布局
-    // 注意：列数是columns*3，因为每列有3个串
-    const width = columns * 3; // 每列有3个串
+    // 先按照3
+    const width = 3; // 每列有3个串
     const stringArray = [];
     
     // 蛇形排列逻辑: 将一维数组按照蛇形方式填充到二维数组中
     // 思路: 每列宽度为3，从左到右、从上到下进行填充
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < rows*columns; i++) {
         const row = [];
         for (let j = 0; j < width; j++) {
             // 计算一维数组中的索引 - 蛇形排列
@@ -237,28 +222,67 @@ function calculateOptimalGrouping(combinerBoxGroups, rows, columns) {
         }
         stringArray.push(row);
     }
-    
-    console.log(`分组矩阵大小: ${stringArray.length} 行 × ${stringArray[0].length} 列`);
-    
-    // 输出分组矩阵的前5行和最后5行，用于调试
-    const previewRows = 5;
-    console.log(`分组矩阵预览 (前${previewRows}行):`);
-    for (let i = 0; i < Math.min(previewRows, stringArray.length); i++) {
-        console.log(`行 ${i+1}: ${JSON.stringify(stringArray[i])}`);
-    }
-    
-    if (stringArray.length > previewRows * 2) {
-        console.log('...... (中间行省略) ......');
-        
-        console.log(`分组矩阵预览 (最后${previewRows}行):`);
-        for (let i = Math.max(0, stringArray.length - previewRows); i < stringArray.length; i++) {
-            console.log(`行 ${i+1}: ${JSON.stringify(stringArray[i])}`);
-        }
-    }
-    
-    return stringArray;
+    // 现在需要把stringArray切割成Columns段，然后拼接成 rows行，columns*3列
+   
+    return transformMatrix(stringArray,columns);
 }
-
+/**
+ * 将输入矩阵按照规则转换成新矩阵
+ * @param {Array} inputMatrix - 输入矩阵，每行是一个数组，可能有多列
+ * @param {Number} n - 要分割成的组数
+ * @returns {Array} - 转换后的矩阵
+ */
+function transformMatrix(inputMatrix, n) {
+    // 确保输入矩阵是有效的
+    if (!inputMatrix || inputMatrix.length === 0) {
+      return [];
+    }
+    
+    // 计算每组的大小
+    const groupSize = Math.ceil(inputMatrix.length / n);
+    
+    // 将输入矩阵分成n组
+    const groups = [];
+    for (let i = 0; i < n; i++) {
+      const start = i * groupSize;
+      const end = Math.min(start + groupSize, inputMatrix.length);
+      if (start < inputMatrix.length) {
+        groups.push(inputMatrix.slice(start, end));
+      }
+    }
+    
+    // 确定结果矩阵的行数（取最大组的长度）
+    const rows = Math.max(...groups.map(group => group.length));
+    
+    // 创建结果矩阵
+    const result = Array(rows).fill().map(() => []);
+    
+    // 填充结果矩阵
+    for (let i = 0; i < groups.length; i++) {
+      const group = groups[i];
+      
+      // 对偶数索引的组进行处理（即第2、4、6...组）
+      const processedGroup = i % 2 === 1 ? [...group].reverse() : group;
+      
+      // 将当前组的元素添加到结果矩阵的相应行中
+      for (let j = 0; j < rows; j++) {
+        if (j < processedGroup.length) {
+          // 获取当前行的所有列值，并将它们添加到结果中
+          const rowValues = processedGroup[j];
+          result[j].push(...rowValues);
+        } else {
+          // 如果该行在当前组中没有对应的元素，添加占位符
+          // 确定应该添加多少个占位符（使用输入矩阵的第一行作为参考）
+          const columnCount = inputMatrix[0].length;
+          for (let k = 0; k < columnCount; k++) {
+            result[j].push(null);
+          }
+        }
+      }
+    }
+    
+    return result;
+  }
 /**
  * 应用自定义分组
  * @param {HTMLElement} pvArray - PV阵列容器元素
