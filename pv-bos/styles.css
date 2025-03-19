@@ -535,4 +535,78 @@ footer {
     border-radius: 4px;
     font-weight: 500;
     background-color: #e1f5fe;
+}
+
+/* 汇流箱优化器样式 */
+.combiner-optimizer-settings {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.combiner-optimizer-settings h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.combiner-optimizer-settings .form-group {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.combiner-optimizer-settings label {
+    min-width: 120px;
+    margin-right: 10px;
+}
+
+.combiner-optimizer-settings input[type="number"],
+.combiner-optimizer-settings select {
+    padding: 5px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 120px;
+}
+
+.combiner-optimizer-settings button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.combiner-optimizer-settings button:hover {
+    background-color: #2980b9;
+}
+
+/* 优化后的汇流箱样式 */
+.combiner-box.optimized {
+    border: 2px dashed;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    z-index: 20;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .combiner-optimizer-settings .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .combiner-optimizer-settings label {
+        margin-bottom: 5px;
+    }
+    
+    .combiner-optimizer-settings input[type="number"],
+    .combiner-optimizer-settings select {
+        width: 100%;
+    }
 } 

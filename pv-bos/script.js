@@ -756,8 +756,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 groupCalculationBtn.classList.add('active');
                 groupCalculationBtn.textContent = '取消分组';
                 
-                // 分组计算完成后，可以在此处添加汇流箱位置优化计算
-                // 此处将来添加基于分组布局的汇流箱位置优化计算代码
+                // 触发汇流箱位置优化计算
+                setTimeout(() => {
+                    if (window.CombinerBoxOptimizer && window.arrayGrouping && window.arrayGrouping.length > 0) {
+                        logDebug('开始优化汇流箱位置');
+                        window.CombinerBoxOptimizer.startOptimization(
+                            layoutParams.rows, 
+                            layoutParams.columns, 
+                            window.arrayGrouping
+                        );
+                    } else {
+                        logDebug('未找到优化器或分组数据不可用，无法优化汇流箱位置');
+                    }
+                }, 500); // 延迟执行，确保先完成分组计算
                 
             } else {
                 groupCalculationBtn.classList.remove('active');

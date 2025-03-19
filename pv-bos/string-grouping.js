@@ -237,7 +237,7 @@ function transformMatrix(inputMatrix, n) {
   }
 /**
  * 应用自定义分组
- * @param {HTMLElement} pvArray - PV阵列容器元素
+ * @param {HTMLElement} pvArray - 光伏阵列容器元素
  * @param {Array} combinerBoxGroups - 汇流箱组配置
  * @param {number} totalStrings - 总串数
  * @param {number} rows - 行数
@@ -284,6 +284,8 @@ function applyCustomGrouping(pvArray, combinerBoxGroups, totalStrings, rows, col
         // 将分组数组保存到全局变量和DOM属性中
         window.arrayGrouping = arrayGrouping;
         pvArray.dataset.arrayGroupingJson = JSON.stringify(arrayGrouping);
+        
+        console.log('已生成并保存分组数据，用于汇流箱位置优化');
         
         // 根据分组结果设置颜色映射
         const colorMapping = {};
