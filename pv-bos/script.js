@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 createColumnLine(lineX, 0, dimensions.height);
             }
             
-            // 创建光伏组件和汇流箱
+            // 创建光伏组件和串
             for (let row = 0; row < layoutParams.rows; row++) {
                 for (let col = 0; col < layoutParams.columns; col++) {
                     const moduleIndex = row * layoutParams.columns + col;
@@ -523,23 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // 根据汇流箱配置创建汇流箱
-            let boxIndex = 0;
-            const boxHeight = dimensions.height / combinerBoxGroups.length;
-            
-            for (let i = 0; i < combinerBoxGroups.length; i++) {
-                const group = combinerBoxGroups[i];
-                const yStart = i * boxHeight;
-                
-                for (let j = 0; j < group.count; j++) {
-                    const x = (j / group.count) * dimensions.width + dimensions.width / (2 * group.count);
-                    const y = yStart + boxHeight / 2;
-                    
-                    createCombinerBox(x, y, boxIndex++);
-                }
-            }
-            
-            logDebug(`创建了 ${layoutParams.rows * layoutParams.columns} 个光伏组件和 ${boxIndex} 个汇流箱`);
+            logDebug(`创建了 ${layoutParams.rows * layoutParams.columns} 个光伏组件`);
             
             // 应用串颜色分配
             if (window.StringColoring) {
@@ -610,45 +594,6 @@ document.addEventListener('DOMContentLoaded', function() {
             pvArray.appendChild(string);
         } catch (error) {
             logDebug(`创建串失败: ${error.message}`);
-        }
-    }
-
-    // 创建汇流箱
-    function createCombinerBox(x, y, index) {
-        try {
-            const box = document.createElement('div');
-            box.className = 'combiner-box';
-            box.dataset.index = index;
-            box.style.left = `${x}px`;
-            box.style.top = `${y}px`;
-            
-            // 计算汇流箱所在的列
-            const boxX = parseFloat(x);
-            const moduleWidth = layoutParams.moduleWidth;
-            const columnIndex = Math.floor(boxX / moduleWidth);
-            
-            if (window.StringColoring) {
-                // 检查配置是否匹配
-                const totalStrings = calculateTotalStrings();
-                const isConfigMatched = window.StringColoring.checkConfigurationMatch(combinerBoxGroups, totalStrings);
-                
-                // 使用列索引获取颜色，并传入配置是否匹配
-                const color = window.StringColoring.getCombinerBoxColor(columnIndex, isConfigMatched);
-                box.style.backgroundColor = color.bg;
-                box.style.borderColor = color.border;
-                
-                // 添加列标识，便于调试
-                box.setAttribute('title', `列 #${columnIndex + 1}`);
-            }
-            
-            box.addEventListener('click', function(e) {
-                e.stopPropagation();
-                showCombinerBoxDetails(index);
-            });
-            
-            pvArray.appendChild(box);
-        } catch (error) {
-            logDebug(`创建汇流箱失败: ${error.message}`);
         }
     }
 
@@ -810,9 +755,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (groupCalculationActive) {
                 groupCalculationBtn.classList.add('active');
                 groupCalculationBtn.textContent = '取消分组';
+                
+                // 分组计算完成后，可以在此处添加汇流箱位置优化计算
+                // 此处将来添加基于分组布局的汇流箱位置优化计算代码
+                
             } else {
                 groupCalculationBtn.classList.remove('active');
                 groupCalculationBtn.textContent = '分组运算';
+                
+                // 取消分组时清除汇流箱
+                const combinerBoxes = document.querySelectorAll('.combiner-box');
+                combinerBoxes.forEach(box => box.remove());
             }
         }
         
