@@ -56,13 +56,33 @@ main {
 
 .controls {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 10px;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.layout-controls, .array-controls, .view-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+select, input[type="number"] {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
 button {
@@ -77,6 +97,14 @@ button {
 
 button:hover {
     background-color: #2980b9;
+}
+
+#apply-layout {
+    background-color: #27ae60;
+}
+
+#apply-layout:hover {
+    background-color: #219951;
 }
 
 .view-options {
@@ -94,6 +122,17 @@ button:hover {
     height: 500px;
 }
 
+.dimensions-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .pv-array {
     position: relative;
     transform-origin: 0 0;
@@ -101,16 +140,48 @@ button:hover {
     min-height: 100%;
 }
 
-.tracker-row {
+/* 布局1：紫色和黄色 */
+.layout1 .tracker-row {
     position: absolute;
     background-color: rgba(142, 68, 173, 0.2);
     border: 1px solid rgba(142, 68, 173, 0.5);
 }
 
-.string {
+.layout1 .string {
     position: absolute;
     background-color: rgba(241, 196, 15, 0.3);
     border: 1px solid rgba(241, 196, 15, 0.7);
+}
+
+/* 布局2：红色和黄色 */
+.layout2 .tracker-row {
+    position: absolute;
+    background-color: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.5);
+}
+
+.layout2 .string {
+    position: absolute;
+    background-color: rgba(241, 196, 15, 0.3);
+    border: 1px solid rgba(241, 196, 15, 0.7);
+}
+
+/* 布局3：红色、绿色和紫色 */
+.layout3 .tracker-row {
+    position: absolute;
+    background-color: rgba(46, 204, 113, 0.2);
+    border: 1px solid rgba(46, 204, 113, 0.5);
+}
+
+.layout3 .string {
+    position: absolute;
+    background-color: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.5);
+}
+
+.layout3 .string:nth-child(odd) {
+    background-color: rgba(142, 68, 173, 0.2);
+    border: 1px solid rgba(142, 68, 173, 0.5);
 }
 
 .combiner-box {
@@ -166,4 +237,62 @@ footer {
         grid-row: 2;
         grid-column: 2;
     }
+}
+
+/* 滑块样式 */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #d3d3d3;
+    outline: none;
+    border-radius: 5px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+}
+
+/* 光伏组件样式 */
+.pv-module {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.pv-module:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* 布局1：红色 */
+.layout1 .pv-module {
+    background-color: rgba(231, 76, 60, 0.7);
+    border: 1px solid rgba(192, 57, 43, 0.8);
+}
+
+/* 布局2：绿色 */
+.layout2 .pv-module {
+    background-color: rgba(46, 204, 113, 0.7);
+    border: 1px solid rgba(39, 174, 96, 0.8);
+}
+
+/* 布局3：蓝色 */
+.layout3 .pv-module {
+    background-color: rgba(52, 152, 219, 0.7);
+    border: 1px solid rgba(41, 128, 185, 0.8);
 } 

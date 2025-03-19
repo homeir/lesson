@@ -13,20 +13,43 @@
             <div class="system-info">
                 <h2>系统信息</h2>
                 <ul>
-                    <li>总功率: 11.01MWp</li>
-                    <li>型号: 1P84 624stringsx28x630WpBi 48units 13in1 SCB</li>
+                    <li>总功率: <span id="total-power">11.01</span> MWp</li>
+                    <li>型号: 1P84 <span id="total-strings">624</span>stringsx28x630WpBi <span id="combiner-count">48</span>units 13in1 SCB</li>
                     <li>光伏板功率: 630Wp</li>
-                    <li>总串数: 624串</li>
-                    <li>汇流箱数量: 48个</li>
+                    <li>总串数: <span id="string-count">624</span>串</li>
+                    <li>汇流箱数量: <span id="box-count">48</span>个</li>
                 </ul>
             </div>
         </header>
         
         <main>
             <div class="controls">
-                <button id="zoom-in">放大</button>
-                <button id="zoom-out">缩小</button>
-                <button id="reset-view">重置视图</button>
+                <div class="layout-controls">
+                    <label for="layout-select">布局选择:</label>
+                    <select id="layout-select">
+                        <option value="layout1">布局1 (紫黄色 - 384.6×383.5)</option>
+                        <option value="layout2">布局2 (红黄色 - 369.9×408.5)</option>
+                        <option value="layout3">布局3 (多色 - 352.8×385.5)</option>
+                    </select>
+                </div>
+                
+                <div class="array-controls">
+                    <div class="control-group">
+                        <label for="row-slider">行数: <span id="row-value">5</span></label>
+                        <input type="range" id="row-slider" min="1" max="20" value="5" class="slider">
+                    </div>
+                    <div class="control-group">
+                        <label for="column-slider">列数: <span id="column-value">4</span></label>
+                        <input type="range" id="column-slider" min="1" max="20" value="4" class="slider">
+                    </div>
+                </div>
+                
+                <div class="view-controls">
+                    <button id="zoom-in">放大</button>
+                    <button id="zoom-out">缩小</button>
+                    <button id="reset-view">重置视图</button>
+                </div>
+                
                 <div class="view-options">
                     <label>
                         <input type="checkbox" id="show-strings" checked>
@@ -41,6 +64,9 @@
             
             <div class="pv-array-container">
                 <div id="pv-array" class="pv-array"></div>
+                <div class="dimensions-info">
+                    <span id="array-width">384.6</span> × <span id="array-height">383.5</span>
+                </div>
             </div>
             
             <div class="details-panel">
@@ -52,7 +78,7 @@
         </main>
         
         <footer>
-            <p>光伏阵列模拟器 - 集中式布局模拟</p>
+            <p>光伏阵列模拟器 - 实时调整行列数量</p>
         </footer>
     </div>
     
