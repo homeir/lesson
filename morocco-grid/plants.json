@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Centrale thermique de Kenitra",
+    "type": "BESS Plant",
+    "capacity MWh": 270,
+    "superficie (m2)": 12000,
+    "poc (kV)": 225,
+    "lat": 39.3024086,
+    "lng": 41.0411096,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Settat",
+    "type": "BESS Plant",
+    "capacity MWh": 150,
+    "superficie (m2)": 5800,
+    "poc (kV)": 225,
+    "lat": 29.7616272,
+    "lng": 27.1760038,
+    "status": "Planned"
+  },
+  {
+    "name": "Site hydraulique Al Massira",
+    "type": "BESS Plant",
+    "capacity MWh": 180,
+    "superficie (m2)": 8000,
+    "poc (kV)": 225,
+    "lat": 28.9466989,
+    "lng": 21.134951,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Tit Mellil",
+    "type": "BESS Plant",
+    "capacity MWh": 300,
+    "superficie (m2)": 12000,
+    "poc (kV)": 225,
+    "lat": 30.4706779,
+    "lng": 32.9057712,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste Laâwamer",
+    "type": "BESS Plant",
+    "capacity MWh": 100,
+    "superficie (m2)": 3500,
+    "poc (kV)": 60,
+    "lat": 28.0372889,
+    "lng": 30.8623635,
+    "status": "Planned"
+  },
+  {
+    "name": "Centrale Thermique de Tétouan",
+    "type": "BESS Plant",
+    "capacity MWh": 100,
+    "superficie (m2)": 4000,
+    "poc (kV)": 60,
+    "lat": 49.4075552,
+    "lng": 55.2051085,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Khénifra",
+    "type": "BESS Plant",
+    "capacity MWh": 100,
+    "superficie (m2)": 4000,
+    "poc (kV)": 60,
+    "lat": 47.4466572,
+    "lng": 25.8397477,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Khouribga",
+    "type": "BESS Plant",
+    "capacity MWh": 150,
+    "superficie (m2)": 7100,
+    "poc (kV)": 225,
+    "lat": 34.5443657,
+    "lng": 25.6568783,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Tensift I",
+    "type": "BESS Plant",
+    "capacity MWh": 200,
+    "superficie (m2)": 10000,
+    "poc (kV)": 225,
+    "lat": 25.5632552,
+    "lng": 12.8214609,
+    "status": "Planned"
+  },
+  {
+    "name": "Poste de Tensift II",
+    "type": "BESS Plant",
+    "capacity MWh": 150,
+    "superficie (m2)": 7000,
+    "poc (kV)": 225,
+    "lat": 23.6805185,
+    "lng": 12.8475209,
+    "status": "Planned"
+  }
+]
