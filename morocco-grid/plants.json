@@ -12,7 +12,7 @@
   {
     "name": "Poste de Settat",
     "type": "BESS Plant",
-    "capacity MWh": 150,
+    "capacity MWh":150,
     "superficie (m2)": 5800,
     "poc (kV)": 225,
     "lat": 29.7616272,
