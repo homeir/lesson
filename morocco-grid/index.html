@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>African Power Transmission Network Analysis</title>
+    <title>Morocco Transmission Network Analysis</title>
     <style>
         body {
             margin: 0;
@@ -102,6 +102,23 @@
             margin-right: 10px;
             border-radius: 50%;
         }
+        .action-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .action-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -130,12 +147,41 @@
             <label for="mapTypeTerrain">Terrain</label>
         </div>
         
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Display Options</h3>
+            <div class="control-item">
+                <input type="checkbox" id="showTransmissionLines" checked>
+                <label for="showTransmissionLines">Show Transmission Lines</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showFutureLines" checked>
+                <label for="showFutureLines">Show Planned Lines</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showPowerPlants" checked>
+                <label for="showPowerPlants">Show Power Plants</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showSubstations" checked>
+                <label for="showSubstations">Show Substations</label>
+            </div>
+        </div>
+        
         <!-- Voltage filters will be dynamically added by JavaScript -->
         
         <div class="stats">
             <h3 style="margin-top: 0;">Statistics</h3>
             <div id="stats-content">
                 <div>Total Lines: <span id="total-lines">0</span></div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Tools</h3>
+            <button id="saveView" class="action-button">Save Current View</button>
+            <div id="shareUrlContainer" style="display: none; margin-top: 10px;">
+                <input type="text" id="shareUrl" style="width: 100%; margin-bottom: 5px;" readonly>
+                <small>Copy this URL to share the current map view</small>
             </div>
         </div>
     </div>
@@ -150,7 +196,7 @@
     <script src="app.js"></script>
     
     <!-- Include Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries=geometry&callback=initMap" async defer></script>
     
     <script>
         // Map type switching
