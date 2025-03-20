@@ -56,7 +56,7 @@ function getDefaultColorMapping(totalStrings) {
 function getStringColorMapping(combinerBoxGroups, totalStrings, rows, columns) {
     // 无论配置是否匹配，都使用黄色作为默认颜色
     console.log('初始状态，使用黄色作为默认颜色');
-    return getDefaultColorMapping(totalStrings);
+        return getDefaultColorMapping(totalStrings);
 }
 
 /**
@@ -286,11 +286,12 @@ function applyCustomGrouping(pvArray, combinerBoxGroups, totalStrings, rows, col
         pvArray.dataset.arrayGroupingJson = JSON.stringify(arrayGrouping);
         
         console.log('已生成并保存分组数据，用于汇流箱位置优化');
+        console.log('window.arrayGrouping 已设置，长度:', arrayGrouping.length);
         
         // 根据分组结果设置颜色映射
-        const colorMapping = {};
-        const stringsPerModule = 3; // 每个模块有3个串
-        
+    const colorMapping = {};
+    const stringsPerModule = 3; // 每个模块有3个串
+    
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < columns; col++) {
                 for (let s = 0; s < stringsPerModule; s++) {

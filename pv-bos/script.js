@@ -756,20 +756,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 groupCalculationBtn.classList.add('active');
                 groupCalculationBtn.textContent = '取消分组';
                 
-                // 触发汇流箱位置优化计算
-                setTimeout(() => {
-                    if (window.CombinerBoxOptimizer && window.arrayGrouping && window.arrayGrouping.length > 0) {
-                        logDebug('开始优化汇流箱位置');
-                        window.CombinerBoxOptimizer.startOptimization(
-                            layoutParams.rows, 
-                            layoutParams.columns, 
-                            window.arrayGrouping
-                        );
-                    } else {
-                        logDebug('未找到优化器或分组数据不可用，无法优化汇流箱位置');
-                    }
-                }, 500); // 延迟执行，确保先完成分组计算
-                
+                // 分组完成后直接调用优化器的显示函数
+                if (window.CombinerBoxOptimizer) {
+                    // 先触发分组计算，然后显示优化设置
+                    setTimeout(() => {
+                        if (window.arrayGrouping && window.arrayGrouping.length > 0) {
+                            logDebug('分组完成，显示汇流箱位置优化设置');
+                            window.CombinerBoxOptimizer.showSettings();
+                        }
+                    }, 300);
+                }
             } else {
                 groupCalculationBtn.classList.remove('active');
                 groupCalculationBtn.textContent = '分组运算';
@@ -777,6 +773,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 取消分组时清除汇流箱
                 const combinerBoxes = document.querySelectorAll('.combiner-box');
                 combinerBoxes.forEach(box => box.remove());
+                
+                // 隐藏优化设置
+                if (window.CombinerBoxOptimizer) {
+                    window.CombinerBoxOptimizer.hideSettings();
+                }
             }
         }
         

@@ -182,18 +182,26 @@ button:hover {
 /* 汇流箱样式 */
 .combiner-box {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background-color: #e74c3c;
-    border: 1px solid #c0392b;
-    border-radius: 2px;
-    cursor: pointer;
-    z-index: 30;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    background-color: #FF5500;
+    border: 3px solid #CC4400;
     transform: translate(-50%, -50%);
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(255, 85, 0, 0.8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.combiner-box.optimized {
+    background-color: #FF5500;
+    border: 3px solid #CC4400;
 }
 
 .combiner-box:hover {
-    transform: translate(-50%, -50%) scale(1.5);
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 85, 0, 1);
 }
 
 /* 布局颜色样式 */
@@ -553,15 +561,28 @@ footer {
     font-size: 1.2rem;
 }
 
+.optimizer-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .combiner-optimizer-settings .form-group {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
+    flex-basis: calc(33.33% - 10px);
+    min-width: 180px;
 }
 
 .combiner-optimizer-settings label {
-    min-width: 120px;
-    margin-right: 10px;
+    min-width: 80px;
+    margin-right: 8px;
+    font-size: 0.9em;
+    white-space: nowrap;
 }
 
 .combiner-optimizer-settings input[type="number"],
@@ -569,7 +590,8 @@ footer {
     padding: 5px 8px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    width: 120px;
+    width: 80px;
+    flex-grow: 1;
 }
 
 .combiner-optimizer-settings button {
@@ -579,8 +601,9 @@ footer {
     border-radius: 4px;
     padding: 8px 15px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 5px;
     font-weight: 500;
+    width: 100%;
 }
 
 .combiner-optimizer-settings button:hover {
@@ -596,17 +619,12 @@ footer {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-    .combiner-optimizer-settings .form-group {
+    .optimizer-controls {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 5px;
     }
     
-    .combiner-optimizer-settings label {
-        margin-bottom: 5px;
-    }
-    
-    .combiner-optimizer-settings input[type="number"],
-    .combiner-optimizer-settings select {
-        width: 100%;
+    .combiner-optimizer-settings .form-group {
+        flex-basis: 100%;
     }
 } 

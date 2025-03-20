@@ -8,10 +8,10 @@
 
     // 光伏板参数
     let moduleDimensions = {
-        length: 2.172, // 默认长度(m)
-        width: 1.303,  // 默认宽度(m)
+        length: 2.382, // 默认长度(m)
+        width: 1.134,  // 默认宽度(m)
         mountType: '1P', // 默认1P布置，可选'1P'或'2P'
-        rowSpacing: 6.5, // 默认行间距(m)
+        rowSpacing: 7.35, // 默认行间距(m)
         columnSpacing: 0.3 // 默认列间距(m)
     };
 
@@ -42,35 +42,50 @@
             return null;
         }
         
+        // 寻找区域的边界
+        let [minRow, maxRow] = stringPositions.reduce(([min, max], pos) => [Math.min(min, pos[0]), Math.max(max, pos[0])], [Infinity, -Infinity]);
+        let [minCol, maxCol] = stringPositions.reduce(([min, max], pos) => [Math.min(min, pos[1]), Math.max(max, pos[1])], [Infinity, -Infinity]);
+        
+        console.log('找到区域边界: minRow:', minRow, 'maxRow:', maxRow, 'minCol:', minCol, 'maxCol:', maxCol);
+        
+        // 直接使用分组的实际串位置作为候选位置
+        // 确保比较精确点，增加采样点的密度
         let bestPosition = null;
         let minTotalDistance = Infinity;
         
-        // 尝试每个串位置作为汇流箱位置
-        for (let i = 0; i < stringPositions.length; i++) {
-            const candidatePos = stringPositions[i];
-            const candidateRealPos = mapToRealPosition(
-                candidatePos[0], 
-                candidatePos[1], 
-                moduleDimensions.mountType
-            );
+        // 找到中心点位置
+        const centerRow = Math.floor((minRow + maxRow) / 2);
+        const centerCol = Math.floor((minCol + maxCol) / 2);
+        
+        // 优先考虑测试中心点
+        const candidatePositions = [
+            [centerRow, centerCol], // 中心点
+            ...stringPositions // 然后再考虑所有串位置
+        ];
+        
+        // 测试每个候选位置
+        for (const candidatePos of candidatePositions) {
+            const row = candidatePos[0];
+            const col = candidatePos[1];
             
+            const candidateRealPos = mapToRealPosition(row, col, moduleDimensions.mountType);
             let totalDistance = 0;
             
-            // 计算到所有其他串的距离总和
-            for (let j = 0; j < stringPositions.length; j++) {
-                if (i === j) continue; // 跳过自身
+            // 计算到所有串的距离总和
+            for (const stringPos of stringPositions) {
+                // 跳过自身
+                if (row === stringPos[0] && col === stringPos[1]) continue;
                 
-                const otherPos = stringPositions[j];
                 const otherRealPos = mapToRealPosition(
-                    otherPos[0], 
-                    otherPos[1], 
+                    stringPos[0],
+                    stringPos[1],
                     moduleDimensions.mountType
                 );
                 
                 const distance = calculateDistance(
-                    candidateRealPos.x, 
-                    candidateRealPos.y, 
-                    otherRealPos.x, 
+                    candidateRealPos.x,
+                    candidateRealPos.y,
+                    otherRealPos.x,
                     otherRealPos.y
                 );
                 
@@ -81,8 +96,8 @@
             if (totalDistance < minTotalDistance) {
                 minTotalDistance = totalDistance;
                 bestPosition = {
-                    row: candidatePos[0],
-                    col: candidatePos[1],
+                    row: row,
+                    col: col,
                     realX: candidateRealPos.x,
                     realY: candidateRealPos.y,
                     totalDistance: totalDistance
@@ -90,59 +105,74 @@
             }
         }
         
+        console.log('选择最优位置:', bestPosition);
         return bestPosition;
     }
-
+    function chechTheTotalCombinerBoxes(arrayGrouping) {
+        let totalCombinerBoxes = new Set();
+        for (let i = 0; i < arrayGrouping.length; i++) {
+            for (let j = 0; j < arrayGrouping[i].length; j++) {
+                totalCombinerBoxes.add(arrayGrouping[i][j]);
+            }
+        }
+        return Array.from(totalCombinerBoxes);
+    }
+    
     // 分析分组阵列，按汇流箱分组
-    function analyzeArrayGrouping(arrayGrouping, rows, columns) {
+    function analyzeArrayGrouping(arrayGrouping) {
         if (!arrayGrouping || arrayGrouping.length === 0) {
             console.error('分组数组为空，无法分析');
             return [];
         }
         
+        console.log('分析分组数组:', arrayGrouping);
+        
         // 按汇流箱分组的结果
         const combinerGroups = {};
         
+        // 检查并提取所有汇流箱ID
+        let combinerBoxIds = chechTheTotalCombinerBoxes(arrayGrouping);
+        console.log('发现的汇流箱ID:', combinerBoxIds);
+        
+        if (combinerBoxIds.length === 0) {
+            console.error('未找到有效的汇流箱ID');
+            return {};
+        }
+        
         // 遍历所有串，按汇流箱ID分组
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < columns; col++) {
-                // 每个组件有3个串
-                for (let s = 0; s < 3; s++) {
-                    const stringIndex = (row * columns + col) * 3 + s;
-                    const combinerBoxId = arrayGrouping[stringIndex];
-                    
-                    if (combinerBoxId === undefined) continue;
-                    
-                    // 初始化汇流箱分组
-                    if (!combinerGroups[combinerBoxId]) {
-                        combinerGroups[combinerBoxId] = [];
+        combinerBoxIds.forEach(boxId => {
+            if (boxId === null || boxId === undefined) return; // 跳过空值
+            
+            combinerGroups[boxId] = [];
+            
+            // 遍历整个阵列查找此汇流箱ID对应的串位置
+            for (let row = 0; row < arrayGrouping.length; row++) {
+                for (let col = 0; col < arrayGrouping[row].length; col++) {
+                    if (arrayGrouping[row][col] === boxId) {
+                        // 找到一个匹配的串，记录其行列位置
+                        combinerGroups[boxId].push([row, col]);
                     }
-                    
-                    // 添加串位置到对应汇流箱的分组中
-                    combinerGroups[combinerBoxId].push([row, col, s]);
                 }
             }
-        }
+            
+            console.log(`汇流箱 #${boxId} 有 ${combinerGroups[boxId].length} 个串连接`);
+        });
         
         return combinerGroups;
     }
 
     // 计算所有汇流箱的最优位置
-    function calculateOptimalCombinerPositions(arrayGrouping, rows, columns) {
+    function calculateOptimalCombinerPositions(arrayGrouping) {
         // 分析分组数组，获取汇流箱分组
-        const combinerGroups = analyzeArrayGrouping(arrayGrouping, rows, columns);
+        const combinerGroups = analyzeArrayGrouping(arrayGrouping);
+        console.log('分组配置数组 combinerGroups:', combinerGroups);
         const optimalPositions = {};
         
         // 依次计算每个汇流箱的最优位置
         for (const [combinerBoxId, stringPositions] of Object.entries(combinerGroups)) {
-            // 简化串位置数组，只保留行列信息
-            const simplifiedPositions = stringPositions.map(pos => [pos[0], pos[1]]);
-            
-            // 去重，因为同一组件上的不同串坐标相同
-            const uniquePositions = Array.from(new Set(simplifiedPositions.map(JSON.stringify)), JSON.parse);
-            
+
             // 计算最优位置
-            const optimalPosition = findOptimalCombinerPosition(uniquePositions);
+            const optimalPosition = findOptimalCombinerPosition(stringPositions);
             
             if (optimalPosition) {
                 optimalPositions[combinerBoxId] = optimalPosition;
@@ -172,33 +202,52 @@
             box.dataset.combinerBoxId = combinerBoxId;
             
             // 将实际物理位置映射到页面坐标
-            // 这里需要根据页面上的比例尺进行转换
-            // 假设页面上每个光伏组件宽度为layoutParams.moduleWidth像素
-            // 高度为layoutParams.moduleHeight像素
             const layoutParams = window.layoutParams || { 
                 moduleWidth: 180, 
                 moduleHeight: 8, 
                 marginY: 4 
             };
             
-            const x = position.col * layoutParams.moduleWidth;
-            const y = position.row * (layoutParams.moduleHeight + layoutParams.marginY);
+            // 修正位置计算，考虑实际布局
+            // 在每个组件的中心位置放置汇流箱
+            const moduleWidth = layoutParams.moduleWidth;
+            const moduleHeight = layoutParams.moduleHeight + layoutParams.marginY;
+            
+            // 计算汇流箱在组件中间的位置
+            const x = position.col * moduleWidth + (moduleWidth / 2);
+            const y = position.row * moduleHeight + (moduleHeight / 2);
             
             box.style.left = `${x}px`;
             box.style.top = `${y}px`;
             
-            // 设置汇流箱颜色
-            if (window.StringColoring) {
-                const color = window.StringColoring.getCombinerBoxColor(position.col, true);
-                box.style.backgroundColor = color.bg;
-                box.style.borderColor = color.border;
-            }
+            // 设置统一的鲜明颜色
+            box.style.backgroundColor = '#FF5500'; // 明亮的橙红色
+            box.style.borderColor = '#CC4400';
+            box.style.width = '25px';
+            box.style.height = '25px';
+            box.style.position = 'absolute';
+            box.style.transform = 'translate(-50%, -50%)'; // 居中定位
+            box.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)'; // 添加阴影增强可见性
+            box.style.zIndex = '100'; // 确保汇流箱显示在最上层
             
             // 设置提示信息
             box.setAttribute('title', `汇流箱 #${combinerBoxId}
 位置: 第${position.row + 1}行, 第${position.col + 1}列
 物理坐标: (${position.realX.toFixed(2)}m, ${position.realY.toFixed(2)}m)
 总距离: ${position.totalDistance.toFixed(2)}m`);
+            
+            // 添加ID标签显示
+            const label = document.createElement('span');
+            label.textContent = combinerBoxId;
+            label.style.position = 'absolute';
+            label.style.top = '50%';
+            label.style.left = '50%';
+            label.style.transform = 'translate(-50%, -50%)';
+            label.style.color = '#FFFFFF'; // 白色文字
+            label.style.fontWeight = 'bold';
+            label.style.fontSize = '12px';
+            label.style.textShadow = '0 0 2px #000'; // 文字阴影提高可读性
+            box.appendChild(label);
             
             // 点击事件
             box.addEventListener('click', function(e) {
@@ -209,6 +258,8 @@
             });
             
             pvArray.appendChild(box);
+            
+            console.log(`创建汇流箱 #${combinerBoxId}，位置: (${x}, ${y})`);
         } catch (error) {
             console.error(`创建汇流箱失败: ${error.message}`);
         }
@@ -216,60 +267,83 @@
 
     // 启动优化过程
     function startOptimization(rows, columns, arrayGrouping) {
+        console.log('开始优化汇流箱位置');
+        console.log('参数: rows=', rows, 'columns=', columns);
+        console.log('arrayGrouping 类型:', typeof arrayGrouping);
+        console.log('arrayGrouping 长度:', arrayGrouping ? arrayGrouping.length : 0);
+        
         const pvArray = document.getElementById('pv-array');
         if (!pvArray) {
             console.error('找不到pv-array元素');
             return;
         }
         
-        const optimalPositions = calculateOptimalCombinerPositions(arrayGrouping, rows, columns);
-        renderCombinerBoxes(optimalPositions, pvArray);
+        if (!arrayGrouping || arrayGrouping.length === 0) {
+            console.error('数组分组数据为空，无法执行优化');
+            alert('分组数据不可用，请先执行分组运算');
+            return;
+        }
         
-        return optimalPositions;
+        try {
+            // 获取DOM中可能存储的分组信息
+            if (pvArray.dataset.arrayGroupingJson) {
+                try {
+                    const jsonData = JSON.parse(pvArray.dataset.arrayGroupingJson);
+                    if (jsonData && jsonData.length > 0) {
+                        console.log('使用DOM中存储的分组信息');
+                        arrayGrouping = jsonData;
+                    }
+                } catch (e) {
+                    console.error('解析DOM分组数据失败:', e);
+                }
+            }
+            
+            const optimalPositions = calculateOptimalCombinerPositions(arrayGrouping);
+            console.log('计算出的最优位置:', optimalPositions);
+            
+            renderCombinerBoxes(optimalPositions, pvArray);
+            console.log('已渲染汇流箱到页面');
+            
+            return optimalPositions;
+        } catch (error) {
+            console.error('优化过程中出错:', error);
+            alert('优化过程中发生错误: ' + error.message);
+        }
     }
 
-    // 创建汇流箱参数设置界面
-    function createSettingsUI() {
-        const settingsContainer = document.createElement('div');
-        settingsContainer.className = 'combiner-optimizer-settings';
-        settingsContainer.innerHTML = `
-            <h3>汇流箱位置优化设置</h3>
-            <div class="form-group">
-                <label for="module-length">组件长度 (m):</label>
-                <input type="number" id="module-length" min="0.5" max="5" step="0.001" value="${moduleDimensions.length}">
-            </div>
-            <div class="form-group">
-                <label for="module-width">组件宽度 (m):</label>
-                <input type="number" id="module-width" min="0.5" max="5" step="0.001" value="${moduleDimensions.width}">
-            </div>
-            <div class="form-group">
-                <label for="mount-type">安装方式:</label>
-                <select id="mount-type">
-                    <option value="1P" ${moduleDimensions.mountType === '1P' ? 'selected' : ''}>1P竖排</option>
-                    <option value="2P" ${moduleDimensions.mountType === '2P' ? 'selected' : ''}>2P横排</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="row-spacing">行间距 (m):</label>
-                <input type="number" id="row-spacing" min="0.1" max="20" step="0.1" value="${moduleDimensions.rowSpacing}">
-            </div>
-            <div class="form-group">
-                <label for="column-spacing">列间距 (m):</label>
-                <input type="number" id="column-spacing" min="0.1" max="5" step="0.1" value="${moduleDimensions.columnSpacing}">
-            </div>
-            <button id="optimize-button">优化汇流箱位置</button>
-        `;
-        
-        // 插入到页面中
-        const insertPoint = document.querySelector('.array-controls');
-        if (insertPoint) {
-            insertPoint.parentNode.insertBefore(settingsContainer, insertPoint.nextSibling);
-            
-            // 添加事件监听器
+    // 显示优化设置UI
+    function showOptimizerSettings() {
+        const container = document.getElementById('optimizer-container');
+        if (container) {
+            container.style.display = 'block';
+            // 初始化事件监听器
             setupEventListeners();
-        } else {
-            console.error('找不到合适的插入点');
+            // 更新输入字段值为当前配置
+            updateSettingsUI();
         }
+    }
+    
+    // 隐藏优化设置UI
+    function hideOptimizerSettings() {
+        const container = document.getElementById('optimizer-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+    
+    // 更新设置UI的输入值为当前配置
+    function updateSettingsUI() {
+        const lengthInput = document.getElementById('module-length');
+        const widthInput = document.getElementById('module-width');
+        const mountTypeSelect = document.getElementById('mount-type');
+        const rowSpacingInput = document.getElementById('row-spacing');
+        const columnSpacingInput = document.getElementById('column-spacing');
+        
+        if (lengthInput) lengthInput.value = moduleDimensions.length;
+        if (widthInput) widthInput.value = moduleDimensions.width;
+        if (mountTypeSelect) mountTypeSelect.value = moduleDimensions.mountType;
+        if (rowSpacingInput) rowSpacingInput.value = moduleDimensions.rowSpacing;
+        if (columnSpacingInput) columnSpacingInput.value = moduleDimensions.columnSpacing;
     }
 
     // 设置事件监听器
@@ -312,7 +386,9 @@
         }
         
         if (optimizeButton) {
-            optimizeButton.addEventListener('click', function() {
+            // 直接添加点击事件监听器
+            optimizeButton.onclick = function() {
+                console.log('优化按钮被点击');
                 if (!window.arrayGrouping || window.arrayGrouping.length === 0) {
                     alert('请先执行分组运算，获取阵列分组信息');
                     return;
@@ -322,14 +398,26 @@
                 const columns = window.layoutParams ? window.layoutParams.columns : 4;
                 
                 startOptimization(rows, columns, window.arrayGrouping);
-            });
+            };
         }
     }
 
     // 在DOM加载完成后初始化
     document.addEventListener('DOMContentLoaded', function() {
-        // 延迟加载，确保主脚本已经初始化
-        setTimeout(createSettingsUI, 1000);
+        // 监听分组状态变化
+        const checkGroupStatus = function() {
+            if (window.groupCalculationActive) {
+                showOptimizerSettings();
+            } else {
+                hideOptimizerSettings();
+            }
+        };
+        
+        // 初始检查一次
+        setTimeout(checkGroupStatus, 1000);
+        
+        // 设置定期检查
+        setInterval(checkGroupStatus, 500);
     });
     
     // 暴露公共接口
@@ -340,6 +428,23 @@
         },
         getModuleDimensions: function() {
             return Object.assign({}, moduleDimensions);
+        },
+        showSettings: showOptimizerSettings,
+        hideSettings: hideOptimizerSettings,
+        // 添加调试方法
+        debug: function() {
+            console.log('-- 调试信息 --');
+            console.log('模块尺寸:', moduleDimensions);
+            console.log('优化器容器:', document.getElementById('optimizer-container'));
+            console.log('优化按钮:', document.getElementById('optimize-button'));
+            console.log('全局arrayGrouping:', window.arrayGrouping);
+            console.log('layoutParams:', window.layoutParams);
+            console.log('groupCalculationActive:', window.groupCalculationActive);
+            return {
+                moduleDimensions,
+                arrayGrouping: window.arrayGrouping,
+                layoutParams: window.layoutParams
+            };
         }
     };
 })(); 

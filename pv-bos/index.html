@@ -90,6 +90,39 @@
                             <button id="group-calculation-btn">分组运算</button>
                         </div>
                     </div>
+                    
+                    <!-- 优化器设置区域，将通过JS动态显示 -->
+                    <div id="optimizer-container" style="display: none;">
+                        <div class="combiner-optimizer-settings">
+                            <h3>汇流箱位置优化设置</h3>
+                            <div class="optimizer-controls">
+                                <div class="form-group">
+                                    <label for="module-length">组件长度 (m):</label>
+                                    <input type="number" id="module-length" min="0.5" max="5" step="0.001" value="2.382">
+                                </div>
+                                <div class="form-group">
+                                    <label for="module-width">组件宽度 (m):</label>
+                                    <input type="number" id="module-width" min="0.5" max="5" step="0.001" value="1.134">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mount-type">安装方式:</label>
+                                    <select id="mount-type">
+                                        <option value="1P" selected>1P竖排</option>
+                                        <option value="2P">2P横排</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="row-spacing">行间距 (m):</label>
+                                    <input type="number" id="row-spacing" min="0.1" max="20" step="0.1" value="7.35">
+                                </div>
+                                <div class="form-group">
+                                    <label for="column-spacing">列间距 (m):</label>
+                                    <input type="number" id="column-spacing" min="0.1" max="5" step="0.1" value="0.3">
+                                </div>
+                            </div>
+                            <button id="optimize-button">优化汇流箱位置</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="view-controls">
