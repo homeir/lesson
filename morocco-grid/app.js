@@ -229,7 +229,7 @@ function getPowerPlantIcon(type, status) {
     // Set color based on plant type
     switch(type) {
         case 'BESS Plant':
-            color = '#FF7900'; // SG Orange
+            color = '#FFD700'; // SG Orange
             break;
         case 'Solar Plant':
             color = '#FFA500'; // Orange
@@ -253,7 +253,7 @@ function getPowerPlantIcon(type, status) {
         fillColor: color,
         fillOpacity: status === 'Planned' ? 0.6 : 0.9,
         strokeColor: '#000000',
-        strokeWeight: 1,
+        strokeWeight: 2,
         scale: 8
     };
 }
