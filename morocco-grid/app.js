@@ -64,14 +64,11 @@ function initMap() {
     // Load GeoJSON data
     loadGeoJsonData();
     
-    // Load Future GeoJSON data
-    loadFutureGeoJsonData();
+
     
     // Load Power Plants data
     loadPowerPlantsData();
     
-    // Load Substations data
-    loadSubstationsData();
 
     // Add voltage filter event listeners
     setupVoltageFilters();
@@ -91,32 +88,6 @@ function initMap() {
     }, 1000); // Add a delay to ensure all data is loaded
 }
 
-// Load Future GeoJSON data
-function loadFutureGeoJsonData() {
-    fetch('futuretransmissionlines.geojson')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load future GeoJSON data: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            try {
-                if (!data || !data.features || !Array.isArray(data.features)) {
-                    throw new Error('Invalid future GeoJSON data format');
-                }
-                
-                displayFutureGeoJsonData(data);
-            } catch (processError) {
-                console.error('Error processing future GeoJSON data:', processError);
-                alert('Error processing future transmission line data: ' + processError.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading future GeoJSON data:', error);
-            alert('Error loading future transmission line data: ' + error.message);
-        });
-}
 
 // Display Future GeoJSON data
 function displayFutureGeoJsonData(data) {
