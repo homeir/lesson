@@ -229,7 +229,7 @@ function getPowerPlantIcon(type, status) {
     // Set color based on plant type
     switch(type) {
         case 'BESS Plant':
-            color = '#FFD700'; // Gold
+            color = '#FF7900'; // SG Orange
             break;
         case 'Solar Plant':
             color = '#FFA500'; // Orange
