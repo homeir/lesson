@@ -22,7 +22,7 @@
   {
     "name": "Site hydraulique Al Massira",
     "type": "BESS Plant",
-    "capacity MWh": 180,
+    "capacity MWh":180,
     "superficie (m2)": 8000,
     "poc (kV)": 225,
     "lat": 28.9466989,
