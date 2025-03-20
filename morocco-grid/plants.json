@@ -35,8 +35,8 @@
     "capacity MWh": 300,
     "superficie (m2)": 12000,
     "poc (kV)": 225,
-    "lng": -6.933792,
-    "lat": 34.397383,
+    "lng": -7.4810008,
+    "lat": 33.5554229,
     "status": "Planned"
   },
   {
@@ -45,8 +45,8 @@
     "capacity MWh": 100,
     "superficie (m2)": 3500,
     "poc (kV)": 60,
-    "lng": -7.009536,
-    "lat": 34.447616,
+    "lng": -8.472925,
+    "lat": 32.410058,
     "status": "Planned"
   },
   {
@@ -55,8 +55,8 @@
     "capacity MWh": 100,
     "superficie (m2)": 4000,
     "poc (kV)": 60,
-    "lng": -6.40051,
-    "lat": 34.279631,
+    "lng": -5.4662674,
+    "lat": 35.5697092,
     "status": "Planned"
   },
   {
@@ -66,7 +66,7 @@
     "superficie (m2)": 4000,
     "poc (kV)": 60,
     "lng": -6.218177,
-    "lat": 33.136521,
+    "lat": 33.1291173,
     "status": "Planned"
   },
   {
@@ -75,8 +75,8 @@
     "capacity MWh": 150,
     "superficie (m2)": 7100,
     "poc (kV)": 225,
-    "lng": -6.713309,
-    "lat": 33.857692,
+    "lng": -6.8723661,
+    "lat": 32.8868356,
     "status": "Planned"
   },
   {
@@ -85,8 +85,8 @@
     "capacity MWh": 200,
     "superficie (m2)": 10000,
     "poc (kV)": 225,
-    "lng": -6.946387,
-    "lat": 33.817052,
+    "lng":  -8.103574,
+    "lat": 31.739274,
     "status": "Planned"
   },
   {
@@ -95,8 +95,8 @@
     "capacity MWh": 150,
     "superficie (m2)": 7000,
     "poc (kV)": 225,
-    "lng": -7.019101,
-    "lat": 33.92454,
+    "lng": -8.211377,
+    "lat": 31.749201,
     "status": "Planned"
   }
 ]
