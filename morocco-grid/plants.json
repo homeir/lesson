@@ -5,8 +5,8 @@
     "capacity MWh": 270,
     "superficie (m2)": 12000,
     "poc (kV)": 225,
-    "lng": -6.665197,
-    "lat": 34.245765,
+    "lng": -6.5643874,
+    "lat": 34.2858408,
     "status": "Planned"
   },
   {
@@ -15,8 +15,8 @@
     "capacity MWh": 150,
     "superficie (m2)": 5800,
     "poc (kV)": 225,
-    "lng": -6.910783,
-    "lat": 34.192783,
+    "lng": -7.626108,
+    "lat": 32.9953253,
     "status": "Planned"
   },
   {
@@ -25,8 +25,8 @@
     "capacity MWh": 180,
     "superficie (m2)": 8000,
     "poc (kV)": 225,
-    "lng": -6.889121,
-    "lat": 33.98088,
+    "lng": -7.6378648,
+    "lat": 32.4764229,
     "status": "Planned"
   },
   {
