@@ -5,28 +5,28 @@
     "capacity MWh": 270,
     "superficie (m2)": 12000,
     "poc (kV)": 225,
-    "lng": 39.3024086,
-    "lat": 41.0411096,
+    "lng": -6.665197,
+    "lat": 34.245765,
     "status": "Planned"
   },
   {
     "name": "Poste de Settat",
     "type": "BESS Plant",
-    "capacity MWh":150,
+    "capacity MWh": 150,
     "superficie (m2)": 5800,
     "poc (kV)": 225,
-    "lng": 29.7616272,
-    "lat": 27.1760038,
+    "lng": -6.910783,
+    "lat": 34.192783,
     "status": "Planned"
   },
   {
     "name": "Site hydraulique Al Massira",
     "type": "BESS Plant",
-    "capacity MWh":180,
+    "capacity MWh": 180,
     "superficie (m2)": 8000,
     "poc (kV)": 225,
-    "lng": 28.9466989,
-    "lat": 21.134951,
+    "lng": -6.889121,
+    "lat": 33.98088,
     "status": "Planned"
   },
   {
@@ -35,8 +35,8 @@
     "capacity MWh": 300,
     "superficie (m2)": 12000,
     "poc (kV)": 225,
-    "lng": 30.4706779,
-    "lat": 32.9057712,
+    "lng": -6.933792,
+    "lat": 34.397383,
     "status": "Planned"
   },
   {
@@ -45,8 +45,8 @@
     "capacity MWh": 100,
     "superficie (m2)": 3500,
     "poc (kV)": 60,
-    "lng": 28.0372889,
-    "lat": 30.8623635,
+    "lng": -7.009536,
+    "lat": 34.447616,
     "status": "Planned"
   },
   {
@@ -55,8 +55,8 @@
     "capacity MWh": 100,
     "superficie (m2)": 4000,
     "poc (kV)": 60,
-    "lng": 49.4075552,
-    "lat": 55.2051085,
+    "lng": -6.40051,
+    "lat": 34.279631,
     "status": "Planned"
   },
   {
@@ -65,8 +65,8 @@
     "capacity MWh": 100,
     "superficie (m2)": 4000,
     "poc (kV)": 60,
-    "lng": 47.4466572,
-    "lat": 25.8397477,
+    "lng": -6.218177,
+    "lat": 33.136521,
     "status": "Planned"
   },
   {
@@ -75,8 +75,8 @@
     "capacity MWh": 150,
     "superficie (m2)": 7100,
     "poc (kV)": 225,
-    "lng": 34.5443657,
-    "lat": 25.6568783,
+    "lng": -6.713309,
+    "lat": 33.857692,
     "status": "Planned"
   },
   {
@@ -85,8 +85,8 @@
     "capacity MWh": 200,
     "superficie (m2)": 10000,
     "poc (kV)": 225,
-    "lng": 25.5632552,
-    "lat": 12.8214609,
+    "lng": -6.946387,
+    "lat": 33.817052,
     "status": "Planned"
   },
   {
@@ -95,8 +95,8 @@
     "capacity MWh": 150,
     "superficie (m2)": 7000,
     "poc (kV)": 225,
-    "lng": 23.6805185,
-    "lat": 12.8475209,
+    "lng": -7.019101,
+    "lat": 33.92454,
     "status": "Planned"
   }
 ]
