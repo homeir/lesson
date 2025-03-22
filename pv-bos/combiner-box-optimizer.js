@@ -15,14 +15,17 @@
         columnSpacing: 0.3 // 默认列间距(m)
     };
 
+    let totalStringLength = 0;
+
     // 坐标映射到实际物理位置
     function mapToRealPosition(row, col, mountType) {
         const { length, width, rowSpacing, columnSpacing } = moduleDimensions;
-        
+        // 获取每串组件数量
+        const modulesPerString = document.getElementById('modules-per-string').value;
         // 根据安装方式确定实际尺寸
-        const moduleLength = mountType === '1P' ? length : width;
-        const moduleWidth = mountType === '1P' ? width : length;
-        
+        const moduleLength = mountType === '1P' ? length : width
+        const moduleWidth = (mountType === '1P' ? width : length) * modulesPerString; // 需要乘以每串组件数量;
+
         // 计算每行/列的实际物理位置
         const x = col * (moduleWidth + columnSpacing);
         const y = row * (moduleLength + rowSpacing);
@@ -30,9 +33,10 @@
         return { x, y };
     }
 
-    // 计算两点之间的欧氏距离
+    // 计算两点之间的折线距离
     function calculateDistance(x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        //return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        return Math.abs(x2 - x1) + Math.abs(y2 - y1);
     }
 
     // 获取汇流箱最优位置
@@ -100,7 +104,8 @@
                     col: col,
                     realX: candidateRealPos.x,
                     realY: candidateRealPos.y,
-                    totalDistance: totalDistance
+                    totalDistance: totalDistance,
+                    stringCount: stringPositions.length // 添加串数量信息
                 };
             }
         }
@@ -201,52 +206,54 @@
             box.className = 'combiner-box optimized';
             box.dataset.combinerBoxId = combinerBoxId;
             
-            // 将实际物理位置映射到页面坐标
+            // 将计算好的位置直接映射到页面坐标
             const layoutParams = window.layoutParams || { 
-                moduleWidth: 180, 
+                moduleWidth: 60, 
                 moduleHeight: 8, 
                 marginY: 4 
             };
             
-            // 修正位置计算，考虑实际布局
-            // 在每个组件的中心位置放置汇流箱
+            // 简单地使用行列位置直接计算坐标
+            // position.row和position.col是基于计算得到的最优位置
             const moduleWidth = layoutParams.moduleWidth;
             const moduleHeight = layoutParams.moduleHeight + layoutParams.marginY;
             
-            // 计算汇流箱在组件中间的位置
-            const x = position.col * moduleWidth + (moduleWidth / 2);
-            const y = position.row * moduleHeight + (moduleHeight / 2);
+            // 计算汇流箱位置，直接使用position中的行列坐标
+            const x = position.col * moduleWidth;
+            const y = position.row * moduleHeight;
             
-            box.style.left = `${x}px`;
-            box.style.top = `${y}px`;
+            // 设置位置，放在组件中心
+            box.style.left = `${x + moduleWidth/2}px`;
+            box.style.top = `${y + moduleHeight/2}px`;
             
-            // 设置统一的鲜明颜色
-            box.style.backgroundColor = '#FF5500'; // 明亮的橙红色
+            // 设置样式
+            box.style.backgroundColor = '#FF5500';
             box.style.borderColor = '#CC4400';
             box.style.width = '25px';
             box.style.height = '25px';
             box.style.position = 'absolute';
             box.style.transform = 'translate(-50%, -50%)'; // 居中定位
-            box.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)'; // 添加阴影增强可见性
-            box.style.zIndex = '100'; // 确保汇流箱显示在最上层
+            box.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)';
+            box.style.zIndex = '100';
             
             // 设置提示信息
             box.setAttribute('title', `汇流箱 #${combinerBoxId}
 位置: 第${position.row + 1}行, 第${position.col + 1}列
 物理坐标: (${position.realX.toFixed(2)}m, ${position.realY.toFixed(2)}m)
-总距离: ${position.totalDistance.toFixed(2)}m`);
+总距离: ${position.totalDistance.toFixed(2)}m
+连接串数: ${position.stringCount || '未知'}`);
             
             // 添加ID标签显示
             const label = document.createElement('span');
-            label.textContent = combinerBoxId;
+            label.textContent = parseInt(combinerBoxId)+1;
             label.style.position = 'absolute';
             label.style.top = '50%';
             label.style.left = '50%';
             label.style.transform = 'translate(-50%, -50%)';
-            label.style.color = '#FFFFFF'; // 白色文字
+            label.style.color = '#FFFFFF';
             label.style.fontWeight = 'bold';
             label.style.fontSize = '12px';
-            label.style.textShadow = '0 0 2px #000'; // 文字阴影提高可读性
+            label.style.textShadow = '0 0 2px #000';
             box.appendChild(label);
             
             // 点击事件
@@ -259,7 +266,7 @@
             
             pvArray.appendChild(box);
             
-            console.log(`创建汇流箱 #${combinerBoxId}，位置: (${x}, ${y})`);
+            console.log(`创建汇流箱 #${combinerBoxId}，位置: 行=${position.row}，列=${position.col}，坐标=(${box.style.left}, ${box.style.top})`);
         } catch (error) {
             console.error(`创建汇流箱失败: ${error.message}`);
         }
@@ -304,11 +311,64 @@
             renderCombinerBoxes(optimalPositions, pvArray);
             console.log('已渲染汇流箱到页面');
             
+            // 显示优化结果
+            displayOptimizationResults(optimalPositions);
+            
+            // 确保结果区域可见
+            const resultsArea = document.getElementById('optimization-results');
+            if (resultsArea) {
+                resultsArea.style.display = 'block';
+                // 滚动到结果区域
+                setTimeout(() => {
+                    resultsArea.scrollIntoView({behavior: 'smooth'});
+                    console.log('滚动到优化结果区域');
+                }, 200);
+            }
+            
             return optimalPositions;
         } catch (error) {
             console.error('优化过程中出错:', error);
             alert('优化过程中发生错误: ' + error.message);
         }
+    }
+
+    // 显示优化计算结果
+    function displayOptimizationResults(optimalPositions) {
+        console.log('显示优化结果:', optimalPositions);
+        const resultsContent = document.getElementById('results-content');
+        if (!resultsContent) {
+            console.error('无法找到结果容器元素');
+            return;
+        }
+
+        // 清空结果容器
+        resultsContent.innerHTML = '';
+
+        // 如果没有位置数据
+        if (!optimalPositions || Object.keys(optimalPositions).length === 0) {
+            resultsContent.innerHTML = '<p>未能计算出优化位置。请检查分组数据。</p>';
+            return;
+        }
+
+        // 计算总距离
+        let totalDistance = 0;
+        for (const [boxId, position] of Object.entries(optimalPositions)) {
+            const distance = position.totalDistance || 0;
+            totalDistance += distance;
+        }
+
+
+        // 创建结果显示
+        const resultDiv = document.createElement('div');
+        resultDiv.className = 'total-distance-result';
+        resultDiv.innerHTML = `<p style="font-size: 16px; font-weight: bold; text-align: center;">总距离: <span style="color: #2980b9;">${totalDistance.toFixed(2)}m</span></p>`;
+        resultsContent.appendChild(resultDiv);
+
+        // 显示计算完成时间
+        const timestamp = document.createElement('div');
+        timestamp.className = 'timestamp';
+        timestamp.textContent = `计算完成时间: ${new Date().toLocaleString()}`;
+        resultsContent.appendChild(timestamp);
     }
 
     // 显示优化设置UI
@@ -431,20 +491,8 @@
         },
         showSettings: showOptimizerSettings,
         hideSettings: hideOptimizerSettings,
-        // 添加调试方法
-        debug: function() {
-            console.log('-- 调试信息 --');
-            console.log('模块尺寸:', moduleDimensions);
-            console.log('优化器容器:', document.getElementById('optimizer-container'));
-            console.log('优化按钮:', document.getElementById('optimize-button'));
-            console.log('全局arrayGrouping:', window.arrayGrouping);
-            console.log('layoutParams:', window.layoutParams);
-            console.log('groupCalculationActive:', window.groupCalculationActive);
-            return {
-                moduleDimensions,
-                arrayGrouping: window.arrayGrouping,
-                layoutParams: window.layoutParams
-            };
-        }
+        displayResults: displayOptimizationResults,
+       
+
     };
 })(); 

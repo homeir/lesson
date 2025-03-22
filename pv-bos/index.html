@@ -27,8 +27,6 @@
         
         <main>
             <div class="controls">
-
-                
                 <div class="array-controls">
                     <div class="control-group">
                         <label for="row-input">行数:</label>
@@ -133,7 +131,7 @@
                 
                 <div class="display-options">
                     <label><input type="checkbox" id="show-strings" checked> 显示串</label>
-                    <label><input type="checkbox" id="show-combiner-boxes"> 显示汇流箱</label>
+                    <label><input type="checkbox" id="show-combiner-boxes" checked> 显示汇流箱</label>
                 </div>
             </div>
             
@@ -148,6 +146,16 @@
                 <h3>详细信息</h3>
                 <div id="selection-details">
                     点击阵列中的元素查看详情
+                </div>
+            </div>
+            
+            <!-- 汇流箱优化计算结果 -->
+            <div id="optimization-results" class="optimization-results">
+                <h3>汇流箱位置优化计算结果</h3>
+                <div class="results-container">
+                    <div id="results-content" class="results-content">
+                        <p>尚未执行位置优化计算。点击"优化汇流箱位置"按钮开始计算。</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -171,5 +179,7 @@
     <script src="script.js"></script>
     <script src="string-grouping.js"></script>
     <script src="combiner-box-optimizer.js"></script>
+    <script src="test-results.js"></script>
+    <script src="test-display.js"></script>
 </body>
 </html>
