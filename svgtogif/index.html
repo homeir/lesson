@@ -78,7 +78,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 获取SVG中的所有动画元素
     const svgDoc = new DOMParser().parseFromString(svgContent, 'image/svg+xml');
-    const animations = svgDoc.querySelectorAll('animate, animateTransform, animateMotion');
+    
+    // 检查是否是 draw.io 生成的 SVG
+    const isDrawIO = svgDoc.querySelector('svg').getAttribute('data-tool') === 'draw.io';
+    
+    let animations;
+    if (isDrawIO) {
+      // 对于 draw.io SVG，我们检查所有可能包含动画的元素
+      animations = svgDoc.querySelectorAll('animate, animateTransform, animateMotion, set, animateColor');
+      
+      // 如果没有找到标准动画元素，尝试查找包含动画属性的元素
+      if (animations.length === 0) {
+        animations = svgDoc.querySelectorAll('[style*="animation"], [style*="transition"]');
+      }
+    } else {
+      // 对于普通 SVG，使用标准动画元素
+      animations = svgDoc.querySelectorAll('animate, animateTransform, animateMotion');
+    }
     
     if (animations.length === 0) {
       alert('SVG文件中没有找到动画元素！');
@@ -86,10 +102,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 获取动画持续时间
-    const duration = Math.max(...Array.from(animations).map(anim => {
-      const dur = anim.getAttribute('dur');
-      return dur ? parseFloat(dur) * 1000 : 1000;
-    }));
+    let duration = 2000; // 默认2秒
+    if (isDrawIO) {
+      // 对于 draw.io SVG，尝试从样式或动画属性中获取持续时间
+      const styleDuration = svgDoc.querySelector('[style*="animation-duration"]');
+      if (styleDuration) {
+        const match = styleDuration.style.animationDuration.match(/(\d+)s/);
+        if (match) {
+          duration = parseFloat(match[1]) * 1000;
+        }
+      }
+    } else {
+      // 对于标准 SVG，从动画元素中获取持续时间
+      duration = Math.max(...Array.from(animations).map(anim => {
+        const dur = anim.getAttribute('dur');
+        return dur ? parseFloat(dur) * 1000 : 1000;
+      }));
+    }
 
     // 设置帧数
     const frames = 30;
