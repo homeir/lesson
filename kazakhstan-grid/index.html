@@ -102,6 +102,24 @@
             margin-right: 10px;
             border-radius: 50%;
         }
+        /* 自定义比例尺样式 */
+        .scale-control {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        }
+        .scale-bar {
+            height: 4px;
+            background: #000;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -147,6 +165,10 @@
             <div class="legend-item">
                 <div class="legend-color" style="background-color: #00FF00; height: 2px; cursor: pointer;" onclick="zoomToPlants()"></div>
                 <div class="legend-text">Mirny Connection</div>
+            </div>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #00FF00; opacity: 0.1; cursor: pointer;" onclick="zoomToPlants()"></div>
+                <div class="legend-text">Mirny Area</div>
             </div>
         </div>
         <div class="legend-section">
@@ -261,8 +283,15 @@
                 zoomControl: true,
                 zoomControlOptions: {
                     position: google.maps.ControlPosition.RIGHT_TOP
+                },
+                scaleControl: true,
+                scaleControlOptions: {
+                    position: google.maps.ControlPosition.BOTTOM_LEFT
                 }
             });
+
+            // 添加自定义比例尺
+            addCustomScaleControl();
 
             // Load substation data
             loadSubstations();
@@ -289,6 +318,75 @@
             document.getElementById('mapTypeSatellite').addEventListener('change', changeMapType);
             document.getElementById('mapTypeHybrid').addEventListener('change', changeMapType);
             document.getElementById('mapTypeTerrain').addEventListener('change', changeMapType);
+        }
+
+        // 添加自定义比例尺控件
+        function addCustomScaleControl() {
+            // 创建比例尺容器
+            const scaleControl = document.createElement('div');
+            scaleControl.className = 'scale-control';
+            
+            // 创建比例尺文本
+            const scaleText = document.createElement('div');
+            scaleText.className = 'scale-text';
+            scaleControl.appendChild(scaleText);
+            
+            // 创建比例尺条
+            const scaleBar = document.createElement('div');
+            scaleBar.className = 'scale-bar';
+            scaleControl.appendChild(scaleBar);
+            
+            // 将比例尺添加到地图
+            map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(scaleControl);
+            
+            // 更新比例尺
+            google.maps.event.addListener(map, 'bounds_changed', function() {
+                updateScale(scaleText, scaleBar);
+            });
+            
+            // 初始更新
+            setTimeout(() => {
+                updateScale(scaleText, scaleBar);
+            }, 500);
+        }
+        
+        // 更新比例尺信息
+        function updateScale(scaleText, scaleBar) {
+            // 获取地图中心点纬度
+            const center = map.getCenter();
+            const lat = center.lat();
+            
+            // 获取地图边界
+            const bounds = map.getBounds();
+            if (!bounds) return;
+            
+            // 计算比例
+            const earth = 6378.137; // 地球半径 (km)
+            const width = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
+            const distance = Math.round((Math.PI * earth * Math.cos(lat * Math.PI / 180) * width) / 180);
+            
+            // 设置比例尺长度
+            let scaleWidth = 100; // 像素
+            let scaleDistance;
+            
+            // 选择合适的比例单位
+            if (distance > 100) {
+                scaleDistance = Math.round(distance / 100) * 100;
+                scaleText.textContent = scaleDistance + ' km';
+            } else if (distance > 10) {
+                scaleDistance = Math.round(distance / 10) * 10;
+                scaleText.textContent = scaleDistance + ' km';
+            } else if (distance > 1) {
+                scaleDistance = Math.round(distance);
+                scaleText.textContent = scaleDistance + ' km';
+            } else {
+                scaleDistance = Math.round(distance * 1000);
+                scaleText.textContent = scaleDistance + ' m';
+            }
+            
+            // 计算比例尺条宽度
+            const ratio = scaleDistance / distance;
+            scaleBar.style.width = (scaleWidth * ratio) + 'px';
         }
 
         // Load substation data
@@ -551,6 +649,14 @@
                         lng: plant.lng
                     }));
                     
+                    // 添加第一个点到末尾，使路径闭合
+                    if (data.length > 0) {
+                        plantPath.push({
+                            lat: data[0].lat,
+                            lng: data[0].lng
+                        });
+                    }
+                    
                     // 创建连接线
                     const plantLine = new google.maps.Polyline({
                         path: plantPath,
@@ -558,6 +664,17 @@
                         strokeColor: '#00FF00',
                         strokeOpacity: 0.8,
                         strokeWeight: 2,
+                        map: map
+                    });
+                    
+                    // 创建闭合多边形
+                    const plantPolygon = new google.maps.Polygon({
+                        paths: plantPath,
+                        strokeColor: '#00FF00',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#00FF00',
+                        fillOpacity: 0.1,
                         map: map
                     });
                     
