@@ -138,6 +138,20 @@
                 <div class="legend-text">220kV Substations</div>
             </div>
         </div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Plants</h4>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #00FF00; border-radius: 50%;"></div>
+                <div class="legend-text">Plants</div>
+            </div>
+        </div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Other</h4>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; opacity: 0.35;"></div>
+                <div class="legend-text">KML Polygon</div>
+            </div>
+        </div>
     </div>
 
     <div class="controls">
@@ -196,6 +210,7 @@
                 <div>500kV Lines: <span id="lines-500">0</span></div>
                 <div>220kV Lines: <span id="lines-220">0</span></div>
                 <div>Substations: <span id="total-substations">0</span></div>
+                <div>Plants: <span id="total-plants">0</span></div>
             </div>
         </div>
     </div>
@@ -215,13 +230,18 @@
         let gridLines = [];
         // Store station labels
         let stationLabels = [];
+        // Store plant markers
+        let plantMarkers = [];
+        // Store KML polygon
+        let kmlPolygons = [];
         // Store statistics
         let stats = {
             total: 0,
             voltage1150: 0,
             voltage500: 0,
             voltage220: 0,
-            substations: 0
+            substations: 0,
+            plants: 0
         };
 
         // Initialize map
@@ -245,6 +265,12 @@
             
             // Load transmission lines data
             loadTransmissionLines();
+            
+            // Load plants data
+            loadPlants();
+            
+            // Load KML data
+            loadKmlData();
 
             // Add filter event listeners
             document.getElementById('voltage1150').addEventListener('change', filterLines);
@@ -492,6 +518,7 @@
             document.getElementById('lines-500').textContent = stats.voltage500;
             document.getElementById('lines-220').textContent = stats.voltage220;
             document.getElementById('total-substations').textContent = stats.substations;
+            document.getElementById('total-plants').textContent = stats.plants || 0;
         }
 
         // Change map type
@@ -505,6 +532,96 @@
             } else if (document.getElementById('mapTypeTerrain').checked) {
                 map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
             }
+        }
+
+        // Load plants data
+        function loadPlants() {
+            fetch('plants.json')
+                .then(response => response.json())
+                .then(data => {
+                    stats.plants = data.length;
+                    data.forEach(plant => {
+                        const marker = new google.maps.Marker({
+                            position: { lat: plant.lat, lng: plant.lng },
+                            map: map,
+                            title: plant.name,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: '#00FF00',
+                                fillOpacity: 1,
+                                strokeWeight: 1,
+                                strokeColor: '#FFFFFF',
+                                scale: 6
+                            }
+                        });
+                        
+                        // Add info window
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `<div><strong>${plant.name}</strong><br>${plant.type}<br>Status: ${plant.status}<br>Year: ${plant.year}</div>`
+                        });
+                        
+                        marker.addListener('click', () => {
+                            infoWindow.open(map, marker);
+                        });
+                        
+                        plantMarkers.push(marker);
+                    });
+                    updateStats();
+                });
+        }
+        
+        // Load KML data
+        function loadKmlData() {
+            fetch('doc.kml')
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const kmlDoc = parser.parseFromString(data, 'text/xml');
+                    
+                    const placemarks = kmlDoc.getElementsByTagName('Placemark');
+                    for (let i = 0; i < placemarks.length; i++) {
+                        const placemark = placemarks[i];
+                        const polygon = placemark.getElementsByTagName('Polygon');
+                        
+                        if (polygon.length > 0) {
+                            const coordinates = placemark.getElementsByTagName('coordinates')[0].textContent.trim();
+                            const coordinatePairs = coordinates.split(' ');
+                            
+                            const path = coordinatePairs.map(pair => {
+                                const coords = pair.split(',');
+                                return { 
+                                    lat: parseFloat(coords[1]), 
+                                    lng: parseFloat(coords[0]) 
+                                };
+                            });
+                            
+                            const polygonObj = new google.maps.Polygon({
+                                paths: path,
+                                strokeColor: '#FF0000',
+                                strokeOpacity: 0.8,
+                                strokeWeight: 2,
+                                fillColor: '#FF0000',
+                                fillOpacity: 0.35,
+                                map: map
+                            });
+                            
+                            kmlPolygons.push(polygonObj);
+                            
+                            // Add click listener to polygon
+                            polygonObj.addListener('click', () => {
+                                const infoPanel = document.getElementById('info-panel');
+                                const infoTitle = document.getElementById('info-title');
+                                const infoContent = document.getElementById('info-content');
+                                
+                                const name = placemark.getElementsByTagName('name')[0].textContent;
+                                
+                                infoTitle.textContent = 'KML Polygon Information';
+                                infoContent.innerHTML = `<div><strong>Name:</strong> ${name}</div>`;
+                                infoPanel.style.display = 'block';
+                            });
+                        }
+                    }
+                });
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
