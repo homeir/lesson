@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>储能系统配置计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .calculator {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 30px;
+            background-color: #e8f4fc;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        .formula {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>储能系统配置计算器</h1>
+    
+    <div class="calculator">
+        <div class="section">
+            <div class="section-title">储能柜基本参数</div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="cabinetEnergy">单个储能柜电量 (kWh)</label>
+                    <input type="number" id="cabinetEnergy" value="6684" step="0.1">
+                </div>
+                <div class="input-field">
+                    <label for="cabinetPower">单个储能柜功率 (kW)</label>
+                    <input type="number" id="cabinetPower" value="1680" step="0.1">
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="lossFactor">损耗系数</label>
+                    <input type="number" id="lossFactor" value="0.982" step="0.001" min="0" max="1">
+                </div>
+                <div class="input-field">
+                    <label for="maxCabinetPower">单个储能柜最大功率 (kW)</label>
+                    <input type="number" id="maxCabinetPower" value="1848" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">客户要求</div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="pocPF">POC点功率因数 (PF)</label>
+                    <input type="number" id="pocPF" value="0.9" step="0.01" min="0" max="1">
+                </div>
+                <div class="input-field">
+                    <label for="pocVT">POC点电压波动 (VT)</label>
+                    <input type="number" id="pocVT" value="0.9" step="0.01" min="0" max="1">
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="pocActivePower">POC点有功功率 (MW)</label>
+                    <input type="number" id="pocActivePower" value="500" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">无功补偿设备参数</div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="scCapacity">SC设备单台容量 (MVar)</label>
+                    <input type="number" id="scCapacity" value="8" step="0.1">
+                </div>
+                <div class="input-field">
+                    <label for="tempDerating">高温降额系数</label>
+                    <input type="number" id="tempDerating" value="0.9" step="0.01" min="0" max="1">
+                </div>
+                <div class="input-field">
+                    <label for="safetyMargin">安全余量系数</label>
+                    <input type="number" id="safetyMargin" value="1.2" step="0.05" min="1">
+                </div>
+            </div>
+        </div>
+        
+        <button id="calculateBtn">计算配置</button>
+        
+        <div class="results" id="results" style="display: none;">
+            <h2>计算结果</h2>
+            
+            <div class="result-item">
+                <strong>POC点需要的视在功率:</strong>
+                <div id="pocApparentPower"></div>
+                <div class="formula">公式: PCCapp = P / PF = <span id="pocActivePowerValue"></span> / <span id="pocPFValue"></span></div>
+            </div>
+            
+            <div class="result-item">
+                <strong>POC点的无功功率:</strong>
+                <div id="pocReactivePower"></div>
+                <div class="formula">公式: PCCvar = √(S² - P²) = √((<span id="sValue"></span>)² - (<span id="pValue"></span>)²)</div>
+            </div>
+            
+            <div class="result-item">
+                <strong>PCS最大能提供的视在功率:</strong>
+                <div id="pcsMaxApparentPower"></div>
+                <div class="formula">公式: Papp.max = PCCapp × 1.1 = <span id="pccappValue"></span> × 1.1</div>
+            </div>
+            
+            <div class="result-item">
+                <strong>考虑损耗和电压波动后的实际视在功率:</strong>
+                <div id="actualApparentPower"></div>
+                <div class="formula">公式: S_实际 = Papp.max × 损耗系数 × VT = <span id="pappMaxValue"></span> × <span id="lossFactorValue"></span> × <span id="pocVTValue"></span></div>
+            </div>
+            
+            <div class="result-item">
+                <strong>验证功率因数0.93时的有功功率:</strong>
+                <div id="verifiedActivePower"></div>
+                <div class="formula">公式: P = S_实际 × PF = <span id="actualSValue"></span> × 0.93</div>
+            </div>
+            
+            <div class="result-item">
+                <strong>此时PCS能提供的无功功率:</strong>
+                <div id="pcsReactivePower"></div>
+                <div class="formula">公式: Q = √(S_实际² - P²) = √((<span id="actualSValue2"></span>)² - (<span id="pocActivePowerValue2"></span>)²)</div>
+            </div>
+            
+            <div class="result-item">
+                <strong>还需要额外无功功率:</strong>
+                <div id="additionalReactivePower"></div>
+                <div class="formula">公式: Q_额外 = PCCvar - Q_PCS = <span id="pccvarValue"></span> - <span id="qpcsValue"></span></div>
+            </div>
+            
+            <div class="result-item">
+                <strong>需要SC设备数量:</strong>
+                <div id="scUnitsRequired"></div>
+                <div class="formula">公式: 数量 = Q_额外 / (SC容量 × 降额系数) × 安全余量 = <span id="qExtraValue"></span> / (<span id="scCapacityValue"></span> × <span id="tempDeratingValue"></span>) × <span id="safetyMarginValue"></span></div>
+                <div class="note">注: 结果已向上取整</div>
+            </div>
+            
+            <div class="result-item">
+                <strong>需要储能柜数量:</strong>
+                <div id="cabinetUnitsRequired"></div>
+                <div class="formula">公式: 数量 = PCCapp / 单个储能柜功率 = <span id="pccappValue2"></span> / <span id="cabinetPowerValue"></span></div>
+                <div class="note">注: 使用储能柜标称功率计算</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // 获取输入值
+            const cabinetEnergy = parseFloat(document.getElementById('cabinetEnergy').value);
+            const cabinetPower = parseFloat(document.getElementById('cabinetPower').value);
+            const lossFactor = parseFloat(document.getElementById('lossFactor').value);
+            const maxCabinetPower = parseFloat(document.getElementById('maxCabinetPower').value);
+            const pocPF = parseFloat(document.getElementById('pocPF').value);
+            const pocVT = parseFloat(document.getElementById('pocVT').value);
+            const pocActivePower = parseFloat(document.getElementById('pocActivePower').value);
+            const scCapacity = parseFloat(document.getElementById('scCapacity').value);
+            const tempDerating = parseFloat(document.getElementById('tempDerating').value);
+            const safetyMargin = parseFloat(document.getElementById('safetyMargin').value);
+
+            // 计算POC点需要的视在功率
+            const pocApparentPower = pocActivePower / pocPF;
+            
+            // 计算POC点的无功功率
+            const pocReactivePower = Math.sqrt(Math.pow(pocApparentPower, 2) - Math.pow(pocActivePower, 2));
+            
+            // PCS最大能提供的视在功率
+            const pcsMaxApparentPower = pocApparentPower * 1.1;
+            
+            // 考虑损耗和电压波动后的实际视在功率
+            const actualApparentPower = pcsMaxApparentPower * lossFactor * pocVT;
+            
+            // 验证功率因数0.93时的有功功率
+            const verifiedActivePower = actualApparentPower * 0.93;
+            
+            // 此时PCS能提供的无功功率
+            const pcsReactivePower = Math.sqrt(Math.pow(actualApparentPower, 2) - Math.pow(pocActivePower, 2));
+            
+            // 还需要额外无功功率
+            const additionalReactivePower = pocReactivePower - pcsReactivePower;
+            
+            // 需要SC设备数量
+            const scUnitsRequired = Math.ceil((additionalReactivePower / (scCapacity * tempDerating)) * safetyMargin;
+            
+            // 需要储能柜数量
+            const cabinetUnitsRequired = Math.ceil(pocApparentPower / (cabinetPower / 1000)); // 转换为MW
+
+            // 显示结果
+            document.getElementById('pocApparentPower').textContent = pocApparentPower.toFixed(2) + ' MVA';
+            document.getElementById('pocReactivePower').textContent = pocReactivePower.toFixed(2) + ' MVar';
+            document.getElementById('pcsMaxApparentPower').textContent = pcsMaxApparentPower.toFixed(2) + ' MVA';
+            document.getElementById('actualApparentPower').textContent = actualApparentPower.toFixed(2) + ' MVA';
+            document.getElementById('verifiedActivePower').textContent = verifiedActivePower.toFixed(2) + ' MW';
+            document.getElementById('pcsReactivePower').textContent = pcsReactivePower.toFixed(2) + ' MVar';
+            document.getElementById('additionalReactivePower').textContent = additionalReactivePower.toFixed(2) + ' MVar';
+            document.getElementById('scUnitsRequired').textContent = scUnitsRequired + ' 台';
+            document.getElementById('cabinetUnitsRequired').textContent = cabinetUnitsRequired + ' 台';
+
+            // 显示公式中的值
+            document.getElementById('pocActivePowerValue').textContent = pocActivePower;
+            document.getElementById('pocPFValue').textContent = pocPF;
+            document.getElementById('sValue').textContent = pocApparentPower.toFixed(2);
+            document.getElementById('pValue').textContent = pocActivePower;
+            document.getElementById('pccappValue').textContent = pocApparentPower.toFixed(2);
+            document.getElementById('pappMaxValue').textContent = pcsMaxApparentPower.toFixed(2);
+            document.getElementById('lossFactorValue').textContent = lossFactor;
+            document.getElementById('pocVTValue').textContent = pocVT;
+            document.getElementById('actualSValue').textContent = actualApparentPower.toFixed(2);
+            document.getElementById('actualSValue2').textContent = actualApparentPower.toFixed(2);
+            document.getElementById('pocActivePowerValue2').textContent = pocActivePower;
+            document.getElementById('pccvarValue').textContent = pocReactivePower.toFixed(2);
+            document.getElementById('qpcsValue').textContent = pcsReactivePower.toFixed(2);
+            document.getElementById('qExtraValue').textContent = additionalReactivePower.toFixed(2);
+            document.getElementById('scCapacityValue').textContent = scCapacity;
+            document.getElementById('tempDeratingValue').textContent = tempDerating;
+            document.getElementById('safetyMarginValue').textContent = safetyMargin;
+            document.getElementById('pccappValue2').textContent = pocApparentPower.toFixed(2);
+            document.getElementById('cabinetPowerValue').textContent = (cabinetPower / 1000).toFixed(3);
+
+            // 显示结果区域
+            document.getElementById('results').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

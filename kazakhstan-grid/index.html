@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kazakhstan Electricity Grid Analysis</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 10px;
+        }
+        .legend-text {
+            font-size: 12px;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .control-item {
+            margin-bottom: 5px;
+        }
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .info-content {
+            font-size: 14px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .stats {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .control-section {
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .legend-section {
+            margin-top: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="legend">
+        <h3 style="margin-top: 0;">Legend</h3>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Transmission Lines</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF0000; height: 4px;"></div>
+                <div class="legend-text">1150kV Lines</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF6600; height: 3px;"></div>
+                <div class="legend-text">500kV Lines</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #0000FF; height: 2px;"></div>
+                <div class="legend-text">220kV Lines</div>
+            </div>
+        </div>
+        <div class="legend-section">
+            <h4 style="margin-top: 0;">Substations</h4>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; border-radius: 50%;"></div>
+                <div class="legend-text">1150kV Substations</div>
+            </div>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF6600; border-radius: 50%;"></div>
+                <div class="legend-text">500kV Substations</div>
+            </div>
+            <div class="legend-item">
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #0000FF; border-radius: 50%;"></div>
+                <div class="legend-text">220kV Substations</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <h3 style="margin-top: 0;">Voltage Filter</h3>
+        <div class="control-item">
+            <input type="checkbox" id="voltage1150" checked>
+            <label for="voltage1150">1150kV Lines</label>
+        </div>
+        <div class="control-item">
+            <input type="checkbox" id="voltage500" checked>
+            <label for="voltage500">500kV Lines</label>
+        </div>
+        <div class="control-item">
+            <input type="checkbox" id="voltage220" checked>
+            <label for="voltage220">220kV Lines</label>
+        </div>
+        
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Station Labels</h3>
+            <div class="control-item">
+                <input type="checkbox" id="showFromNames" checked>
+                <label for="showFromNames">Show Origin Stations</label>
+            </div>
+            <div class="control-item">
+                <input type="checkbox" id="showToNames" checked>
+                <label for="showToNames">Show Destination Stations</label>
+            </div>
+            <button id="applyLabels" style="margin-top: 5px;">Apply</button>
+        </div>
+        
+        <div class="control-section">
+            <h3 style="margin-top: 0;">Map Type</h3>
+            <div class="control-item">
+                <input type="radio" id="mapTypeRoadmap" name="mapType" value="roadmap" checked>
+                <label for="mapTypeRoadmap">Road Map</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeSatellite" name="mapType" value="satellite">
+                <label for="mapTypeSatellite">Satellite</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeHybrid" name="mapType" value="hybrid">
+                <label for="mapTypeHybrid">Hybrid</label>
+            </div>
+            <div class="control-item">
+                <input type="radio" id="mapTypeTerrain" name="mapType" value="terrain">
+                <label for="mapTypeTerrain">Terrain</label>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <h3 style="margin-top: 0;">Statistics</h3>
+            <div id="stats-content">
+                <div>Total Lines: <span id="total-lines">0</span></div>
+                <div>1150kV Lines: <span id="lines-1150">0</span></div>
+                <div>500kV Lines: <span id="lines-500">0</span></div>
+                <div>220kV Lines: <span id="lines-220">0</span></div>
+                <div>Substations: <span id="total-substations">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="info-panel">
+        <div class="close-btn" onclick="closeInfoPanel()">×</div>
+        <div class="info-title" id="info-title">Information</div>
+        <div class="info-content" id="info-content"></div>
+    </div>
+
+    <script>
+        // Store map object
+        let map;
+        // Store substation markers
+        let substationMarkers = [];
+        // Store grid lines
+        let gridLines = [];
+        // Store station labels
+        let stationLabels = [];
+        // Store statistics
+        let stats = {
+            total: 0,
+            voltage1150: 0,
+            voltage500: 0,
+            voltage220: 0,
+            substations: 0
+        };
+
+        // Initialize map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 48.0, lng: 68.0 }, // Kazakhstan center
+                zoom: 6,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+                },
+                streetViewControl: true,
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_TOP
+                }
+            });
+
+            // Load substation data
+            loadSubstations();
+            
+            // Load transmission lines data
+            loadTransmissionLines();
+
+            // Add filter event listeners
+            document.getElementById('voltage1150').addEventListener('change', filterLines);
+            document.getElementById('voltage500').addEventListener('change', filterLines);
+            document.getElementById('voltage220').addEventListener('change', filterLines);
+            
+            // Add label control event listener
+            document.getElementById('applyLabels').addEventListener('click', updateLabels);
+            
+            // Add map type change event listeners
+            document.getElementById('mapTypeRoadmap').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeSatellite').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeHybrid').addEventListener('change', changeMapType);
+            document.getElementById('mapTypeTerrain').addEventListener('change', changeMapType);
+        }
+
+        // Load substation data
+        function loadSubstations() {
+            fetch('substations-existing.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    stats.substations = data.features.length;
+                    data.features.forEach(feature => {
+                        const properties = feature.properties;
+                        const coordinates = feature.geometry.coordinates;
+                        
+                        // Get voltage level from properties
+                        const voltage = parseInt(properties['#LayerName'].match(/\d+/)[0]);
+                        
+                        // Set color based on voltage
+                        let color;
+                        if (voltage === 1150) {
+                            color = '#FF0000';
+                        } else if (voltage === 500) {
+                            color = '#FF6600';
+                        } else {
+                            color = '#0000FF';
+                        }
+                        
+                        const marker = new google.maps.Marker({
+                            position: { lat: coordinates[1], lng: coordinates[0] },
+                            map: map,
+                            title: properties['#Name'],
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: color,
+                                fillOpacity: 1,
+                                strokeWeight: 1,
+                                strokeColor: '#FFFFFF',
+                                scale: 8
+                            }
+                        });
+
+                        // Add info window
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `<div><strong>${properties['#Name']}</strong><br>${voltage}kV Substation</div>`
+                        });
+
+                        marker.addListener('click', () => {
+                            infoWindow.open(map, marker);
+                        });
+
+                        substationMarkers.push(marker);
+                    });
+                    updateStats();
+                });
+        }
+
+        // Load transmission lines data
+        function loadTransmissionLines() {
+            fetch('lines-existing.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    stats.total = data.features.length;
+                    data.features.forEach(feature => {
+                        const properties = feature.properties;
+                        const coordinates = feature.geometry.coordinates;
+                        
+                        // Get voltage level from properties
+                        const voltage = parseInt(properties['#LayerName'].match(/\d+/)[0]);
+                        
+                        // Set color and weight based on voltage
+                        let color, weight;
+                        if (voltage === 1150) {
+                            color = '#FF0000';
+                            weight = 4;
+                            stats.voltage1150++;
+                        } else if (voltage === 500) {
+                            color = '#FF6600';
+                            weight = 3;
+                            stats.voltage500++;
+                        } else {
+                            color = '#0000FF';
+                            weight = 2;
+                            stats.voltage220++;
+                        }
+                        
+                        // Convert coordinates to path
+                        const path = coordinates.map(coord => ({
+                            lat: coord[1],
+                            lng: coord[0]
+                        }));
+                        
+                        // Create line
+                        const line = new google.maps.Polyline({
+                            path: path,
+                            geodesic: true,
+                            strokeColor: color,
+                            strokeOpacity: 1.0,
+                            strokeWeight: weight,
+                            map: map
+                        });
+                        
+                        // Store line info
+                        const lineInfo = {
+                            line: line,
+                            voltage: voltage,
+                            fromName: properties['#Name']?.split(' - ')[0] || '',
+                            toName: properties['#Name']?.split(' - ')[1] || '',
+                            path: path
+                        };
+                        
+                        gridLines.push(lineInfo);
+                        
+                        // Add click event
+                        line.addListener('click', () => {
+                            showLineInfo(lineInfo);
+                        });
+                        
+                        // Add labels if names exist
+                        if (lineInfo.fromName) {
+                            const label = addLabel(path[0], lineInfo.fromName, 'from');
+                            if (label) stationLabels.push(label);
+                        }
+                        
+                        if (lineInfo.toName && lineInfo.toName !== lineInfo.fromName) {
+                            const label = addLabel(path[path.length - 1], lineInfo.toName, 'to');
+                            if (label) stationLabels.push(label);
+                        }
+                    });
+                    updateStats();
+                });
+        }
+        
+        // Add label
+        function addLabel(position, text, type) {
+            if (!text) return null;
+            
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                label: {
+                    text: text,
+                    color: '#000000',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 0
+                }
+            });
+            
+            return {
+                marker: marker,
+                type: type,
+                text: text
+            };
+        }
+        
+        // Update labels based on checkbox selection
+        function updateLabels() {
+            const showFrom = document.getElementById('showFromNames').checked;
+            const showTo = document.getElementById('showToNames').checked;
+            
+            // Remove all existing labels
+            stationLabels.forEach(label => {
+                label.marker.setMap(null);
+            });
+            stationLabels = [];
+            
+            // Add labels based on selection
+            gridLines.forEach(lineInfo => {
+                if (showFrom && lineInfo.fromName) {
+                    const label = addLabel(lineInfo.path[0], lineInfo.fromName, 'from');
+                    if (label) stationLabels.push(label);
+                }
+                
+                if (showTo && lineInfo.toName && lineInfo.toName !== lineInfo.fromName) {
+                    const label = addLabel(lineInfo.path[lineInfo.path.length - 1], lineInfo.toName, 'to');
+                    if (label) stationLabels.push(label);
+                }
+            });
+        }
+        
+        // Filter lines
+        function filterLines() {
+            const show1150 = document.getElementById('voltage1150').checked;
+            const show500 = document.getElementById('voltage500').checked;
+            const show220 = document.getElementById('voltage220').checked;
+            
+            gridLines.forEach(item => {
+                if (item.voltage === 1150) {
+                    item.line.setVisible(show1150);
+                } else if (item.voltage === 500) {
+                    item.line.setVisible(show500);
+                } else {
+                    item.line.setVisible(show220);
+                }
+            });
+        }
+        
+        // Show line info
+        function showLineInfo(lineInfo) {
+            const infoPanel = document.getElementById('info-panel');
+            const infoTitle = document.getElementById('info-title');
+            const infoContent = document.getElementById('info-content');
+            
+            infoTitle.textContent = 'Line Information';
+            
+            let content = '';
+            content += `<div><strong>Voltage:</strong> ${lineInfo.voltage}kV</div>`;
+            
+            if (lineInfo.fromName) {
+                content += `<div><strong>Origin Station:</strong> ${lineInfo.fromName}</div>`;
+            }
+            
+            if (lineInfo.toName) {
+                content += `<div><strong>Destination Station:</strong> ${lineInfo.toName}</div>`;
+            }
+            
+            infoContent.innerHTML = content;
+            infoPanel.style.display = 'block';
+        }
+        
+        // Close info panel
+        function closeInfoPanel() {
+            document.getElementById('info-panel').style.display = 'none';
+        }
+        
+        // Update statistics
+        function updateStats() {
+            document.getElementById('total-lines').textContent = stats.total;
+            document.getElementById('lines-1150').textContent = stats.voltage1150;
+            document.getElementById('lines-500').textContent = stats.voltage500;
+            document.getElementById('lines-220').textContent = stats.voltage220;
+            document.getElementById('total-substations').textContent = stats.substations;
+        }
+
+        // Change map type
+        function changeMapType() {
+            if (document.getElementById('mapTypeRoadmap').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+            } else if (document.getElementById('mapTypeSatellite').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+            } else if (document.getElementById('mapTypeHybrid').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+            } else if (document.getElementById('mapTypeTerrain').checked) {
+                map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries&callback=initMap" async defer></script>
+</body>
+</html>

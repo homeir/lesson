@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Three-Phase Power Triangle Visualization</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; }
+        .panel { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        canvas { background: #f9f9f9; display: block; }
+        .slider-container { margin: 20px 0; width: 100%; }
+        h1 { color: #2c3e50; }
+        .power-values { background: #f0f8ff; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Three-Phase Power Relationship</h1>
+    
+    <div class="slider-container">
+        <label>Phase Angle θ: <span id="theta-value">30</span>°</label>
+        <input type="range" id="theta" min="0" max="90" value="30" step="1" style="width: 300px;">
+    </div>
+    
+    <div class="container">
+        <div class="panel">
+            <h3>Three-Phase Voltage & Current</h3>
+            <canvas id="waveform" width="500" height="300"></canvas>
+        </div>
+        <div class="panel">
+            <h3>Power Triangle</h3>
+            <canvas id="triangle" width="400" height="300"></canvas>
+        </div>
+    </div>
+    
+    <div class="power-values">
+        <p>Active Power P = <span id="P-val">0</span> W</p>
+        <p>Reactive Power Q = <span id="Q-val">0</span> VAR</p>
+        <p>Apparent Power S = <span id="S-val">0</span> VA</p>
+        <p>Verification: √(P² + Q²) = <span id="calc-val">0</span> ≈ S</p>
+    </div>
+
+    <script>
+        // System parameters
+        const Vrms = 220, Irms = 5; // Standard 3-phase values
+        let theta = 30;
+
+        // DOM elements
+        const thetaSlider = document.getElementById('theta');
+        const thetaValue = document.getElementById('theta-value');
+        const waveformCtx = document.getElementById('waveform').getContext('2d');
+        const triangleCtx = document.getElementById('triangle').getContext('2d');
+
+        // Event listener
+        thetaSlider.addEventListener('input', function() {
+            theta = parseInt(this.value);
+            thetaValue.textContent = theta;
+            updateAll();
+        });
+
+        function updateAll() {
+            // Calculate powers
+            const rad = theta * Math.PI / 180;
+            const P = 3 * Vrms * Irms * Math.cos(rad);
+            const Q = 3 * Vrms * Irms * Math.sin(rad);
+            const S = 3 * Vrms * Irms;
+
+            // Update display
+            document.getElementById('P-val').textContent = P.toFixed(1);
+            document.getElementById('Q-val').textContent = Q.toFixed(1);
+            document.getElementById('S-val').textContent = S.toFixed(1);
+            document.getElementById('calc-val').textContent = Math.sqrt(P*P + Q*Q).toFixed(1);
+
+            // Draw visuals
+            drawWaveform();
+            drawTriangle(P, Q, S);
+        }
+
+        function drawWaveform() {
+            waveformCtx.clearRect(0, 0, 500, 300);
+            
+            // Draw grid
+            waveformCtx.strokeStyle = '#ddd';
+            waveformCtx.lineWidth = 0.5;
+            for (let y = 50; y <= 250; y += 50) {
+                waveformCtx.beginPath();
+                waveformCtx.moveTo(0, y);
+                waveformCtx.lineTo(500, y);
+                waveformCtx.stroke();
+            }
+            
+            // Draw three-phase voltages (red/green/blue)
+            const colors = ['#e74c3c', '#2ecc71', '#3498db'];
+            for (let phase = 0; phase < 3; phase++) {
+                waveformCtx.strokeStyle = colors[phase];
+                waveformCtx.lineWidth = 2;
+                waveformCtx.beginPath();
+                
+                for (let x = 0; x < 500; x++) {
+                    const t = x / 50;
+                    const y = 150 + 80 * Math.sin(t - phase * 2 * Math.PI / 3);
+                    if (x === 0) waveformCtx.moveTo(x, y);
+                    else waveformCtx.lineTo(x, y);
+                }
+                waveformCtx.stroke();
+                
+                // Draw corresponding current (dashed)
+                waveformCtx.setLineDash([5, 3]);
+                waveformCtx.beginPath();
+                for (let x = 0; x < 500; x++) {
+                    const t = x / 50;
+                    const y = 150 + 80 * Math.sin(t - phase * 2 * Math.PI / 3 - theta * Math.PI / 180);
+                    if (x === 0) waveformCtx.moveTo(x, y);
+                    else waveformCtx.lineTo(x, y);
+                }
+                waveformCtx.stroke();
+                waveformCtx.setLineDash([]);
+            }
+            
+            // Labels
+            waveformCtx.fillStyle = '#000';
+            waveformCtx.font = '12px Arial';
+            waveformCtx.fillText('Phase A (Red)', 420, 40);
+            waveformCtx.fillText('Phase B (Green)', 420, 60);
+            waveformCtx.fillText('Phase C (Blue)', 420, 80);
+            waveformCtx.fillText('Voltage (Solid)', 420, 100);
+            waveformCtx.fillText('Current (Dashed)', 420, 120);
+        }
+
+        function drawTriangle(P, Q, S) {
+            triangleCtx.clearRect(0, 0, 400, 300);
+            const scale = 120 / S; // Scaling factor
+            const originX = 100, originY = 200;
+            
+            // Draw axes
+            triangleCtx.strokeStyle = '#7f8c8d';
+            triangleCtx.lineWidth = 1;
+            triangleCtx.beginPath();
+            triangleCtx.moveTo(50, originY); triangleCtx.lineTo(350, originY);
+            triangleCtx.moveTo(originX, 50); triangleCtx.lineTo(originX, 250);
+            triangleCtx.stroke();
+            
+            // Draw power triangle
+            triangleCtx.strokeStyle = '#e67e22';
+            triangleCtx.lineWidth = 2;
+            triangleCtx.beginPath();
+            triangleCtx.moveTo(originX, originY);
+            triangleCtx.lineTo(originX + P * scale, originY);
+            triangleCtx.lineTo(originX + P * scale, originY - Q * scale);
+            triangleCtx.closePath();
+            triangleCtx.stroke();
+            
+            // Fill triangle
+            triangleCtx.fillStyle = 'rgba(230, 126, 34, 0.1)';
+            triangleCtx.fill();
+            
+            // Labels
+            triangleCtx.fillStyle = '#2c3e50';
+            triangleCtx.font = 'bold 14px Arial';
+            triangleCtx.fillText('P (Active)', originX + P * scale / 2 - 30, originY + 20);
+            triangleCtx.fillText('Q (Reactive)', originX + P * scale + 10, originY - Q * scale / 2);
+            triangleCtx.fillText('S (Apparent)', originX + P * scale / 2 - 40, originY - Q * scale / 2 - 20);
+            
+            // Angle arc
+            triangleCtx.beginPath();
+            triangleCtx.arc(originX, originY, 30, 0, -theta * Math.PI / 180, true);
+            triangleCtx.stroke();
+            triangleCtx.fillText(`θ = ${theta}°`, originX + 40, originY - 40);
+            
+            // Right angle indicator
+            if (theta > 0 && theta < 90) {
+                const rightAngleSize = 10;
+                triangleCtx.beginPath();
+                triangleCtx.moveTo(originX + P * scale - rightAngleSize, originY);
+                triangleCtx.lineTo(originX + P * scale - rightAngleSize, originY - rightAngleSize);
+                triangleCtx.lineTo(originX + P * scale, originY - rightAngleSize);
+                triangleCtx.stroke();
+            }
+        }
+
+        // Initialize
+        updateAll();
+    </script>
+</body>
+</html>
