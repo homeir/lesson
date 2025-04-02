@@ -139,17 +139,21 @@
             </div>
         </div>
         <div class="legend-section">
-            <h4 style="margin-top: 0;">Plants</h4>
+            <h4 style="margin-top: 0;">Mirny</h4>
             <div class="legend-item">
-                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #00FF00; border-radius: 50%;"></div>
-                <div class="legend-text">Plants</div>
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #00FF00; border-radius: 50%; cursor: pointer;" onclick="zoomToPlants()"></div>
+                <div class="legend-text">Mirny Points</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #00FF00; height: 2px; cursor: pointer;" onclick="zoomToPlants()"></div>
+                <div class="legend-text">Mirny Connection</div>
             </div>
         </div>
         <div class="legend-section">
             <h4 style="margin-top: 0;">Other</h4>
             <div class="legend-item">
-                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; opacity: 0.35;"></div>
-                <div class="legend-text">KML Polygon</div>
+                <div style="width: 20px; height: 20px; margin-right: 10px; background-color: #FF0000; opacity: 0.35; cursor: pointer;" onclick="zoomToKml()"></div>
+                <div class="legend-text">BESS Location</div>
             </div>
         </div>
     </div>
@@ -540,6 +544,23 @@
                 .then(response => response.json())
                 .then(data => {
                     stats.plants = data.length;
+                    
+                    // 创建植物点连接线的路径
+                    const plantPath = data.map(plant => ({
+                        lat: plant.lat,
+                        lng: plant.lng
+                    }));
+                    
+                    // 创建连接线
+                    const plantLine = new google.maps.Polyline({
+                        path: plantPath,
+                        geodesic: true,
+                        strokeColor: '#00FF00',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        map: map
+                    });
+                    
                     data.forEach(plant => {
                         const marker = new google.maps.Marker({
                             position: { lat: plant.lat, lng: plant.lng },
@@ -621,6 +642,53 @@
                             });
                         }
                     }
+                });
+        }
+
+        // 缩放到植物点位置
+        function zoomToPlants() {
+            // 计算植物点的边界
+            let bounds = new google.maps.LatLngBounds();
+            fetch('plants.json')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(plant => {
+                        bounds.extend(new google.maps.LatLng(plant.lat, plant.lng));
+                    });
+                    // 缩放到边界
+                    map.fitBounds(bounds);
+                    // 适当缩小一点视角以便看到全景
+                    let zoomLevel = map.getZoom();
+                    map.setZoom(zoomLevel - 1);
+                });
+        }
+        
+        // 缩放到KML多边形位置
+        function zoomToKml() {
+            fetch('doc.kml')
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const kmlDoc = parser.parseFromString(data, 'text/xml');
+                    
+                    const coordinates = kmlDoc.getElementsByTagName('coordinates')[0].textContent.trim();
+                    const coordinatePairs = coordinates.split(' ');
+                    
+                    // 计算KML多边形的边界
+                    let bounds = new google.maps.LatLngBounds();
+                    coordinatePairs.forEach(pair => {
+                        const coords = pair.split(',');
+                        const lat = parseFloat(coords[1]);
+                        const lng = parseFloat(coords[0]);
+                        bounds.extend(new google.maps.LatLng(lat, lng));
+                    });
+                    
+                    // 缩放到边界
+                    map.fitBounds(bounds);
+                    // 适当放大一点视角以便更好地看到细节
+                    setTimeout(() => {
+                        map.setZoom(map.getZoom() + 2);
+                    }, 100);
                 });
         }
     </script>
