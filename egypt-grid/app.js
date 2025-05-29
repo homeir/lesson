@@ -11,6 +11,8 @@ let stats = {
     total: 0,
     voltageCategories: {}
 };
+// Store nodes
+let nodes = [];
 
 // Initialize map
 function initMap() {
@@ -22,6 +24,7 @@ function initMap() {
     
     // Get display options from URL if present
     const showLines = urlParams.get('showLines') !== 'false';
+    const showNodes = urlParams.get('showNodes') !== 'false';
     
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: lat, lng: lng },
@@ -60,10 +63,12 @@ function initMap() {
     
     // Set display option checkboxes based on URL
     document.getElementById('showTransmissionLines').checked = showLines;
+    document.getElementById('showNodes').checked = showNodes;
     
     // Apply display options
     setTimeout(() => {
         toggleTransmissionLines(showLines);
+        toggleNodes(showNodes);
     }, 1000); // Add a delay to ensure all data is loaded
     
     // Make map accessible globally for map type switching
@@ -99,6 +104,7 @@ function loadGeoJsonData() {
                 
                 displayGeoJsonData(data);
                 createVoltageLegend();
+                createNodesLegend();
                 
                 // Delay updating statistics to ensure DOM is fully loaded
                 setTimeout(() => {
@@ -121,9 +127,11 @@ function loadGeoJsonData() {
 
 // Display GeoJSON data
 function displayGeoJsonData(data) {
-    // Clear existing transmission lines
+    // Clear existing transmission lines and nodes
     transmissionLines.forEach(line => line.setMap(null));
     transmissionLines = [];
+    nodes.forEach(node => node.setMap(null));
+    nodes = [];
 
     // Reset statistics
     stats.total = 0;
@@ -131,7 +139,7 @@ function displayGeoJsonData(data) {
     
     // Process each feature
     data.features.forEach(feature => {
-        // Ensure it's a line string type
+        // Process transmission lines
         if (feature.geometry && feature.geometry.type === 'LineString') {
             const properties = feature.properties;
             const voltage = properties.transmissionPower; // 使用transmissionPower属性
@@ -210,10 +218,170 @@ function displayGeoJsonData(data) {
                 showLineInfo(lineInfo);
             });
         }
+        
+        // Process nodes (excluding substations)
+        else if (feature.geometry && feature.geometry.type === 'Point') {
+            const properties = feature.properties;
+            const nodeType = properties.nodeType;
+            const nodeName = properties.name;
+            
+            // Skip substation nodes
+            if (nodeType && nodeType.toLowerCase() === 'substation') {
+                return;
+            }
+            
+            // Create node marker
+            const position = {
+                lat: feature.geometry.coordinates[1],
+                lng: feature.geometry.coordinates[0]
+            };
+            
+            // Create label for node
+            const label = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: nodeName,
+                icon: getNodeIcon(nodeType),
+                label: {
+                    text: nodeName,
+                    color: '#000000',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                }
+            });
+            
+            // Add click event for node info
+            label.addListener('click', () => {
+                showNodeInfo({
+                    name: nodeName,
+                    type: nodeType,
+                    position: position
+                });
+            });
+            
+            nodes.push(label);
+        }
     });
     
     // Create voltage filters
     createVoltageFilters(stats.voltageCategories);
+}
+
+// Get node icon based on type
+function getNodeIcon(nodeType) {
+    let color;
+    let shape;
+    
+    // Set color and shape based on node type
+    switch(nodeType) {
+        case 'city':
+            color = '#FF6B6B'; // Red for cities
+            shape = google.maps.SymbolPath.CIRCLE;
+            break;
+        case 'town':
+            color = '#4ECDC4'; // Teal for towns
+            shape = google.maps.SymbolPath.CIRCLE;
+            break;
+        case 'dam':
+            color = '#45B7D1'; // Blue for dams
+            shape = 'M -8,-8 L 8,-8 L 8,8 L -8,8 Z'; // Square shape
+            break;
+        default:
+            color = '#95A5A6'; // Gray for unknown
+            shape = google.maps.SymbolPath.CIRCLE;
+    }
+    
+    return {
+        path: shape,
+        fillColor: color,
+        fillOpacity: 0.8,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+        scale: 6
+    };
+}
+
+// Show node info
+function showNodeInfo(nodeInfo) {
+    try {
+        const infoPanel = document.getElementById('info-panel');
+        const infoTitle = document.getElementById('info-title');
+        const infoContent = document.getElementById('info-content');
+        
+        if (!infoPanel || !infoTitle || !infoContent) {
+            console.error('Info panel elements do not exist');
+            return;
+        }
+        
+        infoTitle.textContent = nodeInfo.name;
+        
+        let content = '';
+        content += `<div><strong>Type:</strong> ${nodeInfo.type}</div>`;
+        content += `<div><strong>Coordinates:</strong> ${nodeInfo.position.lat.toFixed(4)}, ${nodeInfo.position.lng.toFixed(4)}</div>`;
+        
+        infoContent.innerHTML = content;
+        infoPanel.style.display = 'block';
+    } catch (error) {
+        console.error('Error showing node info:', error);
+    }
+}
+
+// Create nodes legend
+function createNodesLegend() {
+    try {
+        const legendDiv = document.querySelector('.legend');
+        if (!legendDiv) {
+            console.error('Legend element does not exist');
+            return;
+        }
+        
+        // Check if nodes legend section already exists
+        let legendSection = document.getElementById('nodes-legend');
+        if (!legendSection) {
+            legendSection = document.createElement('div');
+            legendSection.id = 'nodes-legend';
+            legendSection.className = 'legend-section';
+            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Network Nodes</h4>';
+            
+            // Add to legend
+            legendDiv.appendChild(legendSection);
+        } else {
+            // Clear existing content
+            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Network Nodes</h4>';
+        }
+        
+        // Define node types and corresponding colors
+        const nodeTypes = [
+            { type: 'City', color: '#FF6B6B', shape: 'circle' },
+            { type: 'Town', color: '#4ECDC4', shape: 'circle' },
+            { type: 'Dam', color: '#45B7D1', shape: 'square' }
+        ];
+        
+        nodeTypes.forEach(item => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            const iconStyle = item.shape === 'square' 
+                ? `background-color: ${item.color}; width: 12px; height: 12px; border-radius: 0;`
+                : `background-color: ${item.color}; width: 12px; height: 12px; border-radius: 50%;`;
+            
+            legendItem.innerHTML = `
+                <div class="legend-icon" style="${iconStyle}"></div>
+                <div class="legend-text">${item.type}</div>
+            `;
+            
+            legendSection.appendChild(legendItem);
+        });
+    } catch (error) {
+        console.error('Error creating nodes legend:', error);
+    }
+}
+
+// Toggle nodes visibility
+function toggleNodes(visible) {
+    nodes.forEach(node => {
+        node.setVisible(visible);
+    });
 }
 
 // Create voltage filters
@@ -287,6 +455,10 @@ function setupVoltageFilters() {
     // Set up display options event listeners
     document.getElementById('showTransmissionLines').addEventListener('change', function() {
         toggleTransmissionLines(this.checked);
+    });
+    
+    document.getElementById('showNodes').addEventListener('change', function() {
+        toggleNodes(this.checked);
     });
 }
 
@@ -500,6 +672,7 @@ function saveCurrentMapView() {
         
         // Add display options to URL
         mapUrl.searchParams.set('showLines', document.getElementById('showTransmissionLines').checked);
+        mapUrl.searchParams.set('showNodes', document.getElementById('showNodes').checked);
         
         // Create modal or dialog to display URL
         const urlString = mapUrl.toString();
