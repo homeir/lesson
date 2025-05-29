@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morocco Transmission Network Analysis</title>
+    <title>Egypt Transmission Network Analysis</title>
     <style>
         body {
             margin: 0;
@@ -153,18 +153,6 @@
                 <input type="checkbox" id="showTransmissionLines" checked>
                 <label for="showTransmissionLines">Show Transmission Lines</label>
             </div>
-            <div class="control-item">
-                <input type="checkbox" id="showFutureLines" checked>
-                <label for="showFutureLines">Show Planned Lines</label>
-            </div>
-            <div class="control-item">
-                <input type="checkbox" id="showPowerPlants" checked>
-                <label for="showPowerPlants">Show Power Plants</label>
-            </div>
-            <div class="control-item">
-                <input type="checkbox" id="showSubstations" checked>
-                <label for="showSubstations">Show Substations</label>
-            </div>
         </div>
         
         <!-- Voltage filters will be dynamically added by JavaScript -->
@@ -198,25 +186,19 @@
     <!-- Include Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFhmcqPX4xASR3mtqT2km-87Ptd3M2bJU&language=en&libraries=geometry&callback=initMap" async defer></script>
     
+    <!-- JavaScript for map type control -->
     <script>
-        // Map type switching
-        document.getElementById('mapTypeRoadmap').addEventListener('change', changeMapType);
-        document.getElementById('mapTypeSatellite').addEventListener('change', changeMapType);
-        document.getElementById('mapTypeHybrid').addEventListener('change', changeMapType);
-        document.getElementById('mapTypeTerrain').addEventListener('change', changeMapType);
-        
-        // Change map type
-        function changeMapType() {
-            if (document.getElementById('mapTypeRoadmap').checked) {
-                map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-            } else if (document.getElementById('mapTypeSatellite').checked) {
-                map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
-            } else if (document.getElementById('mapTypeHybrid').checked) {
-                map.setMapTypeId(google.maps.MapTypeId.HYBRID);
-            } else if (document.getElementById('mapTypeTerrain').checked) {
-                map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
-            }
-        }
+        // Add map type control functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapTypeRadios = document.querySelectorAll('input[name="mapType"]');
+            mapTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked && window.map) {
+                        window.map.setMapTypeId(this.value);
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

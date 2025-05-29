@@ -2,8 +2,6 @@
 let map;
 // Store transmission lines
 let transmissionLines = [];
-// Store future transmission lines
-let futureTransmissionLines = [];
 // Store voltage filters
 let voltageFilters = {};
 // Store transmission line legend
@@ -13,24 +11,17 @@ let stats = {
     total: 0,
     voltageCategories: {}
 };
-// Store power plants
-let powerPlants = [];
-// Store substations
-let substations = [];
 
 // Initialize map
 function initMap() {
     // Get URL parameters for center and zoom if present
     const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get('lat')) || 31.7917;
-    const lng = parseFloat(urlParams.get('lng')) || -7.0926;
+    const lat = parseFloat(urlParams.get('lat')) || 26.8206;  // Egypt center coordinates
+    const lng = parseFloat(urlParams.get('lng')) || 30.8025;
     const zoom = parseInt(urlParams.get('zoom')) || 6;
     
     // Get display options from URL if present
     const showLines = urlParams.get('showLines') !== 'false';
-    const showFuture = urlParams.get('showFuture') !== 'false';
-    const showPlants = urlParams.get('showPlants') !== 'false';
-    const showSubs = urlParams.get('showSubs') !== 'false';
     
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: lat, lng: lng },
@@ -63,294 +54,32 @@ function initMap() {
 
     // Load GeoJSON data
     loadGeoJsonData();
-    
-
-    
-    // Load Power Plants data
-    loadPowerPlantsData();
-    
 
     // Add voltage filter event listeners
     setupVoltageFilters();
     
     // Set display option checkboxes based on URL
     document.getElementById('showTransmissionLines').checked = showLines;
-    document.getElementById('showFutureLines').checked = showFuture;
-    document.getElementById('showPowerPlants').checked = showPlants;
-    document.getElementById('showSubstations').checked = showSubs;
     
     // Apply display options
     setTimeout(() => {
         toggleTransmissionLines(showLines);
-        toggleFutureTransmissionLines(showFuture);
-        togglePowerPlants(showPlants);
-        toggleSubstations(showSubs);
     }, 1000); // Add a delay to ensure all data is loaded
-}
-
-
-// Display Future GeoJSON data
-function displayFutureGeoJsonData(data) {
-    // Clear existing future transmission lines
-    futureTransmissionLines.forEach(line => line.setMap(null));
-    futureTransmissionLines = [];
     
-    // Process each feature
-    data.features.forEach(feature => {
-        // Ensure it's a line string type
-        if (feature.geometry && feature.geometry.type === 'LineString') {
-            const properties = feature.properties;
-            const voltageText = properties.Legend; // 使用Legend属性，如"400 kV"
-            const voltage = parseInt(voltageText, 10); // 解析电压值
-            
-            // Set line color and weight
-            let color, weight;
-            
-            // Set color and weight based on voltage level
-            if (voltage >= 330) {
-                color = '#FF0000'; // Red - 400kV
-                weight = 5;
-            } else if (voltage >= 220) {
-                color = '#FFA500'; // Orange - 225kV
-                weight = 4;
-            } else if (voltage >= 110) {
-                color = '#0000FF'; // Blue - 150kV
-                weight = 3;
-            } else if (voltage >= 60) {
-                color = '#800080'; // Purple - 60kV
-                weight = 2;
-            } else {
-                color = '#00FF00'; // Green - <60kV
-                weight = 1.5;
-            }
-            
-            // Create path coordinates
-            const path = feature.geometry.coordinates.map(coord => {
-                return { lat: coord[1], lng: coord[0] };
-            });
-            
-            // Create line with dashed style for future lines
-            const line = new google.maps.Polyline({
-                path: path,
-                geodesic: true,
-                strokeColor: color,
-                strokeOpacity: 0.7,
-                strokeWeight: weight,
-                map: map,
-                strokePattern: [
-                    {
-                        offset: '0',
-                        repeat: '10px',
-                        icon: {
-                            path: 'M 0,-1 0,1',
-                            strokeOpacity: 1,
-                            scale: 3
-                        }
-                    }
-                ]
-            });
-            
-            // Store line info
-            const lineInfo = {
-                line: line,
-                voltage: voltage,
-                voltageText: voltageText,
-                path: path,
-                isFuture: true
-            };
-            
-            futureTransmissionLines.push(lineInfo);
-            
-            // Add click event
-            line.addListener('click', () => {
-                showLineInfo(lineInfo);
-            });
-        }
-    });
-}
-
-// Load Power Plants data
-function loadPowerPlantsData() {
-    fetch('plants.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load power plants data: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            try {
-                if (!data || !Array.isArray(data)) {
-                    throw new Error('Invalid power plants data format');
+    // Make map accessible globally for map type switching
+    window.map = map;
+    
+    // Add map type switching functionality
+    setTimeout(() => {
+        const mapTypeRadios = document.querySelectorAll('input[name="mapType"]');
+        mapTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked && map) {
+                    map.setMapTypeId(this.value);
                 }
-                
-                displayPowerPlants(data);
-                createPowerPlantsLegend();
-            } catch (processError) {
-                console.error('Error processing power plants data:', processError);
-                alert('Error processing power plants data: ' + processError.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading power plants data:', error);
-            alert('Error loading power plants data: ' + error.message);
+            });
         });
-}
-
-// Display Power Plants on map
-function displayPowerPlants(data) {
-    // Clear existing power plants
-    powerPlants.forEach(marker => marker.setMap(null));
-    powerPlants = [];
-    
-    // Process each power plant
-    data.forEach(plant => {
-        // Create marker for power plant
-        const marker = new google.maps.Marker({
-            position: { lat: plant.lat, lng: plant.lng },
-            map: map,
-            title: plant.name,
-            icon: getPowerPlantIcon(plant.type, plant.status)
-        });
-        
-        // Add click event for power plant info
-        marker.addListener('click', () => {
-            showPowerPlantInfo(plant);
-        });
-        
-        powerPlants.push(marker);
-    });
-}
-
-// Get power plant icon based on type and status
-function getPowerPlantIcon(type, status) {
-    let color;
-    
-    // Set color based on plant type
-    switch(type) {
-        case 'BESS Plant':
-            color = '#FFD700'; // SG Orange
-            break;
-        case 'Solar Plant':
-            color = '#FFA500'; // Orange
-            break;
-        case 'Wind Plant':
-            color = '#87CEEB'; // Sky Blue
-            break;
-        case 'Hydro Plant':
-            color = '#4169E1'; // Royal Blue
-            break;
-        case 'Thermal Plant':
-            color = '#A52A2A'; // Brown
-            break;
-        default:
-            color = '#808080'; // Gray
-    }
-    
-    // Create SVG icon
-    return {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: color,
-        fillOpacity: status === 'Planned' ? 0.6 : 0.9,
-        strokeColor: '#000000',
-        strokeWeight: 2,
-        scale: 8
-    };
-}
-
-// Create power plants legend
-function createPowerPlantsLegend() {
-    try {
-        const legendDiv = document.querySelector('.legend');
-        if (!legendDiv) {
-            console.error('Legend element does not exist');
-            return;
-        }
-        
-        // Check if power plants legend section already exists
-        let legendSection = document.getElementById('plants-legend');
-        if (!legendSection) {
-            legendSection = document.createElement('div');
-            legendSection.id = 'plants-legend';
-            legendSection.className = 'legend-section';
-            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Power Plants</h4>';
-            
-            // Add to legend
-            legendDiv.appendChild(legendSection);
-        } else {
-            // Clear existing content
-            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Power Plants</h4>';
-        }
-        
-        // Define plant types and corresponding colors
-        const plantTypes = [
-            { type: 'BESS Plant', color: '#FFD700' },
-            { type: 'Solar Plant', color: '#FFA500' },
-            { type: 'Wind Plant', color: '#87CEEB' },
-            { type: 'Hydro Plant', color: '#4169E1' },
-            { type: 'Thermal Plant', color: '#A52A2A' }
-        ];
-        
-        plantTypes.forEach(item => {
-            const legendItem = document.createElement('div');
-            legendItem.className = 'legend-item';
-            
-            legendItem.innerHTML = `
-                <div class="legend-icon" style="background-color: ${item.color};"></div>
-                <div class="legend-text">${item.type}</div>
-            `;
-            
-            legendSection.appendChild(legendItem);
-        });
-        
-        // Add operational vs planned legend
-        const statusTypes = [
-            { status: 'Operational', opacity: 0.9 },
-            { status: 'Planned', opacity: 0.6 }
-        ];
-        
-        statusTypes.forEach(item => {
-            const legendItem = document.createElement('div');
-            legendItem.className = 'legend-item';
-            
-            legendItem.innerHTML = `
-                <div class="legend-icon" style="background-color: #808080; opacity: ${item.opacity};"></div>
-                <div class="legend-text">${item.status}</div>
-            `;
-            
-            legendSection.appendChild(legendItem);
-        });
-    } catch (error) {
-        console.error('Error creating power plants legend:', error);
-    }
-}
-
-// Show power plant info
-function showPowerPlantInfo(plant) {
-    try {
-        const infoPanel = document.getElementById('info-panel');
-        const infoTitle = document.getElementById('info-title');
-        const infoContent = document.getElementById('info-content');
-        
-        if (!infoPanel || !infoTitle || !infoContent) {
-            console.error('Info panel elements do not exist');
-            return;
-        }
-        
-        infoTitle.textContent = plant.name;
-        
-        let content = '';
-        content += `<div><strong>Type:</strong> ${plant.type}</div>`;
-        content += `<div><strong>Capacity:</strong> ${plant["capacity MWh"]} MWh</div>`;
-        content += `<div><strong>Connection Voltage:</strong> ${plant["poc (kV)"]} kV</div>`;
-        content += `<div><strong>Area:</strong> ${plant["superficie (m2)"]} m²</div>`;
-        content += `<div><strong>Status:</strong> ${plant.status}</div>`;
-        
-        infoContent.innerHTML = content;
-        infoPanel.style.display = 'block';
-    } catch (error) {
-        console.error('Error showing power plant info:', error);
-    }
+    }, 100);
 }
 
 // Load GeoJSON data
@@ -405,8 +134,8 @@ function displayGeoJsonData(data) {
         // Ensure it's a line string type
         if (feature.geometry && feature.geometry.type === 'LineString') {
             const properties = feature.properties;
-            const voltageText = properties.Legend; // 使用Legend属性，如"400 kV"
-            const voltage = parseInt(voltageText, 10); // 解析电压值
+            const voltage = properties.transmissionPower; // 使用transmissionPower属性
+            const lineType = properties.lineType; // 线路类型：single, double
             
             // Count voltage levels
             if (!stats.voltageCategories[voltage]) {
@@ -415,25 +144,38 @@ function displayGeoJsonData(data) {
             stats.voltageCategories[voltage]++;
             stats.total++;
             
-            // Set line color and weight
+            // Set line color and weight based on voltage level
             let color, weight;
             
-            // Set color and weight based on voltage level
-            if (voltage >= 330) {
-                color = '#FF0000'; // Red - 400kV
+            if (voltage >= 500) {
+                color = '#FF0000'; // Red - 500kV
+                weight = 6;
+            } else if (voltage >= 400) {
+                color = '#FF4500'; // Orange Red - 400kV  
                 weight = 5;
-            } else if (voltage >= 220) {
-                color = '#FFA500'; // Orange - 225kV
+            } else if (voltage >= 275) {
+                color = '#FFA500'; // Orange - 275kV
                 weight = 4;
-            } else if (voltage >= 110) {
+            } else if (voltage >= 225) {
+                color = '#FFD700'; // Gold - 225kV
+                weight = 3.5;
+            } else if (voltage >= 150) {
                 color = '#0000FF'; // Blue - 150kV
                 weight = 3;
+            } else if (voltage >= 110) {
+                color = '#800080'; // Purple - 110kV
+                weight = 2.5;
             } else if (voltage >= 60) {
-                color = '#800080'; // Purple - 60kV
+                color = '#008000'; // Green - 60kV
                 weight = 2;
             } else {
-                color = '#00FF00'; // Green - <60kV
+                color = '#808080'; // Gray - <60kV
                 weight = 1.5;
+            }
+            
+            // Adjust weight for double lines
+            if (lineType === 'double') {
+                weight = weight * 1.5;
             }
             
             // Create path coordinates
@@ -446,7 +188,7 @@ function displayGeoJsonData(data) {
                 path: path,
                 geodesic: true,
                 strokeColor: color,
-                strokeOpacity: 1.0,
+                strokeOpacity: 0.8,
                 strokeWeight: weight,
                 map: map
             });
@@ -455,8 +197,10 @@ function displayGeoJsonData(data) {
             const lineInfo = {
                 line: line,
                 voltage: voltage,
-                voltageText: voltageText,
-                path: path
+                voltageText: voltage + 'kV',
+                lineType: lineType,
+                path: path,
+                nodes: properties.nodes || []
             };
             
             transmissionLines.push(lineInfo);
@@ -544,22 +288,6 @@ function setupVoltageFilters() {
     document.getElementById('showTransmissionLines').addEventListener('change', function() {
         toggleTransmissionLines(this.checked);
     });
-    
-    document.getElementById('showPowerPlants').addEventListener('change', function() {
-        togglePowerPlants(this.checked);
-    });
-    
-    document.getElementById('showSubstations').addEventListener('change', function() {
-        toggleSubstations(this.checked);
-    });
-    
-    // Add future transmission lines toggle if element exists
-    const futureLinesToggle = document.getElementById('showFutureLines');
-    if (futureLinesToggle) {
-        futureLinesToggle.addEventListener('change', function() {
-            toggleFutureTransmissionLines(this.checked);
-        });
-    }
 }
 
 // Filter transmission lines
@@ -590,27 +318,6 @@ function toggleTransmissionLines(visible) {
     });
 }
 
-// Toggle power plants visibility
-function togglePowerPlants(visible) {
-    powerPlants.forEach(marker => {
-        marker.setVisible(visible);
-    });
-}
-
-// Toggle substations visibility
-function toggleSubstations(visible) {
-    substations.forEach(marker => {
-        marker.setVisible(visible);
-    });
-}
-
-// Toggle future transmission lines visibility
-function toggleFutureTransmissionLines(visible) {
-    futureTransmissionLines.forEach(item => {
-        item.line.setVisible(visible);
-    });
-}
-
 // Create voltage level legend
 function createVoltageLegend() {
     try {
@@ -637,11 +344,14 @@ function createVoltageLegend() {
         
         // Define voltage levels and corresponding colors and weights
         const voltageCategories = [
-            { voltage: '400kV', color: '#FF0000', weight: 5 },
-            { voltage: '225kV', color: '#FFA500', weight: 4 },
+            { voltage: '500kV', color: '#FF0000', weight: 6 },
+            { voltage: '400kV', color: '#FF4500', weight: 5 },
+            { voltage: '275kV', color: '#FFA500', weight: 4 },
+            { voltage: '225kV', color: '#FFD700', weight: 3.5 },
             { voltage: '150kV', color: '#0000FF', weight: 3 },
-            { voltage: '60kV', color: '#800080', weight: 2 },
-            { voltage: '<60kV', color: '#00FF00', weight: 1.5 }
+            { voltage: '110kV', color: '#800080', weight: 2.5 },
+            { voltage: '60kV', color: '#008000', weight: 2 },
+            { voltage: '<60kV', color: '#808080', weight: 1.5 }
         ];
         
         voltageCategories.forEach(category => {
@@ -656,14 +366,29 @@ function createVoltageLegend() {
             legendSection.appendChild(legendItem);
         });
         
-        // Add line for planned lines
-        const plannedLineItem = document.createElement('div');
-        plannedLineItem.className = 'legend-item';
-        plannedLineItem.innerHTML = `
-            <div class="legend-color" style="background-color: #888; height: 2px; border-top: 2px dashed #888;"></div>
-            <div class="legend-text">Planned Lines</div>
+        // Add legend for line types
+        const lineTypeItem = document.createElement('div');
+        lineTypeItem.className = 'legend-item';
+        lineTypeItem.innerHTML = `
+            <div class="legend-text" style="margin-top: 10px;"><strong>Line Types:</strong></div>
         `;
-        legendSection.appendChild(plannedLineItem);
+        legendSection.appendChild(lineTypeItem);
+        
+        const singleLineItem = document.createElement('div');
+        singleLineItem.className = 'legend-item';
+        singleLineItem.innerHTML = `
+            <div class="legend-color" style="background-color: #666; height: 2px;"></div>
+            <div class="legend-text">Single Circuit</div>
+        `;
+        legendSection.appendChild(singleLineItem);
+        
+        const doubleLineItem = document.createElement('div');
+        doubleLineItem.className = 'legend-item';
+        doubleLineItem.innerHTML = `
+            <div class="legend-color" style="background-color: #666; height: 4px;"></div>
+            <div class="legend-text">Double Circuit</div>
+        `;
+        legendSection.appendChild(doubleLineItem);
     } catch (error) {
         console.error('Error creating voltage legend:', error);
     }
@@ -684,13 +409,12 @@ function showLineInfo(lineInfo) {
         infoTitle.textContent = 'Transmission Line Information';
         
         let content = '';
-        content += `<div><strong>Voltage:</strong> ${lineInfo.voltageText}</div>`;
-        content += `<div><strong>Length (approx):</strong> ${calculateLineLength(lineInfo.path).toFixed(2)} km</div>`;
+        content += `<div><strong>Voltage Level:</strong> ${lineInfo.voltageText}</div>`;
+        content += `<div><strong>Line Type:</strong> ${lineInfo.lineType === 'single' ? 'Single Circuit' : 'Double Circuit'}</div>`;
+        content += `<div><strong>Line Length (approx):</strong> ${calculateLineLength(lineInfo.path).toFixed(2)} km</div>`;
         
-        if (lineInfo.isFuture) {
-            content += `<div><strong>Status:</strong> Planned</div>`;
-        } else {
-            content += `<div><strong>Status:</strong> Existing</div>`;
+        if (lineInfo.nodes && lineInfo.nodes.length > 0) {
+            content += `<div><strong>Connected Nodes:</strong> ${lineInfo.nodes.join(' - ')}</div>`;
         }
         
         infoContent.innerHTML = content;
@@ -760,162 +484,6 @@ function updateStats() {
     }
 }
 
-// Load Substations data
-function loadSubstationsData() {
-    fetch('substations.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load substations data: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            try {
-                if (!data || !Array.isArray(data)) {
-                    throw new Error('Invalid substations data format');
-                }
-                
-                displaySubstations(data);
-                createSubstationsLegend();
-            } catch (processError) {
-                console.error('Error processing substations data:', processError);
-                alert('Error processing substations data: ' + processError.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading substations data:', error);
-            alert('Error loading substations data: ' + error.message);
-        });
-}
-
-// Display Substations on map
-function displaySubstations(data) {
-    // Clear existing substations
-    substations.forEach(marker => marker.setMap(null));
-    substations = [];
-    
-    // Process each substation
-    data.forEach(station => {
-        // Create marker for substation
-        const marker = new google.maps.Marker({
-            position: { lat: station.lat, lng: station.lng },
-            map: map,
-            title: station.name,
-            icon: getSubstationIcon(station.voltage)
-        });
-        
-        // Add click event for substation info
-        marker.addListener('click', () => {
-            showSubstationInfo(station);
-        });
-        
-        substations.push(marker);
-    });
-}
-
-// Get substation icon based on voltage
-function getSubstationIcon(voltage) {
-    let color;
-    
-    // Set color based on voltage level
-    if (voltage >= 330) {
-        color = '#FF0000'; // Red - 400kV
-    } else if (voltage >= 220) {
-        color = '#FFA500'; // Orange - 225kV
-    } else if (voltage >= 110) {
-        color = '#0000FF'; // Blue - 150kV
-    } else if (voltage >= 60) {
-        color = '#800080'; // Purple - 60kV
-    } else {
-        color = '#00FF00'; // Green - <60kV
-    }
-    
-    // Create SVG icon (square for substations)
-    return {
-        path: 'M -6,-6 L 6,-6 L 6,6 L -6,6 Z', // Square shape
-        fillColor: color,
-        fillOpacity: 0.9,
-        strokeColor: '#000000',
-        strokeWeight: 1,
-        scale: 1
-    };
-}
-
-// Create substations legend
-function createSubstationsLegend() {
-    try {
-        const legendDiv = document.querySelector('.legend');
-        if (!legendDiv) {
-            console.error('Legend element does not exist');
-            return;
-        }
-        
-        // Check if substations legend section already exists
-        let legendSection = document.getElementById('substations-legend');
-        if (!legendSection) {
-            legendSection = document.createElement('div');
-            legendSection.id = 'substations-legend';
-            legendSection.className = 'legend-section';
-            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Substations</h4>';
-            
-            // Add to legend
-            legendDiv.appendChild(legendSection);
-        } else {
-            // Clear existing content
-            legendSection.innerHTML = '<h4 style="margin-top: 10px;">Substations</h4>';
-        }
-        
-        // Define voltage levels and corresponding colors
-        const voltageCategories = [
-            { voltage: '400kV', color: '#FF0000' },
-            { voltage: '225kV', color: '#FFA500' },
-            { voltage: '150kV', color: '#0000FF' },
-            { voltage: '90kV', color: '#800080' },
-            { voltage: '<60kV', color: '#00FF00' }
-        ];
-        
-        voltageCategories.forEach(item => {
-            const legendItem = document.createElement('div');
-            legendItem.className = 'legend-item';
-            
-            // Create a square icon for substations
-            legendItem.innerHTML = `
-                <div class="legend-icon" style="background-color: ${item.color}; width: 12px; height: 12px; border-radius: 0;"></div>
-                <div class="legend-text">${item.voltage} Substation</div>
-            `;
-            
-            legendSection.appendChild(legendItem);
-        });
-    } catch (error) {
-        console.error('Error creating substations legend:', error);
-    }
-}
-
-// Show substation info
-function showSubstationInfo(station) {
-    try {
-        const infoPanel = document.getElementById('info-panel');
-        const infoTitle = document.getElementById('info-title');
-        const infoContent = document.getElementById('info-content');
-        
-        if (!infoPanel || !infoTitle || !infoContent) {
-            console.error('Info panel elements do not exist');
-            return;
-        }
-        
-        infoTitle.textContent = station.name;
-        
-        let content = '';
-        content += `<div><strong>Type:</strong> ${station.type}</div>`;
-        content += `<div><strong>Voltage Level:</strong> ${station.voltage} kV</div>`;
-        
-        infoContent.innerHTML = content;
-        infoPanel.style.display = 'block';
-    } catch (error) {
-        console.error('Error showing substation info:', error);
-    }
-}
-
 // Save current map view
 function saveCurrentMapView() {
     try {
@@ -932,9 +500,6 @@ function saveCurrentMapView() {
         
         // Add display options to URL
         mapUrl.searchParams.set('showLines', document.getElementById('showTransmissionLines').checked);
-        mapUrl.searchParams.set('showFuture', document.getElementById('showFutureLines').checked);
-        mapUrl.searchParams.set('showPlants', document.getElementById('showPowerPlants').checked);
-        mapUrl.searchParams.set('showSubs', document.getElementById('showSubstations').checked);
         
         // Create modal or dialog to display URL
         const urlString = mapUrl.toString();
