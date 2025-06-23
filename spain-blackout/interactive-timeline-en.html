@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Blackout Incident - Detailed Timeline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff6b6b, #4ecdc4, #45b7d1);
+            z-index: 1;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 60px 0;
+            width: 100%;
+        }
+
+        .timeline-content {
+            position: relative;
+            width: 45%;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
+            border-left-color: #ff6b6b;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-right: auto;
+            border-left-color: #4ecdc4;
+        }
+
+        .timeline-item:nth-child(3) .timeline-content {
+            border-left-color: #45b7d1;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-marker {
+            border-color: #ff6b6b;
+        }
+
+        .timeline-item:nth-child(even) .timeline-marker {
+            border-color: #4ecdc4;
+        }
+
+        .timeline-item:nth-child(3) .timeline-marker {
+            border-color: #45b7d1;
+        }
+
+        .phase-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .phase-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+        }
+
+        .phase-1 .phase-icon {
+            background: #ff6b6b;
+        }
+
+        .phase-2 .phase-icon {
+            background: #4ecdc4;
+        }
+
+        .phase-3 .phase-icon {
+            background: #45b7d1;
+        }
+
+        .phase-title h2 {
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .phase-time {
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .phase-summary {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .expand-btn {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .expand-btn i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-btn.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .detail-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            margin-top: 20px;
+        }
+
+        .detail-panel.expanded {
+            max-height: 2000px;
+        }
+
+        .sub-events {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+
+        .sub-event {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+
+        .sub-event-time {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .sub-event-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .key-points {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .key-points h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .key-points h4 i {
+            margin-right: 8px;
+        }
+
+        .key-points ul {
+            margin-left: 20px;
+        }
+
+        .key-points li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .wave-chart {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .wave-chart img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wave-chart img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .wave-chart-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(45deg, #ff9a56, #ff6b9d);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Image Modal for Zoom */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            cursor: pointer;
+        }
+
+        .modal-content {
+            display: block;
+            margin: auto;
+            max-width: 90%;
+            max-height: 80%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: zoom-in 0.3s ease-out;
+        }
+
+        @keyframes zoom-in {
+            from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #bbb;
+        }
+
+        .image-caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 60px !important;
+                margin-right: auto !important;
+            }
+
+            .timeline-marker {
+                left: 30px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .phase-title h2 {
+                font-size: 1.2rem;
+            }
+
+            .modal-content {
+                max-width: 95%;
+                max-height: 70%;
+            }
+        }
+
+        .impact-warning {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .impact-warning h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .impact-warning h3 i {
+            margin-right: 10px;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .wave-chart:hover .zoom-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" data-aos="fade-down">
+            <h1><i class="fas fa-bolt"></i> Spanish Blackout Incident - Detailed Timeline</h1>
+            <p>April 28th, 2025 | Iberian Peninsula Grid Collapse In-Depth Analysis</p>
+        </div>
+
+        <div class="impact-warning" data-aos="fade-up">
+            <h3><i class="fas fa-exclamation-triangle"></i> Incident Impact</h3>
+            <p>Affected 35 million people | Economic losses exceeded €20 billion | Duration from hours to 3 days</p>
+        </div>
+
+        <div class="wave-chart" data-aos="fade-up">
+            <div class="wave-chart-title">Incident Affected Areas</div>
+            <div style="position: relative;">
+                <img src="images/西班牙大停电话术_V4.6---20250623.pdf-1-1.png" alt="Incident Affected Areas Map" onclick="openModal(this)">
+                <div class="zoom-hint">Click to zoom</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <!-- Phase 1: System Oscillation Events -->
+            <div class="timeline-item phase-1" data-aos="fade-right">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="phase-title">
+                        <div class="phase-icon">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <h2>Phase I: System Oscillation Events</h2>
+                    </div>
+                    <div class="phase-time">12:00 - 12:30</div>
+                    <div class="phase-summary">
+                        The grid experienced two severe oscillation events: 0.6Hz forced oscillation and 0.2Hz natural oscillation, with dramatic voltage fluctuations. REE control center implemented multiple emergency measures with limited effectiveness.
+                    </div>
+
+                    <div class="wave-chart">
+                        <div class="wave-chart-title">REE Official Report Overview</div>
+                        <div style="position: relative;">
+                            <img src="images/西班牙大停电话术_V4.6---20250623.pdf-2-2.png" alt="REE Report Overview" onclick="openModal(this)">
+                            <div class="zoom-hint">Click to zoom</div>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this, 'phase1')">
+                        View Detailed Process <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="detail-panel" id="phase1">
+                        <div class="sub-events">
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:00 - 12:03</div>
+                                <div class="sub-event-content">
+                                    System voltage and frequency were within normal operating range, with 0.2 Hz inter-area oscillation damping at 20%. System operation was stable.
+                                </div>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">400kV Transmission Network Voltage (00:00-09:00 on April 28th)</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-4-1.png" alt="System Initial State Voltage Profile" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">400kV Transmission Network Voltage (09:30-12:30 on April 28th)</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-5-1.png" alt="Pre-incident Voltage Profile" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:03 - 12:07</div>
+                                <div class="sub-event-content">
+                                    <strong>0.6Hz Forced Oscillation Outbreak</strong><br>
+                                    • Duration: 4 minutes and 42 seconds<br>
+                                    • 0.2Hz oscillation damping dropped sharply to 5%<br>
+                                    • System-wide average voltage decreased by approximately 30kV (375-410kV)<br>
+                                    • Spain-France interconnection power exchange showed synchronous oscillation
+                                </div>
+                            </div>
+
+                            <div class="key-points">
+                                <h4><i class="fas fa-tools"></i> REE Emergency Measures</h4>
+                                <ul>
+                                    <li>Coupled 400kV lines to reduce system impedance</li>
+                                    <li>Reduced exports to France by 800MW, set export plan to 1,500MW</li>
+                                    <li>Switched France DC link to constant power mode (1,000MW)</li>
+                                    <li>Disconnected parallel reactors to alleviate low voltage</li>
+                                </ul>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:16</div>
+                                <div class="sub-event-content">
+                                    <strong>0.6Hz Oscillation Recurrence</strong><br>
+                                    Voltage fluctuations of 380-405kV occurred. Parallel reactors were disconnected again and previous stabilization measures were repeated.
+                                </div>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">Spain-France Power Exchange (12:06-12:08, 0.6 Hz Oscillation)</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-7-1.png" alt="Spain-France Power Exchange Oscillation" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">Spain-France Power Exchange (12:02-12:08, 0.6 Hz Oscillation)</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-7-2.png" alt="Extended Spain-France Power Exchange Oscillation" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:19</div>
+                                <div class="sub-event-content">
+                                    <strong>0.2Hz Natural Oscillation Appearance</strong><br>
+                                    • Almaraz station voltage fluctuation up to 28kV (375-412kV)<br>
+                                    • Oscillation source: Internal control anomaly at a 250MW photovoltaic plant in Badajoz province<br>
+                                    • Oscillation ceased when the plant self-stabilized
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:22 - 12:27</div>
+                                <div class="sub-event-content">
+                                    System oscillations subsided, voltage returned to normal upper limit. REE began connecting parallel reactors to suppress overvoltage.<br>
+                                    <strong>Key Data:</strong><br>
+                                    • Distributed networks injected approximately 760Mvar reactive power<br>
+                                    • Detected approximately 845MW "effective demand" surge<br>
+                                    • Planned conventional unit failed to connect on schedule
+                                </div>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">0.2 Hz Oscillation Initial Moment (0.6 Hz Oscillation Also Observable)</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-9-1.png" alt="0.2 Hz Oscillation with 0.6 Hz Components" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:27 - 12:30</div>
+                                <div class="sub-event-content">
+                                    Portugal interconnection adjustment completed. System voltage and frequency remained within 375-435kV and normal frequency range, but <strong>voltage continued to rise</strong>, setting the stage for the next phase crisis.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2: Large-scale Disconnection Events -->
+            <div class="timeline-item phase-2" data-aos="fade-left">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="phase-title">
+                        <div class="phase-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <h2>Phase II: Large-scale Disconnection Events</h2>
+                    </div>
+                    <div class="phase-time">12:32:57 - 12:33:18</div>
+                    <div class="phase-summary">
+                        Renewable energy generation units experienced three consecutive large-scale tripping events, with approximately 2000MW capacity disconnected. System voltage rose to 424kV, frequency began to decline, and synchronous relationship collapsed.
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this, 'phase2')">
+                        View Detailed Process <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="detail-panel" id="phase2">
+                        <div class="sub-events">
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:32:00 - 12:32:57</div>
+                                <div class="sub-event-content">
+                                    <strong>System Imbalance Intensified</strong><br>
+                                    • Exports to France linearly decreased from 1,500MW to 0<br>
+                                    • RCW unit scheduling led to reduced reactive absorption<br>
+                                    • Additional 434MW abnormal demand reduced exports<br>
+                                    • Reactor and scheduling changes caused voltage to rise to 424kV
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:32:57</div>
+                                <div class="sub-event-content">
+                                    <strong>First Trip - Granada Province</strong><br>
+                                    A 355MW/165Mvar generation transformer tripped accidentally, main grid voltage rose to 424kV, further exacerbating the reactive power deficit.
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:33:16 - 12:33:17.368</div>
+                                <div class="sub-event-content">
+                                    <strong>Second and Third Consecutive Trips</strong><br>
+                                    <strong>Badajoz Province:</strong><br>
+                                    • Two large generation facilities (582MW and 145MW) tripped consecutively<br>
+                                    <strong>Segovia Province:</strong><br>
+                                    • Three wind farms (23MW) disconnected<br>
+                                    • Multiple photovoltaic and wind installations disconnected consecutively<br>
+                                    <strong>Impact:</strong> Total approximately 2,000MW RCW capacity lost reactive absorption capability
+                                </div>
+                            </div>
+
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value">2,000MW</div>
+                                    <div class="stat-label">Disconnected Capacity</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">424kV</div>
+                                    <div class="stat-label">Peak Voltage</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">3,807MW</div>
+                                    <div class="stat-label">Cross-border Import Peak</div>
+                                </div>
+                            </div>
+
+                            <div class="key-points">
+                                <h4><i class="fas fa-exclamation-circle"></i> Critical Consequences</h4>
+                                <ul>
+                                    <li>Sequential disconnection of generation facilities caused further voltage rise</li>
+                                    <li>System frequency began to decline</li>
+                                    <li>Cross-border imports from France peaked at 3,807MW</li>
+                                    <li>System synchronous relationship completely collapsed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3: Complete System Collapse -->
+            <div class="timeline-item phase-3" data-aos="fade-right">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="phase-title">
+                        <div class="phase-icon">
+                            <i class="fas fa-power-off"></i>
+                        </div>
+                        <h2>Phase III: Complete System Collapse</h2>
+                    </div>
+                    <div class="phase-time">12:33:18 - 12:33:30</div>
+                    <div class="phase-summary">
+                        Large-scale pumping and load shedding measures were activated, but the system was beyond recovery. Various units tripped consecutively due to frequency decline and overvoltage, 400kV voltage dropped to below 1kV, and the Spanish Peninsula grid completely collapsed.
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this, 'phase3')">
+                        View Detailed Process <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="detail-panel" id="phase3">
+                        <div class="sub-events">
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:33:19 - 12:33:24</div>
+                                <div class="sub-event-content">
+                                    <strong>Final Struggle</strong><br>
+                                    • Large-scale pumping and load shedding measures activated<br>
+                                    • Morocco interconnection cut due to underfrequency protection<br>
+                                    • Load shedding caused voltage to continue rising (vicious cycle)<br>
+                                    • France AC link disconnected, HVDC maintained 1,000MW export<br>
+                                    • Various units tripped consecutively due to frequency decline and overvoltage (including nuclear and CCGT)
+                                </div>
+                            </div>
+
+                            <div class="sub-event">
+                                <div class="sub-event-time">12:33:24</div>
+                                <div class="sub-event-content">
+                                    <strong style="color: #dc3545;">Complete System Collapse</strong><br>
+                                    System completely lost voltage support, synchronous disconnection occurred, 400kV voltage dropped to below 1kV, marking the complete collapse of the entire Spanish Peninsula grid.
+                                </div>
+                            </div>
+
+                            <div class="key-points">
+                                <h4><i class="fas fa-search"></i> REE Incident Attribution Analysis</h4>
+                                <ul>
+                                    <li><strong>Dynamic Voltage Control Failure:</strong> Conventional units failed to regulate reactive power according to procedures</li>
+                                    <li><strong>RCW Unit Control Issues:</strong> 22% of RCW units failed to meet reactive output requirements</li>
+                                    <li><strong>Distributed Network Problems:</strong> Uncompensated reactive output from distribution networks exacerbated voltage rise</li>
+                                    <li><strong>Interconnection Scheduling Impact:</strong> Rapid cross-border scheduling changes caused voltage fluctuations</li>
+                                    <li><strong>Protection Setting Deviations:</strong> Protection action thresholds too low or insufficient time delays</li>
+                                    <li><strong>Oscillation Source:</strong> Control failure at Badajoz province photovoltaic plant</li>
+                                    <li><strong>Core Conclusion:</strong> Incident caused by voltage instability, not system inertia issues</li>
+                                </ul>
+                            </div>
+
+                            <div class="wave-chart">
+                                <div class="wave-chart-title">Spanish Government Report Analysis</div>
+                                <div style="position: relative;">
+                                    <img src="images/西班牙大停电话术_V4.6---20250623.pdf-14-2.png" alt="Spanish Government Report Conclusions" onclick="openModal(this)">
+                                    <div class="zoom-hint">Click to zoom</div>
+                                </div>
+                            </div>
+
+                            <div class="impact-warning">
+                                <h3><i class="fas fa-clock"></i> Recovery Timeline</h3>
+                                <p><strong>12:44</strong> First 400kV France-Spain line re-energized<br>
+                                <strong>13:04</strong> Morocco-Spain interconnection re-energized<br>
+                                <strong>Next day 4:00</strong> Spanish transmission grid restoration completed<br>
+                                <strong>Next day 7:00</strong> Power supply coverage reached 99.95%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Analysis Summary -->
+        <div class="wave-chart" data-aos="fade-up" style="margin-top: 40px;">
+            <div class="wave-chart-title">Technical Analysis Summary</div>
+            <div class="key-points">
+                <h4><i class="fas fa-lightbulb"></i> Key Technical Insights</h4>
+                <ul>
+                    <li><strong>Grid-Forming Technology Role:</strong> Could provide voltage support, suppress oscillations, and offer inertia support during critical moments</li>
+                    <li><strong>Digital Twin Deficiency:</strong> Spain's grid simulation relies mainly on electromechanical models, lacking electromagnetic transient analysis</li>
+                    <li><strong>Weak Interconnection:</strong> Only ~5% connection with non-Iberian European grid, creating "grid island" vulnerability</li>
+                    <li><strong>Insufficient Energy Storage:</strong> Only 60MW battery storage capacity, lacking grid-forming storage systems</li>
+                    <li><strong>System Inertia Deficit:</strong> 50% less than Continental Europe, with "significantly poor" frequency stability</li>
+                </ul>
+            </div>
+            
+            <div class="stats-grid" style="margin-top: 20px;">
+                <div class="stat-card" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                    <div class="stat-value">100.63%</div>
+                    <div class="stat-label">Renewable penetration peak (April 16, 2025)</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(45deg, #f093fb, #f5576c);">
+                    <div class="stat-value">60MW</div>
+                    <div class="stat-label">Total battery storage capacity</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(45deg, #4facfe, #00f2fe);">
+                    <div class="stat-value">5%</div>
+                    <div class="stat-label">Non-Iberian grid connection ratio</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(45deg, #43e97b, #38f9d7);">
+                    <div class="stat-value">50%</div>
+                    <div class="stat-label">Lower system inertia vs Continental Europe</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal" onclick="closeModal()">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="image-caption" id="imageCaption"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS animation library
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Toggle detail panels
+        function toggleDetails(button, panelId) {
+            const panel = document.getElementById(panelId);
+            const icon = button.querySelector('i');
+            
+            if (panel.classList.contains('expanded')) {
+                panel.classList.remove('expanded');
+                button.classList.remove('expanded');
+                button.innerHTML = 'View Detailed Process <i class="fas fa-chevron-down"></i>';
+            } else {
+                panel.classList.add('expanded');
+                button.classList.add('expanded');
+                button.innerHTML = 'Collapse Details <i class="fas fa-chevron-up"></i>';
+            }
+        }
+
+        // Image modal functions
+        function openModal(img) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const caption = document.getElementById('imageCaption');
+            
+            modal.style.display = 'block';
+            modalImg.src = img.src;
+            caption.innerHTML = img.alt;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+
+        // Smooth scroll to element
+        function scrollToElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+
+        // Keyboard shortcuts support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close modal if open
+                closeModal();
+                
+                // ESC key collapses all expanded detail panels
+                const expandedPanels = document.querySelectorAll('.detail-panel.expanded');
+                const expandedButtons = document.querySelectorAll('.expand-btn.expanded');
+                
+                expandedPanels.forEach(panel => panel.classList.remove('expanded'));
+                expandedButtons.forEach(button => {
+                    button.classList.remove('expanded');
+                    button.innerHTML = 'View Detailed Process <i class="fas fa-chevron-down"></i>';
+                });
+            }
+        });
+
+        // Page initialization after loading
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+
+            // Add click-to-zoom hint to all chart images
+            const chartImages = document.querySelectorAll('.wave-chart img');
+            chartImages.forEach(img => {
+                img.style.cursor = 'pointer';
+                img.title = 'Click to enlarge';
+            });
+        });
+
+        // Add smooth zoom effect for images
+        document.querySelectorAll('.wave-chart img').forEach(img => {
+            img.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+            });
+            
+            img.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
